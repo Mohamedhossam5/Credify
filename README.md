@@ -1,59 +1,95 @@
-💳 Credify Bank
+# 💳 Credify Bank
 
-Credify Bank is a modern digital banking and expense management application designed to deliver a seamless, fully digital banking experience. It helps users manage their finances, track spending, and make smarter financial decisions through an intuitive and intelligent system.
+Credify Bank is a modern **digital banking and expense management application** built to deliver a **seamless, fully digital financial experience**. It helps users manage accounts, track transactions, and make smarter financial decisions through a clean and intuitive interface.
 
-🌐 Vision
+---
 
-To create a flawless, digital-first banking solution that eliminates complexity and provides users with a smooth, secure, and intelligent financial experience—anytime, anywhere.
+## 🌐 Vision
 
-🚀 Features
-💰 Multi Bank Account Management
-Manage multiple accounts in one place with full visibility and control.
-⚡ Seamless Digital Experience
-Fast, intuitive, and user-friendly interface with minimal friction in all operations.
-💸 Income & Expense Tracking
-Track all financial activities in real-time with categorized transactions.
-📊 Smart Budgeting
-Set budgets and receive insights on your spending habits.
-🤖 AI Financial Assistant (Planned)
-Personalized suggestions to optimize savings and spending.
-📈 Analytics & Reports
-Detailed financial reports and visual insights.
-🔔 Real-Time Notifications
-Instant alerts for transactions, limits, and unusual activities.
-🔐 Secure Authentication
-Strong security measures to protect user data.
-🏦 Bank Accounts
+To build a **flawless, digital-first banking system** that simplifies financial management and provides users with a smooth, secure, and intelligent experience—anytime, anywhere.
 
-Credify Bank supports multiple types of accounts to suit different needs:
+---
 
-Checking Account – For daily transactions and payments
-Savings Account – For storing money and earning interest
-Business Account – For managing company finances (optional)
-Digital Wallet – For quick and flexible transactions
-💳 Transaction Types
+## 🚀 Features
 
-The system supports a wide range of financial transactions:
+- 💰 **Multi-Account Management**  
+  Manage multiple bank accounts from one platform.
 
-🔄 Transfers
-Internal transfers (between user accounts)
-External transfers (to other users/banks)
-💵 Deposits
-Add funds to any account
-💸 Withdrawals
-Remove funds securely
-🧾 Payments
-Bill payments
-Online purchases
-🔁 Recurring Transactions
-Scheduled payments (subscriptions, rent, etc.)
-📊 Categorized Expenses
-Food, transport, shopping, etc.
-🛠️ Tech Stack
+- ⚡ **Seamless Digital Experience**  
+  Fast, intuitive, and frictionless user interactions.
 
-(Update based on your implementation)
+- 💸 **Income & Expense Tracking**  
+  Monitor all transactions in real time with smart categorization.
 
-Frontend: HTML, CSS, JavaScript / React
-Backend: Node.js / Python / C++
-Database: MySQL / MongoDB
-Tools: Git, GitHub
+- 📊 **Smart Budgeting**  
+  Set budgets and gain insights into spending habits.
+
+- 🤖 **AI Financial Assistant (Planned)**  
+  Intelligent suggestions for saving and spending optimization.
+
+- 📈 **Analytics & Reports**  
+  Clear visualizations of financial data.
+
+- 🔔 **Real-Time Notifications**  
+  Instant alerts for transactions and account activity.
+
+- 🔐 **Secure Authentication**  
+  Strong protection for user data and accounts.
+
+---
+
+## 🏦 Bank Accounts
+
+Credify Bank supports different account types:
+
+- **Checking Account** – Daily transactions and payments  
+- **Savings Account** – Store money and earn interest  
+- **Business Account** – Manage company finances *(optional)*  
+- **Digital Wallet** – Fast and flexible transactions  
+
+---
+
+## 💳 Transaction Types
+
+Supported financial operations include:
+
+### 🔄 Transfers
+- Internal transfers (between user accounts)  
+- External transfers (to other users or banks)  
+
+### 💵 Deposits
+- Add funds to accounts  
+
+### 💸 Withdrawals
+- Securely withdraw money  
+
+### 🧾 Payments
+- Bill payments  
+- Online purchases  
+
+### 🔁 Recurring Transactions
+- Scheduled payments (subscriptions, rent, etc.)  
+
+### 📊 Categorized Expenses
+- Track spending (food, transport, shopping, etc.)  
+
+---
+
+## 🛠️ Tech Stack
+
+> *(Update this based on your implementation)*
+
+- **Frontend:** HTML, CSS, JavaScript / React  
+- **Backend:** Node.js / Python / C++  
+- **Database:** MySQL / MongoDB  
+- **Tools:** Git, GitHub  
+
+---
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/your-username/credify-bank.git
+cd credify-bank
+npm install
+npm start
