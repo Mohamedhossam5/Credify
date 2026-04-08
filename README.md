@@ -77,11 +77,11 @@ Supported financial operations include:
 
 ## 🛠️ Tech Stack
 
-> *(Update this based on your implementation)*
+> 
 
-- **Frontend:** HTML, CSS, JavaScript / React  
-- **Backend:** Node.js / Python / C++  
-- **Database:** MySQL / MongoDB  
+- **Frontend:** React.js  
+- **Backend:** Node.js / Express.js
+- **Database:** PostgreSQL  
 - **Tools:** Git, GitHub  
 
 ---
