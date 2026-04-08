@@ -1,30 +1,5 @@
 # Credify Bank Backend & API Documentation
 
-## 🚀 How to Test the App
-The frontend interface is served directly from the API Gateway.
-Open your browser and navigate to: **http://localhost:3000**
-
-
-## ✨ Features
-
-### Architecture
-- **Microservices-based**: Decoupled into User Service, KYC Service, API Gateway, and Face Verification Service.
-- **Language**: 100% migrated to TypeScript for robust type checking.
-- **Databases**: Two separate PostgreSQL databases (`credify_users` and `credify_kyc`).
-- **Security**: JWT Authentication, bcrypt password hashing, helmet and rate limiting (max 200 requests/15 mins).
-
-### Frontend UI
-- Modern glassmorphism design with responsive CSS.
-- **Single Page Application**: Fully handles Auth, state management, and KYC routing.
-- **WebRTC Camera Capture**: Interactive selfie photo capture right in the browser.
-
-### Face Verification AI
-- **Python FastAPI microservice** utilizing the **DeepFace** engine (VGG-Face model).
-- Automatically compares the uploaded selfie against the front of the National ID to compute a facial distance metric.
-- Sets KYC status to `APPROVED` or `REJECTED` based on facial similarity metrics.
-
----
-
 ## 📡 API Endpoints
 
 *Note: The frontend calls these endpoints through the API Gateway on port `3000` (e.g., `http://localhost:3000/api/auth/register`).*
