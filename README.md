@@ -89,7 +89,7 @@ Supported financial operations include:
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/credify-bank.git
+git clone https://github.com/Mohamedhossam5/credify-bank.git
 cd credify-bank
 npm install
 npm start
