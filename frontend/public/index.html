@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credify Bank — Secure Modern Banking</title>
+  <meta name="description" content="Credify Bank — Secure, modern, and trusted banking with AI-powered identity verification.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+  <div class="app">
+    <!-- ─── Auth Section ──────────────────────────── -->
+    <div id="auth-section" class="section active">
+      <div class="auth-card glass">
+        <div class="logo">
+          <div class="logo-icon">C</div>
+          <h1>Credify<span>Bank</span></h1>
+        </div>
+        <p class="subtitle">Secure. Modern. Trusted.</p>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="login">Login</button>
+          <button class="tab" data-tab="register">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="form active">
+          <div class="input-group">
+            <input type="email" id="login-email" placeholder="Email address" required>
+          </div>
+          <div class="input-group">
+            <input type="password" id="login-password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Sign In</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="form">
+          <div class="input-row">
+            <div class="input-group">
+              <input type="text" id="reg-firstName" placeholder="First Name" required>
+            </div>
+            <div class="input-group">
+              <input type="text" id="reg-lastName" placeholder="Last Name" required>
+            </div>
+          </div>
+          <div class="input-group">
+            <input type="email" id="reg-email" placeholder="Email address" required>
+          </div>
+          <div class="input-group">
+            <input type="password" id="reg-password" placeholder="Password (min 8 chars)" required minlength="8">
+          </div>
+          <div class="input-group">
+            <input type="text" id="reg-idNumber" placeholder="National ID Number" required>
+          </div>
+          <div class="input-row">
+            <div class="input-group">
+              <input type="date" id="reg-birthdate" required>
+              <label class="float-label">Birthdate</label>
+            </div>
+            <div class="input-group">
+              <input type="text" id="reg-address" placeholder="Address">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Create Account</button>
+        </form>
+
+        <div id="auth-error" class="error-msg hidden"></div>
+      </div>
+    </div>
+
+    <!-- ─── KYC Dashboard Section ─────────────────── -->
+    <div id="kyc-section" class="section">
+      <nav class="topbar glass">
+        <div class="logo-small">
+          <div class="logo-icon-sm">C</div>
+          <span>Credify</span>
+        </div>
+        <div class="user-info">
+          <span id="user-name"></span>
+          <button id="admin-tab" class="btn btn-ghost hidden">Admin Dashboard</button>
+          <button id="logout-btn" class="btn btn-ghost">Logout</button>
+        </div>
+      </nav>
+
+      <div class="dashboard">
+        <div class="dashboard-header">
+          <h2>KYC Verification</h2>
+          <div id="kyc-status-badge" class="status-badge pending">PENDING</div>
+        </div>
+
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+          <div class="step" id="step-id">
+            <div class="step-circle">1</div>
+            <span>National ID</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-selfie">
+            <div class="step-circle">2</div>
+            <span>Face Selfie</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-proof">
+            <div class="step-circle">3</div>
+            <span>Proof of Address</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step" id="step-review">
+            <div class="step-circle">4</div>
+            <span>Review</span>
+          </div>
+        </div>
+
+        <!-- Upload Cards -->
+        <div class="upload-cards">
+
+          <!-- National ID Card -->
+          <div class="upload-card glass" id="card-national-id">
+            <h3>📄 National ID</h3>
+            <p>Upload front and back of your National ID card</p>
+            <div class="upload-row">
+              <label class="file-upload">
+                <input type="file" id="id-front" accept="image/*,.pdf">
+                <span id="id-front-label">📷 Front Side</span>
+              </label>
+              <label class="file-upload">
+                <input type="file" id="id-back" accept="image/*,.pdf">
+                <span id="id-back-label">📷 Back Side</span>
+              </label>
+            </div>
+            <button id="upload-id-btn" class="btn btn-primary" disabled>Upload National ID</button>
+          </div>
+
+          <!-- Face Selfie Card -->
+          <div class="upload-card glass" id="card-face-selfie">
+            <h3>📷 Face Selfie</h3>
+            <p>Take a clear selfie to match against your ID</p>
+            <div style="text-align: center; margin-top: 16px;">
+              <button id="start-camera-btn" class="btn btn-secondary" style="width: 100%;">Start Camera</button>
+              
+              <div id="admin-selfie-upload-wrapper" class="hidden" style="margin-top: 16px;">
+                <p style="font-size: 11px; margin-bottom: 4px; color: var(--primary);">Admin By-Pass:</p>
+                <div class="file-upload">
+                  <input type="file" id="admin-selfie-file" accept="image/*" />
+                  <label for="admin-selfie-file" id="admin-selfie-label" class="btn tooltip">
+                    📎 Upload Selfie File
+                  </label>
+                </div>
+              </div>
+
+              <div id="camera-container" class="hidden">
+                <video id="camera-feed" autoplay playsinline></video>
+                <canvas id="camera-canvas" class="hidden"></canvas>
+                <div class="camera-overlay">
+                  <div class="face-guide"></div>
+                </div>
+              </div>
+            </div>
+            <img id="selfie-preview" class="selfie-preview hidden" alt="Captured selfie">
+            <div class="camera-controls">
+              <button id="capture-btn" class="btn btn-primary hidden">Take Photo</button>
+              <button id="retake-btn" class="btn btn-ghost hidden">Retake</button>
+            </div>
+            <button id="upload-selfie-btn" class="btn btn-primary hidden">Upload Selfie</button>
+          </div>
+
+          <!-- Proof of Address Card -->
+          <div class="upload-card glass" id="card-proof">
+            <h3>🏠 Proof of Address</h3>
+            <p>Upload a utility bill, bank statement, or government letter</p>
+            <label class="file-upload">
+              <input type="file" id="proof-file" accept="image/*,.pdf">
+              <span id="proof-label">📎 Choose Document</span>
+            </label>
+            <button id="upload-proof-btn" class="btn btn-primary" disabled>Upload Document</button>
+          </div>
+
+        </div>
+
+        <!-- Proceed Option -->
+        <div id="proceed-section" class="hidden" style="text-align: center; margin: 32px 0;">
+          <button id="proceed-btn" class="btn" style="background: linear-gradient(135deg, var(--success), var(--accent)); color: #fff; font-size: 18px; padding: 16px 40px; border-radius: 30px; border: none; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); cursor: pointer; font-weight: 700; transition: transform 0.3s; letter-spacing: 1px;">🚀 Proceed to AI Verification</button>
+        </div>
+
+        <!-- Verification Result -->
+        <div id="verification-result" class="verification-result hidden">
+          <div id="result-icon" class="result-icon"></div>
+          <h3 id="result-title"></h3>
+          <p id="result-message"></p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ─── Admin Dashboard Section ─────────────────── -->
+    <div id="admin-section" class="section">
+      <nav class="topbar glass">
+        <div class="logo-small">
+          <div class="logo-icon-sm">C</div>
+          <span>Credify Admin</span>
+        </div>
+        <div class="user-info">
+          <button id="back-profile-btn" class="btn btn-ghost">← Back to Dashboard</button>
+          <button id="logout-admin-btn" class="btn btn-ghost">Logout</button>
+        </div>
+      </nav>
+      <div class="dashboard">
+        <div class="dashboard-header">
+          <h2>Admin Dashboard</h2>
+          <button id="refresh-admin-btn" class="btn btn-secondary">Refresh</button>
+        </div>
+        
+        <div class="glass" style="border-radius:var(--radius); overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>ID Number</th>
+                <th>KYC Status</th>
+                <th>Match Score</th>
+                <th>Match Result</th>
+                <th>Rejection Reason</th>
+                <th>Account ID</th>
+                <th>Balance</th>
+                <th>Role</th>
+                <th>Joined</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Banking Dashboard Section ───────────────── -->
+    <div id="banking-dashboard" class="section">
+      <nav class="topbar glass">
+        <div class="logo-small">
+          <div class="logo-icon-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">C</div>
+          <span>Credify Bank</span>
+        </div>
+        <div class="user-info">
+          <button id="bank-admin-tab" class="btn btn-ghost hidden">Admin Dashboard</button>
+          <span id="bank-user-name" style="color: var(--text-dim); font-size: 14px;"></span>
+          <button id="logout-bank-btn" class="btn btn-ghost">Logout</button>
+        </div>
+      </nav>
+
+      <div class="dashboard bank-container">
+        <div class="bank-greeting">
+          <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 8px; color: var(--text);">Welcome back, <span id="bank-welcome-name"></span> 👋</h2>
+          <p style="color: var(--text-dim); font-size: 16px;">Here's your financial overview.</p>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="bank-balance-card neo-card">
+          <div class="card-header">
+            <span class="card-label">CURRENT BALANCE</span>
+            <span class="card-chip">CREDIFY DEBIT</span>
+          </div>
+          <div class="card-balance" id="bank-balance">$0.00</div>
+          <div class="card-footer">
+            <div class="card-account-id">
+              <span class="acc-label">Account No.</span>
+              <span class="acc-val" id="bank-account-id"></span>
+            </div>
+            <div class="card-icons">💳</div>
+          </div>
+        </div>
+
+        <h3 style="margin: 40px 0 16px 0; font-size: 20px; font-weight: 700; color: var(--text); display: flex; justify-content: space-between; align-items: center;">
+          Recent Transactions
+          <button id="view-all-tx-btn" class="btn btn-ghost" style="font-size: 14px; padding: 6px 12px;">View All →</button>
+        </h3>
+        <div class="recent-transactions glass" style="border-radius: var(--radius); padding: 16px; overflow-x: auto; margin-bottom: 24px;">
+           <table class="admin-table">
+             <thead>
+               <tr>
+                 <th>Date</th>
+                 <th>To / From</th>
+                 <th>Amount</th>
+                 <th>Status</th>
+               </tr>
+             </thead>
+             <tbody id="recent-tx-body">
+             </tbody>
+           </table>
+           <p id="no-tx-msg" class="hidden" style="text-align: center; color: var(--text-dim); padding: 20px;">No recent transactions.</p>
+        </div>
+
+        <h3 style="margin: 20px 0 16px 0; font-size: 20px; font-weight: 700; color: var(--text);">Quick Actions</h3>
+        <!-- Action Cards -->
+        <div class="bank-actions">
+          <div class="bank-action-card" id="btn-transfer">
+            <div class="action-icon" style="background: var(--primary-bg); color: var(--primary);">💸</div>
+            <h4>Transfer Funds</h4>
+            <p>Send money to any Credify user instantly.</p>
+          </div>
+          <div class="bank-action-card" id="btn-request-card">
+            <div class="action-icon" style="background: var(--accent-bg); color: var(--accent);">💳</div>
+            <h4>Request Credit Card</h4>
+            <p>Apply for our premium metal credit card.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ─── Transactions Full View Section ────────────── -->
+    <div id="transactions-section" class="section">
+      <nav class="topbar glass">
+        <div class="logo-small">
+          <div class="logo-icon-sm" style="background: linear-gradient(135deg, #4f46e5, #818cf8);">C</div>
+          <span>Credify Bank</span>
+        </div>
+        <div class="user-info">
+          <button id="back-bank-dashboard-btn" class="btn btn-ghost">← Back to Dashboard</button>
+          <button id="logout-tx-btn" class="btn btn-ghost">Logout</button>
+        </div>
+      </nav>
+      <div class="dashboard">
+        <div class="dashboard-header">
+           <h2>All Transactions</h2>
+           <button id="refresh-tx-btn" class="btn btn-secondary">Refresh</button>
+        </div>
+        <div class="glass" style="border-radius:var(--radius); overflow-x:auto;">
+           <table class="admin-table">
+             <thead>
+               <tr>
+                 <th>Date</th>
+                 <th>To / From</th>
+                 <th>Bank / details</th>
+                 <th>Type</th>
+                 <th>Reference</th>
+                 <th>Amount</th>
+                 <th>Status</th>
+               </tr>
+             </thead>
+             <tbody id="all-tx-body">
+             </tbody>
+           </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Transfer Modal ────────────────────────────── -->
+  <div id="transfer-modal" class="modal hidden">
+    <div class="modal-content glass">
+      <span class="close-modal" id="close-transfer">×</span>
+      <h2>Transfer Funds</h2>
+      <div class="tabs" style="margin: 20px 0;" id="tx-tabs">
+        <button class="tab active" data-tx-tab="SAME_BANK">Same Bank</button>
+        <button class="tab" data-tx-tab="DOMESTIC">Domestic</button>
+        <button class="tab" data-tx-tab="INTERNATIONAL">International</button>
+      </div>
+      
+      <form id="transfer-form" class="form active">
+        <div class="input-group">
+          <input type="number" id="tx-amount" placeholder="Amount" required min="1" step="0.01">
+        </div>
+        <div class="input-group">
+          <input type="text" id="tx-recipient" placeholder="Recipient Full Name" required>
+        </div>
+        <div class="input-group">
+          <input type="text" id="tx-account" placeholder="Account Number / IBAN" required>
+        </div>
+        
+        <!-- Dynamic Fields -->
+        <div id="tx-domestic-fields" class="hidden">
+           <div class="input-group">
+             <input type="text" id="tx-bank" placeholder="Recipient Bank Name">
+           </div>
+        </div>
+        <div id="tx-intl-fields" class="hidden">
+           <div class="input-group">
+             <input type="text" id="tx-swift" placeholder="SWIFT/BIC Code">
+           </div>
+           <div class="input-group">
+             <input type="text" id="tx-address" placeholder="Recipient Bank Address">
+           </div>
+        </div>
+        <div class="input-group">
+          <input type="text" id="tx-reference" placeholder="Reference / Note (Optional)">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Send <span id="tx-btn-amount"></span></button>
+      </form>
+      <div id="tx-error" class="error-msg hidden"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js?v=4"></script>
+</body>
+</html>
