@@ -1,27 +1,53 @@
 # Credify Bank Backend & API Documentation
 
+This document provides a comprehensive overview of all backend API endpoints available through the API Gateway.
+
 ## 📡 API Endpoints
 
-*Note: The frontend calls these endpoints through the API Gateway on port `3000` (e.g., `http://localhost:3000/api/auth/register`).*
+*Note: The frontend calls all backend endpoints through the API Gateway on port `3000` (e.g., `http://localhost:3000/api/auth/register`). The API Gateway handles rate limiting, security headers, and proxies requests to the appropriate internal microservice.*
 
-### 1. Authentication (User Service - Internal Port `3001`)
+---
+
+### 1. Authentication (User Service)
 
 #### `POST /api/auth/register`
-Creates a new user.
+Creates a new user account.
 - **Body**: `firstName`, `lastName`, `email`, `password`, `idNumber`, `birthdate`, `address`
 - **Response**: User object and JWT `token`.
 
 #### `POST /api/auth/login`
-Authenticates a user.
+Authenticates a user and returns a session token.
 - **Body**: `email`, `password`
 - **Response**: User object and JWT `token`.
 
 #### `GET /api/auth/me`
-Fetches current user profile.
+Fetches the current user profile based on their token.
 - **Headers**: `Authorization: Bearer <token>`
-- **Response**: Full profile details and KYC status.
+- **Response**: Full profile details, role, and KYC status.
 
-### 2. KYC (KYC Service - Internal Port `3002`)
+---
+
+### 2. Finance & Banking (User Service)
+
+*All requests require `Authorization: Bearer <token>` in the headers.*
+
+#### `POST /api/transfer`
+Initiates a fund transfer from the authenticated user to another account.
+- **Body**: 
+  - `type` (SAME_BANK, DOMESTIC, INTERNATIONAL)
+  - `amount`
+  - `recipientName`, `recipientAccount`, `recipientBank` (optional)
+  - `swiftCode` (optional), `recipientAddress` (optional), `reference` (optional)
+- **Response**: Success message and transaction reference.
+
+#### `GET /api/transactions`
+Fetches transaction history for the authenticated user.
+- **Query Params**: `limit` (e.g., `?limit=5`) to restrict the number of results. If the user is an admin, `?global=true` can be passed to fetch all transactions across the platform.
+- **Response**: Array of `transactions` objects.
+
+---
+
+### 3. KYC (KYC Service)
 
 *All requests require `Authorization: Bearer <token>` in the headers.*
 
@@ -29,25 +55,86 @@ Fetches current user profile.
 Gets the current KYC application status and completed documents checklist.
 - **Response**: `{ status: "PENDING", documents: { nationalIdFront: true... } }`
 
+#### `POST /api/kyc/verify`
+Triggers the final manual or background verification process (often after document uploads are complete).
+- **Body**: (Empty or confirmation payload)
+- **Response**: `{ message: '...' }`
+
 #### `POST /api/kyc/upload/national-id`
-Uploads the ID scans.
+Uploads the ID scans (front and back).
 - **Type**: `multipart/form-data`
 - **Body**: `front` (Image/PDF), `back` (Image/PDF)
 
 #### `POST /api/kyc/upload/proof-of-address`
-Uploads utility bill or documentation.
+Uploads utility bill or proof of residence documentation.
 - **Type**: `multipart/form-data`
 - **Body**: `document` (Image/PDF)
 
 #### `POST /api/kyc/upload/face-selfie`
-Uploads the selfie and automatically triggers Face Verification.
+Uploads the selfie and automatically triggers AI Face Verification.
 - **Type**: `multipart/form-data`
 - **Body**: `selfie` (Image)
 
-### 3. Face Verification AI (Face Service - Internal Port `8000`)
-*Called automatically by the KYC service.*
+---
+
+### 4. Admin API (API Gateway Orchestration)
+
+*All requests require `Authorization: Bearer <token>` of an Admin user.*
+
+#### `GET /api/admin/dashboard`
+Fetches aggregated user data and KYC records for the admin dashboard. Reaches out to both User and KYC services internally.
+- **Response**: `{ users: [...] }` (Array of users merged with their KYC match scores and status).
+
+#### `DELETE /api/admin/users/:id`
+Deletes a user account entirely. This endpoint safely cascades deletions across both the User Service (transactions, accounts) and KYC Service (documents, application state).
+- **Params**: `id` (User ID)
+- **Response**: `{ message: 'User deleted successfully.' }`
+
+---
+
+### 5. Utilities (API Gateway)
+
+#### `GET /api/fx-rates`
+Fetches live foreign exchange rates against the Egyptian Pound (EGP). Proxies requests securely to the external `fastforex.io` API.
+- **Headers**: `Authorization: Bearer <token>` (Optional)
+- **Response**: `{ base: "EGP", results: { USD: 0.021, EUR: 0.019, ... }, updated: "..." }`
+
+---
+
+### 6. Internal Machine Learning (Face Service)
+*Internal Port `8000`. Called automatically by the KYC service; not exposed directly to the frontend.*
 
 #### `POST /verify`
+Performs facial recognition logic.
 - **Type**: `multipart/form-data`
 - **Body**: `id_image`, `selfie_image`
 - **Response**: `{ "verified": true, "distance": 0.23, "model": "VGG-Face", "threshold": 0.40 }`
+
+---
+
+## 🔑 Test Credentials
+
+// admin account creds
+// Email: admin@credify.com
+// Password: admin123
+
+// test user creds
+// Email: testuser@credify.com
+// Password: test1234
+
+// KYC test users
+// kyc_tester2@credify.com
+// test1234
+
+// fxrates1000@gmail.com
+// fxrates1@1
+
+//kyc_tester3@credify.com
+//kyc_tester4@credify.com
+//kyc_tester5@credify.com 
+
+
+//	sarah@test.com	test1234
+//	james@test.com	test1234
+//	michael@test.com test1234
+//	rachel@test.com	test1234

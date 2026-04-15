@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import User from "../models/User";
+import Account from "../models/Account";
 import { authenticate, generateToken, AuthenticatedRequest } from "../middleware/auth";
 
 const router = Router();
@@ -59,6 +60,7 @@ router.post("/register", registerValidation, async (req: Request, res: Response)
         lastName: user.last_name,
         email: user.email,
         kycStatus: user.kyc_status,
+        role: user.role,
       },
       token,
     });
@@ -96,6 +98,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
     }
 
     const token = generateToken(user);
+    const account = await Account.findByUserId(user.id);
 
     res.json({
       message: "Login successful.",
@@ -105,6 +108,11 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
         lastName: user.last_name,
         email: user.email,
         kycStatus: user.kyc_status,
+        role: user.role,
+        account: account ? {
+          accountId: account.account_id,
+          balance: account.balance
+        } : null
       },
       token,
     });
@@ -124,6 +132,8 @@ router.get("/me", authenticate, async (req: AuthenticatedRequest, res: Response)
       return;
     }
 
+    const account = await Account.findByUserId(user.id);
+
     res.json({
       user: {
         id: user.id,
@@ -134,7 +144,12 @@ router.get("/me", authenticate, async (req: AuthenticatedRequest, res: Response)
         birthdate: user.birthdate,
         address: user.address,
         kycStatus: user.kyc_status,
+        role: user.role,
         createdAt: user.created_at,
+        account: account ? {
+          accountId: account.account_id,
+          balance: account.balance
+        } : null
       },
     });
   } catch (err) {

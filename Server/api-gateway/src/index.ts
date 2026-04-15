@@ -7,6 +7,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import path from "path";
+import adminRoutes from "./routes/admin";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +30,7 @@ app.use(limiter);
 
 // ─── Serve Frontend ──────────────────────────────────────────
 
-app.use(express.static(path.join(__dirname, "../../frontend/public")));
+app.use(express.static(path.join(__dirname, "../../../frontend/public")));
 
 // ─── Helper: Forward JSON requests ──────────────────────────
 
@@ -89,12 +90,23 @@ app.post("/api/auth/register", (req, res) => forwardJSON(USER_SERVICE_URL, "/api
 app.post("/api/auth/login", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/login", req, res));
 app.get("/api/auth/me", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/me", req, res));
 
+// ─── Finance Routes -> User Service ──────────────────────────
+
+app.get("/api/fx-rates", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/fx-rates", req, res));
+app.post("/api/transfer", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer", req, res));
+app.get("/api/transactions", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
+
 // ─── KYC Routes -> KYC Service ───────────────────────────────
 
 app.get("/api/kyc/status", express.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/status", req, res));
+app.post("/api/kyc/verify", express.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/verify", req, res));
 app.post("/api/kyc/upload/national-id", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/national-id", req, res));
 app.post("/api/kyc/upload/face-selfie", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/face-selfie", req, res));
 app.post("/api/kyc/upload/proof-of-address", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/proof-of-address", req, res));
+
+// ─── Admin Routes ──────────────────────────────────────────────
+
+app.use("/api/admin", adminRoutes);
 
 // ─── Health Check ────────────────────────────────────────────
 
@@ -105,7 +117,7 @@ app.get("/health", (_req, res) => {
 // ─── SPA Fallback ────────────────────────────────────────────
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/public/index.html"));
+  res.sendFile(path.join(__dirname, "../../../frontend/public/index.html"));
 });
 
 // ─── Start Server ────────────────────────────────────────────

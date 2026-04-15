@@ -97,8 +97,6 @@ router.post(
       const complete = await KycApplication.areDocumentsComplete(req.user!.id);
       if (complete) {
         await KycApplication.updateStatus(req.user!.id, "DOCUMENTS_UPLOADED");
-        // Trigger face verification
-        triggerFaceVerification(req.user!.id);
       }
 
       res.json({
@@ -130,7 +128,6 @@ router.post(
       const complete = await KycApplication.areDocumentsComplete(req.user!.id);
       if (complete) {
         await KycApplication.updateStatus(req.user!.id, "DOCUMENTS_UPLOADED");
-        triggerFaceVerification(req.user!.id);
       }
 
       res.json({
@@ -144,6 +141,26 @@ router.post(
   }
 );
 
+// ─── POST /api/kyc/verify ────────────────────────────────────
+
+router.post("/verify", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const complete = await KycApplication.areDocumentsComplete(req.user!.id);
+    if (!complete) {
+      res.status(400).json({ error: "Please complete all uploads first." });
+      return;
+    }
+
+    // Explicit background verification start
+    triggerFaceVerification(req.user!.id);
+
+    res.json({ message: "Verification processing started." });
+  } catch (err) {
+    console.error("[KYC Verify Trigger] Error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 // ─── Face Verification Trigger ───────────────────────────────
 
 async function triggerFaceVerification(userId: number): Promise<void> {
@@ -153,16 +170,17 @@ async function triggerFaceVerification(userId: number): Promise<void> {
 
     await KycApplication.updateStatus(userId, "AI_VERIFICATION_IN_PROGRESS");
 
-    const FormData = (await import("form-data")).default;
     const fs = await import("fs");
+    const idBuffer = await fs.promises.readFile(app.national_id_front);
+    const selfieBuffer = await fs.promises.readFile(app.face_selfie);
+
     const form = new FormData();
-    form.append("id_image", fs.createReadStream(app.national_id_front));
-    form.append("selfie_image", fs.createReadStream(app.face_selfie));
+    form.append("id_image", new Blob([idBuffer]), "id_image.jpg");
+    form.append("selfie_image", new Blob([selfieBuffer]), "selfie_image.jpg");
 
     const response = await fetch(`${FACE_SERVICE_URL}/verify`, {
       method: "POST",
       body: form as any,
-      headers: form.getHeaders(),
     });
 
     if (!response.ok) {
@@ -174,14 +192,14 @@ async function triggerFaceVerification(userId: number): Promise<void> {
     const result = await response.json() as { verified: boolean; distance: number };
     await KycApplication.updateFaceVerification(userId, result.distance, result.verified);
 
-    if (result.verified) {
-      await KycApplication.updateStatus(userId, "APPROVED");
-    } else {
-      await KycApplication.updateStatus(userId, "REJECTED", "Face does not match the ID photo.");
-    }
+    // Always send to admin for final review instead of auto-approving/rejecting
+    const note = result.verified
+      ? "AI face verification passed. Awaiting admin approval."
+      : "AI face verification failed — face does not match ID photo. Awaiting admin review.";
+    await KycApplication.updateStatus(userId, "PENDING_ADMIN_REVIEW", note);
   } catch (err) {
     console.error("[Face Verify] Error:", err);
-    await KycApplication.updateStatus(userId, "MANUAL_REVIEW", "Face verification failed");
+    await KycApplication.updateStatus(userId, "PENDING_ADMIN_REVIEW", "Face verification encountered an error. Awaiting admin review.");
   }
 }
 

@@ -7,6 +7,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import fs from "fs";
 import kycRoutes from "./routes/kyc";
+import internalRoutes from "./routes/internal";
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -27,6 +28,7 @@ app.use(express.json());
 // ─── Routes ──────────────────────────────────────────────────
 
 app.use("/api/kyc", kycRoutes);
+app.use("/api/internal", internalRoutes);
 
 // ─── Health Check ────────────────────────────────────────────
 

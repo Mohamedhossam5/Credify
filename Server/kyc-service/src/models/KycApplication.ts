@@ -35,6 +35,11 @@ class KycApplication {
     return rows[0] || null;
   }
 
+  static async findAll(): Promise<KycRecord[]> {
+    const { rows } = await pool.query("SELECT * FROM kyc_applications ORDER BY created_at DESC");
+    return rows;
+  }
+
   static async uploadNationalId(userId: number, frontPath: string, backPath: string): Promise<KycRecord> {
     const { rows } = await pool.query(
       `UPDATE kyc_applications 
@@ -89,6 +94,10 @@ class KycApplication {
     const app = await this.findByUserId(userId);
     if (!app) return false;
     return !!(app.national_id_front && app.national_id_back && app.face_selfie && app.proof_of_address);
+  }
+
+  static async deleteByUserId(userId: number): Promise<void> {
+    await pool.query("DELETE FROM kyc_applications WHERE user_id = $1", [userId]);
   }
 }
 
