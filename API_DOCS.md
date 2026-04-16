@@ -112,29 +112,3 @@ Performs facial recognition logic.
 
 ---
 
-## 🔑 Test Credentials
-
-// admin account creds
-// Email: admin@credify.com
-// Password: admin123
-
-// test user creds
-// Email: testuser@credify.com
-// Password: test1234
-
-// KYC test users
-// kyc_tester2@credify.com
-// test1234
-
-// fxrates1000@gmail.com
-// fxrates1@1
-
-//kyc_tester3@credify.com
-//kyc_tester4@credify.com
-//kyc_tester5@credify.com 
-
-
-//	sarah@test.com	test1234
-//	james@test.com	test1234
-//	michael@test.com test1234
-//	rachel@test.com	test1234
