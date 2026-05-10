@@ -8,6 +8,7 @@ import morgan from "morgan";
 import authRoutes from "./routes/auth";
 import internalRoutes from "./routes/internal";
 import financeRoutes from "./routes/finance";
+import cardRoutes from "./routes/cards";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/internal", internalRoutes);
 app.use("/api", financeRoutes);
+app.use("/api/cards", cardRoutes);
 
 // ─── Health Check ────────────────────────────────────────────
 

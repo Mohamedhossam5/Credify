@@ -1,0 +1,368 @@
+/* ---- MY ACCOUNTS ---- */
+.account-credit-card {
+  width: 100%;
+  height: 190px;
+  border-radius: 22px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease;
+  backdrop-filter: blur(20px);
+}
+.account-credit-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+#account-details-panel {
+  overflow: hidden;
+  transition:
+    max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+  max-height: 0;
+  opacity: 0;
+}
+#account-details-panel.open {
+  max-height: 400px;
+  opacity: 1;
+}
+.details-inner {
+  padding: 24px;
+}
+.iban-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+[data-theme="light"] .iban-row {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.07);
+}
+.iban-text {
+  font-family: "DM Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  font-variant-numeric: tabular-nums;
+}
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(14, 203, 203, 0.1);
+  border: 1px solid rgba(14, 203, 203, 0.2);
+  color: var(--teal);
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: "Inter", sans-serif;
+}
+.copy-btn:hover {
+  background: rgba(14, 203, 203, 0.2);
+  border-color: var(--teal);
+}
+.copy-btn.copied {
+  background: rgba(0, 232, 143, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+}
+
+/* ---- My Accounts active card state ---- */
+.acc-card-selected {
+  transform: translateY(-4px) scale(1.02) !important;
+  box-shadow:
+    0 0 0 2px rgba(14, 203, 203, 0.55),
+    0 16px 48px rgba(14, 203, 203, 0.18),
+    0 8px 24px rgba(0, 0, 0, 0.4) !important;
+  outline: none !important;
+}
+
+/* Green active dot on account card */
+.acc-active-dot {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #00e88f;
+  box-shadow:
+    0 0 8px rgba(0, 232, 143, 0.7),
+    0 0 0 2px rgba(0, 232, 143, 0.2);
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.acc-card-selected .acc-active-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Transfer page layout */
+#transfers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+#transfers .page-header-row {
+  width: 100%;
+  max-width: 680px;
+  margin-bottom: 20px;
+}
+#transfer-panel {
+  width: 100%;
+  max-width: 680px;
+}
+
+/* ---- TRANSFER LOADING OVERLAY ---- */
+#loading-overlay-transfers {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 9, 24, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+/* ---- MODAL OVERLAY ---- */
+#transfer-modal-overlay {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  background: rgba(4, 9, 24, 0.65);
+  backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* FIX: Success toast always visible */
+#success-toast-transfers {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 40px;
+  z-index: 210;
+}
+
+/* Processing state — blur panel content */
+#transfer-panel.processing-state {
+  opacity: 0.35;
+  filter: blur(2px);
+  pointer-events: none;
+  transition:
+    opacity 0.4s ease,
+    filter 0.4s ease;
+}
+
+.premium-input {
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s ease;
+  font-family: "Inter", sans-serif;
+}
+.premium-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  background: #fff;
+  transform: scale(1.01);
+  outline: none;
+}
+[data-theme="dark"] .premium-input {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f0f4ff;
+}
+[data-theme="dark"] .premium-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgba(14, 203, 203, 0.12);
+}
+[data-theme="dark"] .premium-input::placeholder {
+  color: rgba(240, 244, 255, 0.25);
+}
+[data-theme="dark"] #tr-note {
+  color: #f0f4ff !important;
+}
+[data-theme="dark"] #tr-note::placeholder {
+  color: rgba(240, 244, 255, 0.3) !important;
+}
+[data-theme="dark"] #transfer-panel {
+  background: rgba(15, 26, 58, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-theme="dark"] #transfer-panel .text-slate-900 {
+  color: #f0f4ff;
+}
+[data-theme="dark"] #transfer-panel .text-slate-400 {
+  color: rgba(240, 244, 255, 0.45);
+}
+[data-theme="dark"] #transfer-panel .text-slate-500 {
+  color: rgba(240, 244, 255, 0.55);
+}
+[data-theme="dark"] #transfer-panel .text-slate-600 {
+  color: rgba(240, 244, 255, 0.65);
+}
+[data-theme="dark"] #transfer-panel .bg-slate-50 {
+  background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="dark"] #transfer-panel .border-slate-100,
+[data-theme="dark"] #transfer-panel .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] #transfer-panel label {
+  color: rgba(240, 244, 255, 0.5);
+}
+
+/* Modal inner */
+.modal-inner {
+  background: #fff;
+  border-radius: 24px;
+  position: relative;
+}
+[data-theme="dark"] .modal-inner {
+  background: #0f1a3a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Processing overlay inside modal */
+.modal-processing-overlay {
+  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: rgba(4, 9, 24, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+.modal-processing-overlay.active {
+  display: flex;
+}
+
+.modal-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-summary-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: "Inter", sans-serif;
+}
+.modal-summary-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0d1535;
+  font-family: "Inter", sans-serif;
+}
+[data-theme="dark"] .modal-summary-label {
+  color: rgba(240, 244, 255, 0.5);
+}
+[data-theme="dark"] .modal-summary-value {
+  color: #f0f4ff;
+}
+.modal-summary-mono {
+  font-family: "DM Mono", monospace;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0d1535;
+  font-variant-numeric: tabular-nums;
+}
+[data-theme="dark"] .modal-summary-mono {
+  color: #f0f4ff;
+}
+
+/* ---- RING SPINNER ---- */
+@keyframes ring-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes ring-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.ring-spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.ring-spinner {
+  position: relative;
+  width: 52px;
+  height: 52px;
+}
+
+.ring-spinner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(26, 111, 255, 0.15) 0%,
+    transparent 70%
+  );
+  animation: ring-pulse 1.8s ease-in-out infinite;
+}
+
+.ring-spinner svg {
+  width: 52px;
+  height: 52px;
+  animation: ring-spin 0.9s linear infinite;
+  filter: drop-shadow(0 0 8px rgba(14, 203, 203, 0.5));
+}
+
+.ring-spinner-label {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  color: rgba(240, 244, 255, 0.7);
+  animation: ring-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  #success-toast-transfers {
+    right: 16px;
+    left: 16px;
+    transform: none;
+    top: auto;
+    bottom: 24px;
+  }
+}

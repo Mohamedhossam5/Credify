@@ -28,7 +28,7 @@ class Account {
     return rows[0] || null;
   }
 
-  static async transferFunds(senderUserId: number, amount: number, receiverAccountId?: string): Promise<{ success: boolean; error?: string }> {
+  static async transferFunds(senderUserId: number, amount: number, receiverAccountId?: string, fee: number = 0): Promise<{ success: boolean; error?: string }> {
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -43,14 +43,15 @@ class Account {
       }
       const senderAccount = senderRes.rows[0];
 
-      if (parseFloat(senderAccount.balance) < amount) {
+      const totalDebit = amount + fee;
+      if (parseFloat(senderAccount.balance) < totalDebit) {
         throw new Error("Insufficient balance.");
       }
 
-      // Deduct from sender
+      // Deduct amount + fee from sender
       await client.query(
         "UPDATE accounts SET balance = balance - $1 WHERE id = $2",
-        [amount, senderAccount.id]
+        [totalDebit, senderAccount.id]
       );
 
       // Add to receiver if it's an internal transfer and receiver exists

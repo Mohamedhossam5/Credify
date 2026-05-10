@@ -30,7 +30,7 @@ app.use(limiter);
 
 // ─── Serve Frontend ──────────────────────────────────────────
 
-app.use(express.static(path.join(__dirname, "../../../frontend/public")));
+app.use(express.static(path.join(__dirname, "../../../frontend")));
 
 // ─── Helper: Forward JSON requests ──────────────────────────
 
@@ -88,13 +88,36 @@ app.use("/api/auth", express.json());
 
 app.post("/api/auth/register", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/register", req, res));
 app.post("/api/auth/login", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/login", req, res));
+app.post("/api/auth/verify-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-otp", req, res));
+app.post("/api/auth/resend-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/resend-otp", req, res));
+app.post("/api/auth/send-phone-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/send-phone-otp", req, res));
+app.post("/api/auth/verify-phone", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-phone", req, res));
+app.post("/api/auth/send-email-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/send-email-otp", req, res));
+app.post("/api/auth/verify-email", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-email", req, res));
+app.get("/api/auth/verification-status", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verification-status", req, res));
 app.get("/api/auth/me", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/me", req, res));
 
 // ─── Finance Routes -> User Service ──────────────────────────
 
 app.get("/api/fx-rates", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/fx-rates", req, res));
-app.post("/api/transfer", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer", req, res));
+app.post("/api/transfer/initiate", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/initiate", req, res));
+app.post("/api/transfer/confirm", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/confirm", req, res));
 app.get("/api/transactions", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
+
+// ─── Card Routes -> User Service ─────────────────────────────
+
+app.post("/api/cards/request", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/request", req, res));
+app.get("/api/cards", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards", req, res));
+app.get("/api/cards/:cardId", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}`, req, res));
+app.post("/api/cards/:cardId/freeze", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/freeze`, req, res));
+app.post("/api/cards/:cardId/cancel", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/cancel`, req, res));
+app.post("/api/cards/:cardId/set-limit", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/set-limit`, req, res));
+app.post("/api/cards/load", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/load", req, res));
+app.post("/api/cards/unload", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/unload", req, res));
+app.post("/api/cards/transfer", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/transfer", req, res));
+app.get("/api/cards/deliveries/all", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/deliveries/all", req, res));
+app.post("/api/cards/:cardId/delivery", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
+app.get("/api/cards/:cardId/delivery", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
 
 // ─── KYC Routes -> KYC Service ───────────────────────────────
 
@@ -117,7 +140,7 @@ app.get("/health", (_req, res) => {
 // ─── SPA Fallback ────────────────────────────────────────────
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "../../../frontend/public/index.html"));
+  res.sendFile(path.join(__dirname, "../../../frontend/index.html"));
 });
 
 // ─── Start Server ────────────────────────────────────────────

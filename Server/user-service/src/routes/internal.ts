@@ -36,4 +36,31 @@ router.post("/users/:id/kyc-approved", async (req: Request, res: Response): Prom
   }
 });
 
+// GET /api/internal/users/:id/verification-status
+router.get("/users/:id/verification-status", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    res.json({
+      userId: user.id,
+      phoneVerified: user.phone_verified,
+      emailVerified: user.email_verified,
+      fullyVerified: user.phone_verified && user.email_verified,
+    });
+  } catch (err: any) {
+    console.error("[Internal] Error fetching verification status:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 export default router;

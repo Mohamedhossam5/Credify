@@ -6,9 +6,51 @@ import { authenticate, AuthenticatedRequest } from "../middleware/auth";
 const router = Router();
 
 const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || "http://localhost:8000";
+const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:3001";
 
 // All KYC routes require authentication
 router.use(authenticate as any);
+
+// ─── Verification Guard ──────────────────────────────────────
+// Ensures user has verified phone + email before accessing KYC
+
+async function requireVerification(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const response = await fetch(
+      `${USER_SERVICE_URL}/api/internal/users/${req.user!.id}/verification-status`
+    );
+
+    if (!response.ok) {
+      res.status(502).json({ error: "Could not verify account status." });
+      return;
+    }
+
+    const data = await response.json() as { phoneVerified: boolean; emailVerified: boolean; fullyVerified: boolean };
+
+    if (!data.phoneVerified) {
+      res.status(403).json({
+        error: "Phone number must be verified before submitting KYC documents.",
+        nextStep: "verify-phone",
+      });
+      return;
+    }
+
+    if (!data.emailVerified) {
+      res.status(403).json({
+        error: "Email must be verified before submitting KYC documents.",
+        nextStep: "verify-email",
+      });
+      return;
+    }
+
+    next();
+  } catch (err) {
+    console.error("[KYC Guard] Error checking verification status:", err);
+    res.status(502).json({ error: "Could not verify account status." });
+  }
+}
+
+router.use(requireVerification as any);
 
 // ─── GET /api/kyc/status ─────────────────────────────────────
 

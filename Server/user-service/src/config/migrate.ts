@@ -4,9 +4,14 @@ const migration = `
   CREATE TABLE IF NOT EXISTS users (
     id            SERIAL PRIMARY KEY,
     first_name    VARCHAR(100)  NOT NULL,
+    middle_name   VARCHAR(100),
     last_name     VARCHAR(100)  NOT NULL,
     email         VARCHAR(255)  UNIQUE NOT NULL,
     password_hash VARCHAR(255)  NOT NULL,
+    phone_number  VARCHAR(20)   NOT NULL,
+    phone_verified BOOLEAN      NOT NULL DEFAULT FALSE,
+    email_verified BOOLEAN      NOT NULL DEFAULT FALSE,
+    gender        VARCHAR(10)   NOT NULL DEFAULT 'MALE',
     id_number     VARCHAR(50)   UNIQUE NOT NULL,
     birthdate     DATE          NOT NULL,
     address       TEXT,
@@ -31,6 +36,7 @@ const migration = `
     sender_account_id VARCHAR(50) NOT NULL,
     type VARCHAR(20) NOT NULL,
     amount NUMERIC(15,2) NOT NULL,
+    fee NUMERIC(12,2) NOT NULL DEFAULT 0,
     currency VARCHAR(10) DEFAULT 'USD',
     status VARCHAR(20) DEFAULT 'COMPLETED',
 
@@ -44,6 +50,45 @@ const migration = `
 
     created_at TIMESTAMP DEFAULT NOW()
   );
+
+  CREATE TABLE IF NOT EXISTS cards (
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER       NOT NULL REFERENCES users(id),
+    card_type         VARCHAR(10)   NOT NULL CHECK (card_type IN ('DEBIT', 'PREPAID')),
+    card_number       VARCHAR(16)   UNIQUE NOT NULL,
+    last_four         VARCHAR(4)    NOT NULL,
+    expiry_month      INTEGER       NOT NULL CHECK (expiry_month BETWEEN 1 AND 12),
+    expiry_year       INTEGER       NOT NULL,
+    cvv               VARCHAR(4)    NOT NULL,
+    cardholder_name   VARCHAR(200)  NOT NULL,
+    status            VARCHAR(20)   NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'FROZEN', 'CANCELLED')),
+    prepaid_balance   NUMERIC(15,2) DEFAULT 0.00,
+    linked_account_id VARCHAR(50),
+    daily_limit       NUMERIC(15,2) DEFAULT 10000.00,
+    created_at        TIMESTAMP     DEFAULT NOW(),
+    updated_at        TIMESTAMP     DEFAULT NOW()
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_cards_user_id ON cards(user_id);
+  CREATE INDEX IF NOT EXISTS idx_cards_type_status ON cards(user_id, card_type, status);
+
+  CREATE TABLE IF NOT EXISTS card_deliveries (
+    id                SERIAL PRIMARY KEY,
+    card_id           INTEGER       NOT NULL REFERENCES cards(id),
+    user_id           INTEGER       NOT NULL REFERENCES users(id),
+    delivery_address  TEXT          NOT NULL,
+    city              VARCHAR(100)  NOT NULL,
+    postal_code       VARCHAR(20)   NOT NULL,
+    contact_phone     VARCHAR(30)   NOT NULL,
+    status            VARCHAR(20)   NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED')),
+    notes             TEXT,
+    estimated_delivery TIMESTAMP,
+    created_at        TIMESTAMP     DEFAULT NOW(),
+    updated_at        TIMESTAMP     DEFAULT NOW()
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_card_deliveries_card_id ON card_deliveries(card_id);
+  CREATE INDEX IF NOT EXISTS idx_card_deliveries_user_id ON card_deliveries(user_id);
 `;
 
 async function runMigration(): Promise<void> {

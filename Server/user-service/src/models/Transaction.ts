@@ -6,6 +6,7 @@ export interface TransactionRecord {
   sender_account_id: string;
   type: string;
   amount: number;
+  fee: number;
   currency: string;
   status: string;
   recipient_name: string;
@@ -22,6 +23,7 @@ export interface CreateTransactionInput {
   senderAccountId: string;
   type: string;
   amount: number;
+  fee?: number;
   recipientName: string;
   recipientAccount: string;
   recipientBank?: string;
@@ -34,15 +36,16 @@ class Transaction {
   static async create(input: CreateTransactionInput): Promise<TransactionRecord> {
     const query = `
       INSERT INTO transactions (
-        sender_id, sender_account_id, type, amount, 
+        sender_id, sender_account_id, type, amount, fee,
         recipient_name, recipient_account, recipient_bank, 
         swift_code, recipient_address, reference
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *
     `;
     const values = [
       input.senderId, input.senderAccountId, input.type, input.amount,
+      input.fee ?? 0,
       input.recipientName, input.recipientAccount, input.recipientBank || null,
       input.swiftCode || null, input.recipientAddress || null, input.reference || null
     ];

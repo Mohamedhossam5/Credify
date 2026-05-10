@@ -16,9 +16,20 @@ Creates a new user account.
 - **Response**: User object and JWT `token`.
 
 #### `POST /api/auth/login`
-Authenticates a user and returns a session token.
+Validates credentials and sends a 6-digit OTP to the user's email via Brevo.
 - **Body**: `email`, `password`
+- **Response**: `{ message, otpRequired: true, email }`
+
+#### `POST /api/auth/verify-otp`
+Verifies the OTP and returns a session token if valid.
+- **Body**: `email`, `otp` (6-digit string)
 - **Response**: User object and JWT `token`.
+
+#### `POST /api/auth/resend-otp`
+Resends a fresh OTP to the user's email.
+- **Body**: `email`
+- **Response**: `{ message }`.
+
 
 #### `GET /api/auth/me`
 Fetches the current user profile based on their token.
@@ -112,3 +123,10 @@ Performs facial recognition logic.
 
 ---
 
+## 🔑 Test Credentials
+
+// admin account creds
+// Email: admin@credify.com
+// Password: admin123
+
+//	sarah@test.com	test1234

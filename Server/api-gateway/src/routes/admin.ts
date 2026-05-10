@@ -91,6 +91,7 @@ router.get("/kyc/images/:filename", async (req: Request, res: Response): Promise
 
     const contentType = upstream.headers.get("content-type") || "application/octet-stream";
     res.setHeader("Content-Type", contentType);
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     const buffer = Buffer.from(await upstream.arrayBuffer());
     res.send(buffer);
