@@ -15,7 +15,32 @@ router.get("/users", async (_req: Request, res: Response): Promise<void> => {
   }
 });
 
+// POST /api/internal/users/:id/kyc-status
+// Generic endpoint to update a user's kyc_status from any service.
+router.post("/users/:id/kyc-status", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
+    const { status } = req.body || {};
+    if (!status) {
+      res.status(400).json({ error: "Missing 'status' in request body." });
+      return;
+    }
+
+    await User.updateKycStatus(userId, status);
+    res.json({ message: `User kyc_status updated to ${status}.` });
+  } catch (err: any) {
+    console.error("[Internal] Error updating KYC status:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 // POST /api/internal/users/:id/kyc-approved
+// Kept separately because it also creates the bank account.
 router.post("/users/:id/kyc-approved", async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = parseInt(req.params.id, 10);
@@ -29,7 +54,7 @@ router.post("/users/:id/kyc-approved", async (req: Request, res: Response): Prom
       account = await Account.create(userId);
     }
 
-    res.json({ message: "User KYC appproved and account ready.", account });
+    res.json({ message: "User KYC approved and account ready.", account });
   } catch (err: any) {
     console.error("[Internal] Error approving KYC:", err.message);
     res.status(500).json({ error: "Internal server error." });

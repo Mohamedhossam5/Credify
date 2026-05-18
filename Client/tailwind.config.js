@@ -104,6 +104,10 @@ export default {
         fadein: {
           from: { opacity: '0', transform: 'translateY(9px)' },
           to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        floatGentle: {
+          '0%, 100%': { transform: 'translateY(0) scale(1)', opacity: '0.2' },
+          '50%': { transform: 'translateY(-12px) scale(1.15)', opacity: '0.35' }
         }
       },
       animation: {
@@ -122,6 +126,7 @@ export default {
         'pop-in': 'popIn 0.48s 0.08s cubic-bezier(0.34, 1.56, 0.64, 1) both',
         'spin-ring': 'spinRing 0.6s linear infinite',
         'fadein': 'fadein 0.38s ease forwards',
+        'float-gentle': 'floatGentle ease-in-out infinite',
       },
     },
   },

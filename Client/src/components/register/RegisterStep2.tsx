@@ -4,9 +4,12 @@ import { Input } from '../ui/Input';
 import { PasswordInput } from '../ui/PasswordInput';
 import { Button } from '../ui/Button';
 import { useRegisterStep2 } from '../../hooks/useRegisterStep2';
+import { useAuthStore } from '../../store/authStore';
 
 export const RegisterStep2: React.FC = () => {
   const { currentStep, setCurrentStep, register, handleSubmit, errors, focusedError, onSubmit, onError, watch, isSubmitting } = useRegisterStep2();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const passwordValue = watch('password') || '';
 
@@ -22,6 +25,15 @@ export const RegisterStep2: React.FC = () => {
   }, [passwordValue]);
 
   if (currentStep !== 2) return null;
+
+  // Already-registered user: let them skip forward to the appropriate step
+  const canSkip = isAuthenticated && !!user;
+  const skipToStep = () => {
+    if (!user) return;
+    if (!user.phoneVerified) setCurrentStep(3 as any);
+    else if (!user.emailVerified) setCurrentStep(4 as any);
+    else setCurrentStep(5 as any);
+  };
 
   const strengthColor = pwScore === 0 ? 'bg-transparent' : pwScore <= 2 ? 'bg-auth-red' : pwScore <= 4 ? 'bg-amber-400' : 'bg-auth-teal';
   const strengthLabel = pwScore === 0 ? '' : pwScore <= 2 ? 'Weak' : pwScore <= 4 ? 'Medium' : 'Strong';
@@ -79,9 +91,20 @@ export const RegisterStep2: React.FC = () => {
         </div>
         <PasswordInput label="Confirm password" placeholder="Repeat password" error={focusedError === 'confirmPassword' ? errors.confirmPassword?.message : undefined} {...register('confirmPassword')} />
 
-        <Button type="submit" className="w-full mt-2" isLoading={isSubmitting} loadingText="Creating account…" icon={<ArrowRight className="w-4 h-4 ml-1" />}>
-          Continue
-        </Button>
+        {canSkip ? (
+          <button
+            type="button"
+            onClick={skipToStep}
+            className="w-full flex items-center justify-center gap-2 py-[13px] px-6 rounded-[13px] bg-gradient-to-r from-auth-teal to-auth-blue text-white text-[0.85rem] font-bold border-none cursor-pointer transition-all duration-200 hover:shadow-[0_6px_24px_rgba(16,185,129,0.25)] hover:translate-y-[-1px] active:translate-y-0 mt-2"
+          >
+            Skip to Documents
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </button>
+        ) : (
+          <Button type="submit" className="w-full mt-2" isLoading={isSubmitting} loadingText="Creating account…" icon={<ArrowRight className="w-4 h-4 ml-1" />}>
+            Continue
+          </Button>
+        )}
       </form>
     </div>
   );

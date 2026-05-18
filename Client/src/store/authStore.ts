@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { type RegisterStep1Data, type RegisterStep2Data } from '../schemas/auth';
 import { type UserData } from '../services/auth.service';
 
-type KycState = 'idle' | 'processing' | 'approved' | 'rejected';
+type KycState = 'idle' | 'processing' | 'pending' | 'approved' | 'rejected';
 
 // ─── Onboarding steps ────────────────────────────────────────
 // 1 = personal details, 2 = security/credentials,
@@ -15,6 +15,7 @@ interface AuthState {
   step2Data: RegisterStep2Data | null;
   currentStep: OnboardingStep;
   kycState: KycState;
+  resubmitting: boolean;
 
   // Session
   token: string | null;
@@ -30,6 +31,7 @@ interface AuthState {
   setStep2Data: (data: RegisterStep2Data) => void;
   setCurrentStep: (step: OnboardingStep) => void;
   setKycState: (state: KycState) => void;
+  setResubmitting: (flag: boolean) => void;
 
   // Actions — session
   setSession: (token: string, user: UserData) => void;
@@ -63,6 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   step2Data: null,
   currentStep: 1,
   kycState: 'idle',
+  resubmitting: false,
 
   // Session — hydrated from localStorage
   token: storedToken,
@@ -78,6 +81,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setStep2Data: (data) => set({ step2Data: data }),
   setCurrentStep: (step) => set({ currentStep: step }),
   setKycState: (state) => set({ kycState: state }),
+  setResubmitting: (flag) => set({ resubmitting: flag }),
 
   // ── Session actions ────────────────────────────────────────
   setSession: (token, user) => {
@@ -109,6 +113,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token: null, user: null, isAuthenticated: false, loginEmail: null, otpRequired: false });
   },
   reset: () => set({
-    step1Data: null, step2Data: null, currentStep: 1 as OnboardingStep, kycState: 'idle',
+    step1Data: null, step2Data: null, currentStep: 1 as OnboardingStep, kycState: 'idle', resubmitting: false,
   }),
 }));

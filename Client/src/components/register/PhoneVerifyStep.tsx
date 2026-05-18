@@ -29,6 +29,13 @@ export const PhoneVerifyStep: React.FC = () => {
 
   if (currentStep !== 3) return null;
 
+  // Already verified — show skip option
+  const alreadyVerified = !!user?.phoneVerified;
+  const skipToStep = () => {
+    if (!user?.emailVerified) setCurrentStep(4 as any);
+    else setCurrentStep(5 as any);
+  };
+
   const handleChange = (idx: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const next = [...otp];
@@ -99,6 +106,38 @@ export const PhoneVerifyStep: React.FC = () => {
   const maskedPhone = user?.phoneNumber
     ? user.phoneNumber.slice(0, 5) + '****' + user.phoneNumber.slice(-2)
     : 'your phone';
+
+  // If already verified, show a simplified skip screen
+  if (alreadyVerified) {
+    return (
+      <div className="w-full animate-fadein py-6 md:py-10">
+        <button onClick={() => setCurrentStep(2)} className="inline-flex items-center gap-[7px] bg-transparent border-none text-auth-text-light font-b text-[0.77rem] font-medium cursor-pointer p-0 mb-[14px] transition-colors duration-220 hover:text-auth-teal group">
+          <ArrowLeft className="w-3 h-3 transition-transform duration-200 group-hover:-translate-x-[3px]" /> Security credentials
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="text-[0.64rem] font-bold tracking-[2.8px] uppercase text-auth-teal mb-[7px] flex items-center justify-center gap-[6px]">
+            <Phone className="w-3 h-3" /> Phone Verification
+          </div>
+          <h1 className="font-h text-[1.7rem] font-extrabold text-auth-text-dark tracking-[-0.8px] mb-[5px]">
+            Phone verified ✓
+          </h1>
+          <p className="text-[0.8rem] text-auth-text-light mb-6 leading-[1.55]">
+            Your phone number <span className="font-semibold text-auth-text-mid">{maskedPhone}</span> is already verified.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={skipToStep}
+          className="w-full flex items-center justify-center gap-2 py-[13px] px-6 rounded-[13px] bg-gradient-to-r from-auth-teal to-auth-blue text-white text-[0.85rem] font-bold border-none cursor-pointer transition-all duration-200 hover:shadow-[0_6px_24px_rgba(16,185,129,0.25)] hover:translate-y-[-1px] active:translate-y-0"
+        >
+          Continue
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full animate-fadein py-6 md:py-10">

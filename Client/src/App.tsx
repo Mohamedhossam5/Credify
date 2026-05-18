@@ -18,6 +18,8 @@ const TransfersPage = React.lazy(() => import('./pages/dashboard/TransfersPage')
 const AccountsPage = React.lazy(() => import('./pages/dashboard/AccountsPage'));
 const ExchangePage = React.lazy(() => import('./pages/dashboard/ExchangePage'));
 const SettingsPage = React.lazy(() => import('./pages/dashboard/SettingsPage'));
+const PendingApprovalPage = React.lazy(() => import('./pages/auth/PendingApprovalPage'));
+const RejectedPage = React.lazy(() => import('./pages/auth/RejectedPage'));
 
 // Lazy load Admin Pages ONLY
 const AdminDashboardPage = React.lazy(() => import('./pages/admin/dashboard/AdminDashboardPage'));
@@ -42,6 +44,8 @@ const AppContent: React.FC = () => {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<AuthLayout />} />
         <Route path="/register" element={<AuthLayout />} />
+        <Route path="/pending-approval" element={<PendingApprovalPage />} />
+        <Route path="/rejected" element={<RejectedPage />} />
 
         {/* Dashboard Routes (Protected) */}
         <Route element={<DashboardLayout />}>

@@ -8,6 +8,31 @@ const router = Router();
 const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || "http://localhost:8000";
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:3001";
 
+// ─── Helper: sync user's kyc_status in user-service ──────────
+async function syncUserKycStatus(userId: number, status: string): Promise<void> {
+  try {
+    await fetch(`${USER_SERVICE_URL}/api/internal/users/${userId}/kyc-status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+  } catch (err) {
+    console.error(`[KYC Sync] Failed to sync status '${status}' for user ${userId}:`, err);
+  }
+}
+
+// ─── Helper: reset KYC application if user was previously rejected ───
+async function resetIfRejected(userId: number): Promise<void> {
+  const app = await KycApplication.findByUserId(userId);
+  if (app && app.status === "REJECTED") {
+    await KycApplication.updateStatus(userId, "PENDING", null);
+    // Clear old face verification data
+    await KycApplication.updateFaceVerification(userId, 0, false);
+    // Sync user status back to PENDING
+    await syncUserKycStatus(userId, "PENDING");
+  }
+}
+
 // All KYC routes require authentication
 router.use(authenticate as any);
 
@@ -98,6 +123,7 @@ router.post(
       }
 
       await KycApplication.findOrCreate(req.user!.id);
+      await resetIfRejected(req.user!.id);
       const application = await KycApplication.uploadNationalId(
         req.user!.id, files.front[0].path, files.back[0].path
       );
@@ -134,6 +160,7 @@ router.post(
       }
 
       await KycApplication.findOrCreate(req.user!.id);
+      await resetIfRejected(req.user!.id);
       const application = await KycApplication.uploadFaceSelfie(req.user!.id, req.file.path);
 
       const complete = await KycApplication.areDocumentsComplete(req.user!.id);
@@ -165,6 +192,7 @@ router.post(
       }
 
       await KycApplication.findOrCreate(req.user!.id);
+      await resetIfRejected(req.user!.id);
       const application = await KycApplication.uploadProofOfAddress(req.user!.id, req.file.path);
 
       const complete = await KycApplication.areDocumentsComplete(req.user!.id);
@@ -227,7 +255,8 @@ async function triggerFaceVerification(userId: number): Promise<void> {
 
     if (!response.ok) {
       console.error("[Face Verify] Service returned:", response.status);
-      await KycApplication.updateStatus(userId, "MANUAL_REVIEW", "Face verification service error");
+      await KycApplication.updateStatus(userId, "PENDING_ADMIN_REVIEW", "Face verification service error — awaiting admin review.");
+      await syncUserKycStatus(userId, "PENDING_ADMIN_REVIEW");
       return;
     }
 
@@ -239,9 +268,11 @@ async function triggerFaceVerification(userId: number): Promise<void> {
       ? "AI face verification passed. Awaiting admin approval."
       : "AI face verification failed — face does not match ID photo. Awaiting admin review.";
     await KycApplication.updateStatus(userId, "PENDING_ADMIN_REVIEW", note);
+    await syncUserKycStatus(userId, "PENDING_ADMIN_REVIEW");
   } catch (err) {
     console.error("[Face Verify] Error:", err);
     await KycApplication.updateStatus(userId, "PENDING_ADMIN_REVIEW", "Face verification encountered an error. Awaiting admin review.");
+    await syncUserKycStatus(userId, "PENDING_ADMIN_REVIEW");
   }
 }
 

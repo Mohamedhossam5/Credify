@@ -3,11 +3,24 @@ import { User, Mail, Phone, ArrowRight } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { useRegisterStep1 } from '../../hooks/useRegisterStep1';
+import { useAuthStore } from '../../store/authStore';
 
 export const RegisterStep1: React.FC = () => {
   const { currentStep, register, handleSubmit, errors, focusedError, onSubmit, onError } = useRegisterStep1();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const setCurrentStep = useAuthStore((s) => s.setCurrentStep);
 
   if (currentStep !== 1) return null;
+
+  // Already-registered user: let them skip forward to the appropriate step
+  const canSkip = isAuthenticated && !!user;
+  const skipToStep = () => {
+    if (!user) return;
+    if (!user.phoneVerified) setCurrentStep(3 as any);
+    else if (!user.emailVerified) setCurrentStep(4 as any);
+    else setCurrentStep(5 as any);
+  };
 
   return (
     <div className="w-full animate-fadein py-6 md:py-10">
@@ -101,9 +114,20 @@ export const RegisterStep1: React.FC = () => {
           </div>
         </div>
 
-        <Button type="submit" className="w-full mt-2" icon={<ArrowRight className="w-4 h-4 ml-1" />}>
-          Continue
-        </Button>
+        {canSkip ? (
+          <button
+            type="button"
+            onClick={skipToStep}
+            className="w-full flex items-center justify-center gap-2 py-[13px] px-6 rounded-[13px] bg-gradient-to-r from-auth-teal to-auth-blue text-white text-[0.85rem] font-bold border-none cursor-pointer transition-all duration-200 hover:shadow-[0_6px_24px_rgba(16,185,129,0.25)] hover:translate-y-[-1px] active:translate-y-0 mt-2"
+          >
+            Skip to Documents
+            <ArrowRight className="w-4 h-4 ml-1" />
+          </button>
+        ) : (
+          <Button type="submit" className="w-full mt-2" icon={<ArrowRight className="w-4 h-4 ml-1" />}>
+            Continue
+          </Button>
+        )}
       </form>
     </div>
   );

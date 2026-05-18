@@ -28,6 +28,9 @@ export const EmailVerifyStep: React.FC = () => {
 
   if (currentStep !== 4) return null;
 
+  // Already verified — show skip option
+  const alreadyVerified = !!user?.emailVerified;
+
   const handleChange = (idx: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const next = [...otp];
@@ -92,6 +95,38 @@ export const EmailVerifyStep: React.FC = () => {
   const maskedEmail = user?.email
     ? user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3')
     : 'your email';
+
+  // If already verified, show a simplified skip screen
+  if (alreadyVerified) {
+    return (
+      <div className="w-full animate-fadein py-6 md:py-10">
+        <button onClick={() => setCurrentStep(3)} className="inline-flex items-center gap-[7px] bg-transparent border-none text-auth-text-light font-b text-[0.77rem] font-medium cursor-pointer p-0 mb-[14px] transition-colors duration-220 hover:text-auth-teal group">
+          <ArrowLeft className="w-3 h-3 transition-transform duration-200 group-hover:-translate-x-[3px]" /> Phone verification
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="text-[0.64rem] font-bold tracking-[2.8px] uppercase text-auth-teal mb-[7px] flex items-center justify-center gap-[6px]">
+            <Mail className="w-3 h-3" /> Email Verification
+          </div>
+          <h1 className="font-h text-[1.7rem] font-extrabold text-auth-text-dark tracking-[-0.8px] mb-[5px]">
+            Email verified ✓
+          </h1>
+          <p className="text-[0.8rem] text-auth-text-light mb-6 leading-[1.55]">
+            Your email <span className="font-semibold text-auth-text-mid">{maskedEmail}</span> is already verified.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setCurrentStep(5 as any)}
+          className="w-full flex items-center justify-center gap-2 py-[13px] px-6 rounded-[13px] bg-gradient-to-r from-auth-teal to-auth-blue text-white text-[0.85rem] font-bold border-none cursor-pointer transition-all duration-200 hover:shadow-[0_6px_24px_rgba(16,185,129,0.25)] hover:translate-y-[-1px] active:translate-y-0"
+        >
+          Continue to Documents
+          <ArrowRight className="w-4 h-4 ml-1" />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full animate-fadein py-6 md:py-10">

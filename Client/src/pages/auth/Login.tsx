@@ -10,7 +10,6 @@ import { PasswordInput } from '../../components/ui/PasswordInput';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/authStore';
 import { authService } from '../../services/auth.service';
-import { api } from '../../lib/api';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +22,39 @@ const Login: React.FC = () => {
     mode: 'onTouched',
   });
 
+  // Shared routing logic — reads user.kycStatus as single source of truth
+  const routeAfterLogin = (user: any) => {
+    if (user.role === 'ADMIN' || user.role === 'admin') {
+      navigate('/admin/dashboard');
+      return;
+    }
+
+    switch (user.kycStatus) {
+      case 'APPROVED':
+        navigate('/dashboard');
+        break;
+      case 'REJECTED':
+        navigate('/rejected');
+        break;
+      case 'PENDING_ADMIN_REVIEW':
+        navigate('/pending-approval');
+        break;
+      default: {
+        // PENDING — figure out which onboarding step they're on
+        const { phoneVerified, emailVerified } = user;
+        if (!phoneVerified) {
+          useAuthStore.getState().setCurrentStep(3 as any);
+        } else if (!emailVerified) {
+          useAuthStore.getState().setCurrentStep(4 as any);
+        } else {
+          useAuthStore.getState().setCurrentStep(5 as any);
+        }
+        navigate('/register');
+        break;
+      }
+    }
+  };
+
   const onSubmitCredentials = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
@@ -34,37 +66,7 @@ const Login: React.FC = () => {
         // Admin bypass — no OTP needed
         setSession(res.token, res.user);
         toast.success('Welcome back!');
-        if (res.user.role === 'ADMIN') {
-          navigate('/admin/dashboard');
-        } else if (res.user.kycStatus === 'APPROVED') {
-          navigate('/dashboard');
-        } else {
-          // Check if they need to complete or redo application
-          const { phoneVerified, emailVerified, kycStatus } = res.user;
-          if (kycStatus === 'PENDING' || kycStatus === 'REJECTED' || !phoneVerified || !emailVerified) {
-            let step = 5;
-            if (!phoneVerified) step = 3;
-            else if (!emailVerified) step = 4;
-            
-            useAuthStore.getState().setCurrentStep(step as any);
-            
-            if (kycStatus === 'REJECTED') {
-              try {
-                const kycRes = await api.get('/kyc/status');
-                const reason = kycRes.data.rejectionReason;
-                toast.error(`Your application was rejected. Reason: ${reason || 'Please re-submit your documents.'}`, { duration: 5000 });
-              } catch {
-                toast.error("Your application was rejected. Please re-submit your documents.");
-              }
-            } else {
-              toast.error("Please complete your application to continue.");
-            }
-            navigate('/register');
-          } else {
-            // Under review (DashboardLayout handles showing the review status screen)
-            navigate('/dashboard');
-          }
-        }
+        routeAfterLogin(res.user);
       }
     } catch (err: any) {
       toast.error(err?.message || err?.error || 'Invalid email or password.');
@@ -129,39 +131,7 @@ const Login: React.FC = () => {
       setSession(res.token, res.user);
       clearOtp();
       toast.success('Welcome back!');
-
-      // Route based on role
-      if (res.user.role === 'ADMIN' || res.user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (res.user.kycStatus === 'APPROVED') {
-        navigate('/dashboard');
-      } else {
-        // Check if they need to complete or redo application
-        const { phoneVerified, emailVerified, kycStatus } = res.user;
-        if (kycStatus === 'PENDING' || kycStatus === 'REJECTED' || !phoneVerified || !emailVerified) {
-          let step = 5;
-          if (!phoneVerified) step = 3;
-          else if (!emailVerified) step = 4;
-          
-          useAuthStore.getState().setCurrentStep(step as any);
-          
-          if (kycStatus === 'REJECTED') {
-            try {
-              const kycRes = await api.get('/kyc/status');
-              const reason = kycRes.data.rejectionReason;
-              toast.error(`Your application was rejected. Reason: ${reason || 'Please re-submit your documents.'}`, { duration: 5000 });
-            } catch {
-              toast.error("Your application was rejected. Please re-submit your documents.");
-            }
-          } else {
-            toast.error("Please complete your application to continue.");
-          }
-          navigate('/register');
-        } else {
-          // Under review (DashboardLayout handles showing the review status screen)
-          navigate('/dashboard');
-        }
-      }
+      routeAfterLogin(res.user);
     } catch (err: any) {
       toast.error(err?.message || err?.error || 'Invalid or expired code.');
     } finally {

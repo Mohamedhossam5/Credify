@@ -2,11 +2,11 @@ import React from 'react';
 import { cn } from '../../../lib/utils';
 import { useKycFlow } from '../../../hooks/useKycFlow';
 import { KycProgressSteps } from './KycProgressSteps';
-import { KycResultApproved } from './KycResultApproved';
 import { KycResultRejected } from './KycResultRejected';
+import { KycPendingApproval } from './KycPendingApproval';
 
 export const KycFlow: React.FC = () => {
-  const { kycState, progress, activeStep, redirectCount, retryKyc, abortKyc } = useKycFlow();
+  const { kycState, progress, activeStep, retryKyc, abortKyc } = useKycFlow();
 
   const kycVisible = kycState !== 'idle';
 
@@ -19,8 +19,8 @@ export const KycFlow: React.FC = () => {
         <KycProgressSteps progress={progress} activeStep={activeStep} />
       )}
 
-      {kycState === 'approved' && (
-        <KycResultApproved redirectCount={redirectCount} />
+      {kycState === 'pending' && (
+        <KycPendingApproval />
       )}
 
       {kycState === 'rejected' && (
@@ -29,3 +29,4 @@ export const KycFlow: React.FC = () => {
     </div>
   );
 };
+

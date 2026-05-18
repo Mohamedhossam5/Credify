@@ -8,6 +8,19 @@ const router = Router();
 const USER_SERVICE_URL = process.env.USER_SERVICE_URL || "http://localhost:3001";
 const UPLOAD_DIR = process.env.UPLOAD_DIR || "./uploads";
 
+// ─── Helper: sync user's kyc_status in user-service ──────────
+async function syncUserKycStatus(userId: number, status: string): Promise<void> {
+  try {
+    await fetch(`${USER_SERVICE_URL}/api/internal/users/${userId}/kyc-status`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+  } catch (err) {
+    console.error(`[KYC Sync] Failed to sync status '${status}' for user ${userId}:`, err);
+  }
+}
+
 // GET /api/internal/kyc/all
 router.get("/kyc/all", async (_req: Request, res: Response): Promise<void> => {
   try {
@@ -58,7 +71,7 @@ router.post("/kyc/:userId/approve", async (req: Request, res: Response): Promise
     // Set KYC status to APPROVED
     await KycApplication.updateStatus(userId, "APPROVED");
 
-    // Notify user-service to create bank account
+    // Notify user-service to create bank account + update status
     try {
       await fetch(`${USER_SERVICE_URL}/api/internal/users/${userId}/kyc-approved`, {
         method: "POST",
@@ -91,6 +104,9 @@ router.post("/kyc/:userId/reject", async (req: Request, res: Response): Promise<
 
     const reason = req.body?.reason || "Application rejected by admin.";
     await KycApplication.updateStatus(userId, "REJECTED", reason);
+
+    // Sync user's kyc_status to REJECTED
+    await syncUserKycStatus(userId, "REJECTED");
 
     res.json({ message: "KYC application rejected." });
   } catch (err: any) {
