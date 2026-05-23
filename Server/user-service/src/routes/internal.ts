@@ -88,4 +88,21 @@ router.get("/users/:id/verification-status", async (req: Request, res: Response)
   }
 });
 
+// PUT /api/internal/users/:id/unlock
+router.put("/users/:id/unlock", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
+    await User.unlockAccount(userId);
+    res.json({ message: "User account unlocked successfully." });
+  } catch (err: any) {
+    console.error("[Internal] Error unlocking account:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 export default router;

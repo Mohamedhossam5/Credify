@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 interface AdminSidebarProps {
   collapsed: boolean;
@@ -9,6 +10,12 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <>
@@ -81,6 +88,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
             </span>
             <span className="nav-label">Settings</span>
           </NavLink>
+        </div>
+
+        <div className="sidebar-bottom" style={{ padding: '0 24px 20px 24px', marginTop: 'auto' }}>
+          <div 
+            className="nav-item" 
+            onClick={handleLogout}
+            style={{ color: '#ef4444', cursor: 'pointer' }}
+          >
+            <span className="nav-icon text-red-500">
+              <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+            </span>
+            <span className="nav-label font-medium">Log Out</span>
+          </div>
         </div>
 
         <div className="sidebar-footer" onClick={() => { navigate('/admin/settings'); onCloseMobile(); }}>

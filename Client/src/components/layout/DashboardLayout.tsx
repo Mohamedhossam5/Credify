@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import DashboardNavbar from './DashboardNavbar';
@@ -77,29 +77,31 @@ const DashboardLayout: React.FC = () => {
 
   if (!isAuthenticated) return null;
 
+  // ── Admin Guard ──
+  // Admins must never land on the user dashboard — redirect them to their own.
+  if (user?.role === 'ADMIN') {
+    return <Navigate to="/admin/dashboard" replace state={{ bypassAuth: true }} />;
+  }
+
   // ── KYC Approval Guard ──
-  // Admins bypass this check. Regular users must have APPROVED KYC.
-  const isAdmin = user?.role === 'ADMIN';
+  // Regular users must have APPROVED KYC.
   const kycApproved = user?.kycStatus === 'APPROVED';
 
-  if (!isAdmin && !kycApproved) {
+  if (!kycApproved) {
     const kycStatus = user?.kycStatus || 'PENDING';
 
     if (kycStatus === 'PENDING_ADMIN_REVIEW') {
-      navigate('/pending-approval');
-      return null;
+      return <Navigate to="/pending-approval" replace />;
     }
 
     if (kycStatus === 'REJECTED') {
-      navigate('/rejected');
-      return null;
+      return <Navigate to="/rejected" replace />;
     }
 
     // PENDING — send to register to complete onboarding
     const step = !user?.phoneVerified ? 3 : !user?.emailVerified ? 4 : 5;
     useAuthStore.getState().setCurrentStep(step as any);
-    navigate('/register');
-    return null;
+    return <Navigate to="/register" replace />;
   }
 
   return (

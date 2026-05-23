@@ -78,7 +78,27 @@ export const registerStep2Schema = z
     path: ['confirmPassword'],
   });
 
+/* ===================== FORGOT PASSWORD ===================== */
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+  idNumber: z
+    .string()
+    .regex(/^\d{14}$/, 'National ID must be exactly 14 digits'),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    newPassword: passwordSchema,
+    confirmPassword: confirmPasswordSchema,
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
 /* ===================== TYPES ===================== */
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type RegisterStep1Data = z.infer<typeof registerStep1Schema>;
 export type RegisterStep2Data = z.infer<typeof registerStep2Schema>;
+export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;

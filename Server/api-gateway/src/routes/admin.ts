@@ -101,4 +101,19 @@ router.get("/kyc/images/:filename", async (req: Request, res: Response): Promise
   }
 });
 
+// ─── PUT /api/admin/users/:userId/unlock ─────────────────────
+router.put("/users/:userId/unlock", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/unlock`,
+      { method: "PUT" }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Unlock user error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
 export default router;

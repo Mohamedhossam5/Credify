@@ -1,12 +1,21 @@
 import { Router, Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 import User from "../models/User";
 import Account from "../models/Account";
 import { authenticate, generateToken, AuthenticatedRequest } from "../middleware/auth";
 import { generateOtp, verifyOtp, generateKeyedOtp, verifyKeyedOtp } from "../services/otp";
 import { sendEmail, buildOtpEmailHtml } from "../services/brevo";
 import { sendSms } from "../services/sms";
+
+// ─── In-memory reset token store (10-minute TTL) ─────────────
+interface ResetTokenEntry {
+  email: string;
+  expiresAt: number;
+}
+const resetTokenStore = new Map<string, ResetTokenEntry>();
+const RESET_TOKEN_TTL_MS = 10 * 60 * 1000;
 
 const router = Router();
 
@@ -330,10 +339,26 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
       return;
     }
 
+    if (user.is_locked) {
+      res.status(403).json({ error: "Account locked. Please contact admin." });
+      return;
+    }
+
     const isMatch = await bcrypt.compare(password, user.password_hash!);
     if (!isMatch) {
-      res.status(401).json({ error: "Invalid email or password." });
-      return;
+      if (user.failed_login_attempts >= 2) {
+        await User.lockAccount(user.id);
+        res.status(403).json({ error: "Account locked due to 3 failed attempts. Please contact admin." });
+        return;
+      } else {
+        await User.incrementFailedLogins(user.id);
+        res.status(401).json({ error: "Invalid email or password." });
+        return;
+      }
+    }
+
+    if (user.failed_login_attempts > 0) {
+      await User.resetFailedLogins(user.id);
     }
 
     // ─── Admin bypass: skip OTP entirely ─────────────────────
@@ -534,4 +559,124 @@ router.get("/me", authenticate, async (req: AuthenticatedRequest, res: Response)
   }
 });
 
+// ─── POST /api/auth/forgot-password ─────────────────────────
+// Step 1: Verify email + national ID ownership → send reset OTP
+
+router.post("/forgot-password", [
+  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("idNumber").trim().matches(/^\d{14}$/).withMessage("National ID must be exactly 14 digits"),
+], async (req: Request, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const { email, idNumber } = req.body;
+    const user = await User.findByEmail(email);
+
+    // Check that user exists AND national ID matches — always return generic message (no enumeration)
+    if (!user || user.id_number !== idNumber) {
+      res.json({ message: "If your details are correct, a reset code has been sent." });
+      return;
+    }
+
+    const otp = generateKeyedOtp("password-reset", email);
+
+    // MOCK: Use SMS gateway while Brevo is disabled
+    sendSms(user.email, otp);
+
+    res.json({ message: "If your details are correct, a reset code has been sent." });
+  } catch (err) {
+    console.error("[Forgot Password] Error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// ─── POST /api/auth/verify-reset-otp ────────────────────────
+// Step 2: Verify the reset OTP → issue a short-lived resetToken
+
+router.post("/verify-reset-otp", [
+  body("email").isEmail().normalizeEmail().withMessage("Valid email is required"),
+  body("otp").trim().isLength({ min: 6, max: 6 }).withMessage("OTP must be 6 digits"),
+], async (req: Request, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const { email, otp } = req.body;
+    const isValid = verifyKeyedOtp("password-reset", email, otp);
+    if (!isValid) {
+      res.status(401).json({ error: "Invalid or expired reset code." });
+      return;
+    }
+
+    // Issue a one-time reset token (UUID), valid for 10 minutes
+    const resetToken = uuidv4();
+    resetTokenStore.set(resetToken, {
+      email,
+      expiresAt: Date.now() + RESET_TOKEN_TTL_MS,
+    });
+
+    res.json({ message: "Code verified.", resetToken });
+  } catch (err) {
+    console.error("[Verify Reset OTP] Error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// ─── POST /api/auth/reset-password ──────────────────────────
+// Step 3: Consume resetToken → hash + save new password
+
+router.post("/reset-password", [
+  body("resetToken").trim().notEmpty().withMessage("Reset token is required"),
+  body("newPassword").isLength({ min: 8 }).withMessage("Password must be at least 8 characters"),
+], async (req: Request, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const { resetToken, newPassword } = req.body;
+    const entry = resetTokenStore.get(resetToken);
+
+    if (!entry) {
+      res.status(401).json({ error: "Invalid or expired reset token." });
+      return;
+    }
+
+    if (Date.now() > entry.expiresAt) {
+      resetTokenStore.delete(resetToken);
+      res.status(401).json({ error: "Reset token has expired. Please start over." });
+      return;
+    }
+
+    const user = await User.findByEmail(entry.email);
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    // Hash new password and save
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+    await User.updatePassword(user.id, passwordHash);
+
+    // Consume the token (one-time use)
+    resetTokenStore.delete(resetToken);
+
+    res.json({ message: "Password reset successfully. You can now log in with your new password." });
+  } catch (err) {
+    console.error("[Reset Password] Error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 export default router;
+

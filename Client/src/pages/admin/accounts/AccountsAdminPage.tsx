@@ -19,6 +19,8 @@ interface AdminUser {
   created_at: string;
   account_id?: string;
   balance?: string;
+  is_locked: boolean;
+  failed_login_attempts: number;
 }
 
 const initials = (name: string) => name.split(" ").map(n => n[0]).join("");
@@ -49,6 +51,7 @@ const AccountsAdminPage: React.FC = () => {
   }, []);
 
   const getDisplayStatus = (a: AdminUser) => {
+    if (a.is_locked) return "locked";
     if (frozenAccounts.has(a.id)) return "frozen";
     if (a.kyc_status === "APPROVED") return "active";
     if (a.kyc_status === "REJECTED") return "blocked";
@@ -78,9 +81,20 @@ const AccountsAdminPage: React.FC = () => {
     setDrawerOpen(false);
   };
 
+  const handleUnlockAccount = async (userId: number) => {
+    try {
+      await api.put(`/admin/users/${userId}/unlock`);
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_locked: false, failed_login_attempts: 0 } : u));
+      setDrawerOpen(false);
+      // Optional: Add a toast notification here if desired
+    } catch (err) {
+      console.error("Failed to unlock account", err);
+    }
+  };
+
   const statusBadge = (status: string) => {
     const map: Record<string, string> = {
-      active: "badge-green", frozen: "badge-blue", pending: "badge-yellow", blocked: "badge-red"
+      active: "badge-green", frozen: "badge-blue", pending: "badge-yellow", blocked: "badge-red", locked: "badge-red"
     };
     return <span className={`admin-badge ${map[status] || "badge-gray"}`}>{status.toUpperCase()}</span>;
   };
@@ -122,6 +136,7 @@ const AccountsAdminPage: React.FC = () => {
             <button className={`filter-chip ${statusFilter === 'pending' ? 'active' : ''}`} onClick={() => setStatusFilter('pending')}><span className="chip-dot" style={{ background: '#d97706' }}></span>Pending</button>
             <button className={`filter-chip ${statusFilter === 'blocked' ? 'active' : ''}`} onClick={() => setStatusFilter('blocked')}><span className="chip-dot" style={{ background: '#dc2626' }}></span>Blocked</button>
             <button className={`filter-chip ${statusFilter === 'frozen' ? 'active' : ''}`} onClick={() => setStatusFilter('frozen')}><span className="chip-dot" style={{ background: '#2563eb' }}></span>Frozen</button>
+            <button className={`filter-chip ${statusFilter === 'locked' ? 'active' : ''}`} onClick={() => setStatusFilter('locked')}><span className="chip-dot" style={{ background: '#dc2626' }}></span>Locked</button>
           </div>
         </div>
       </div>
@@ -236,7 +251,11 @@ const AccountsAdminPage: React.FC = () => {
             </div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '12px' }}>ACCOUNT ACTIONS</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              {selectedAcc.kyc_status === "APPROVED" ? (
+              {selectedAcc.is_locked ? (
+                <button className="admin-btn btn-success" onClick={() => handleUnlockAccount(selectedAcc.id)} style={{ justifyContent: 'center' }}>
+                  ✓ Unlock Account
+                </button>
+              ) : selectedAcc.kyc_status === "APPROVED" ? (
                 <button className={`admin-btn ${frozenAccounts.has(selectedAcc.id) ? "btn-success" : "btn-danger"}`} onClick={toggleFreeze} style={{ justifyContent: 'center' }}>
                   {frozenAccounts.has(selectedAcc.id) ? "✓ Unfreeze" : "❄ Freeze Account"}
                 </button>

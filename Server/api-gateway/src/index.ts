@@ -7,6 +7,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import path from "path";
+import http from "http";
+import { URL } from "url";
 import adminRoutes from "./routes/admin";
 
 const app = express();
@@ -57,25 +59,38 @@ async function forwardJSON(serviceUrl: string, apiPath: string, req: Request, re
 
 // ─── Helper: Forward multipart (file upload) requests ───────
 
-async function forwardMultipart(serviceUrl: string, apiPath: string, req: Request, res: Response): Promise<void> {
+function forwardMultipart(serviceUrl: string, apiPath: string, req: Request, res: Response): void {
   try {
-    const headers: Record<string, string> = {};
-    if (req.headers.authorization) {
-      headers["Authorization"] = req.headers.authorization;
-    }
-    if (req.headers["content-type"]) {
-      headers["Content-Type"] = req.headers["content-type"];
-    }
-
-    const upstream = await fetch(`${serviceUrl}${apiPath}`, {
+    const target = new URL(apiPath, serviceUrl);
+    const options: http.RequestOptions = {
+      hostname: target.hostname,
+      port: target.port || 80,
+      path: target.pathname + target.search,
       method: req.method,
-      headers,
-      body: req as any,
-      duplex: "half",
-    } as any);
+      headers: {
+        ...req.headers,
+        host: target.host,
+      },
+    };
 
-    const data = await upstream.json();
-    res.status(upstream.status).json(data);
+    const proxyReq = http.request(options, (proxyRes) => {
+      let body = "";
+      proxyRes.on("data", (chunk) => { body += chunk; });
+      proxyRes.on("end", () => {
+        try {
+          res.status(proxyRes.statusCode || 500).json(JSON.parse(body));
+        } catch {
+          res.status(proxyRes.statusCode || 500).send(body);
+        }
+      });
+    });
+
+    proxyReq.on("error", (err) => {
+      console.error(`[Gateway] Proxy error for ${apiPath}:`, err.message);
+      res.status(502).json({ error: "Upstream service unavailable." });
+    });
+
+    req.pipe(proxyReq);
   } catch (err: any) {
     console.error(`[Gateway] Error forwarding upload to ${serviceUrl}${apiPath}:`, err.message);
     res.status(502).json({ error: "Upstream service unavailable." });
@@ -96,6 +111,9 @@ app.post("/api/auth/send-email-otp", (req, res) => forwardJSON(USER_SERVICE_URL,
 app.post("/api/auth/verify-email", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-email", req, res));
 app.get("/api/auth/verification-status", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verification-status", req, res));
 app.get("/api/auth/me", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/me", req, res));
+app.post("/api/auth/forgot-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/forgot-password", req, res));
+app.post("/api/auth/verify-reset-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-reset-otp", req, res));
+app.post("/api/auth/reset-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/reset-password", req, res));
 
 // ─── Finance Routes -> User Service ──────────────────────────
 

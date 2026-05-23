@@ -7,7 +7,7 @@ import { ErrorBoundary } from '../shared/ErrorBoundary';
 import '../../styles/admin.css';
 
 const AdminLayout: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState('light');
@@ -29,6 +29,11 @@ const AdminLayout: React.FC = () => {
   // If not authenticated and no bypass flag, redirect to login
   if (!isAuthenticated && !isBypassed) {
     return <Navigate to="/login" replace />;
+  }
+
+  // If authenticated but not an admin, redirect to user dashboard
+  if (isAuthenticated && user && user.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />;
   }
 
   const toggleSidebar = () => {

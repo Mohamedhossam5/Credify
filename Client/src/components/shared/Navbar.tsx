@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
       <nav className="flex justify-between items-center px-12 py-4 max-w-7xl mx-auto">
 
 
-        <div className="flex items-center h-16">
+        <Link to="/" className="flex items-center h-16 cursor-pointer">
           <img
             src={myImage}
             alt="Credify Bank"
@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
           <div id="fallback-logo" className={`hidden text-2xl font-bold tracking-tight ${isOverFooter ? 'text-white' : 'text-slate-800'}`}>
             Credify
           </div>
-        </div>
+        </Link>
 
 
         <div className="hidden md:flex items-center gap-10">
@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
             );
 
             return isAbout ? (
-              <Link key={item} to="/admin/dashboard" state={{ bypassAuth: true }} className={className}>
+              <Link key={item} to="/about" className={className}>
                 {children}
               </Link>
             ) : (

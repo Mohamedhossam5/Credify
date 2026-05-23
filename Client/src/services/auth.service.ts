@@ -133,4 +133,23 @@ export const authService = {
     const { data } = await api.get('/auth/me');
     return data;
   },
+
+  /** Step 1 of forgot-password: verify email + national ID ownership → send reset OTP */
+  forgotPassword: async (email: string, idNumber: string): Promise<{ message: string }> => {
+    const { data } = await api.post('/auth/forgot-password', { email, idNumber });
+    return data;
+  },
+
+  /** Step 2 of forgot-password: verify reset OTP → get one-time resetToken */
+  verifyResetOtp: async (email: string, otp: string): Promise<{ message: string; resetToken: string }> => {
+    const { data } = await api.post('/auth/verify-reset-otp', { email, otp });
+    return data;
+  },
+
+  /** Step 3 of forgot-password: consume resetToken → save new password */
+  resetPassword: async (resetToken: string, newPassword: string): Promise<{ message: string }> => {
+    const { data } = await api.post('/auth/reset-password', { resetToken, newPassword });
+    return data;
+  },
 };
+
