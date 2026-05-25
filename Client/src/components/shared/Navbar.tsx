@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
 
 
         <div className="hidden md:flex items-center gap-10">
-          {['Home', 'Personal', 'Payments', 'About'].map((item) => {
+          {['Home', 'Payments', 'About'].map((item) => {
             const className = `font-medium transition-colors duration-500 relative group ${isOverFooter ? 'text-white' : 'text-slate-600 hover:text-slate-900'
               }`;
             const children = (

@@ -123,12 +123,31 @@ const Features: React.FC = () => {
               </p>
             </div>
             <div className="flex justify-start pl-12 md:pl-20">
-              <div className="bg-surface-container rounded-xl p-12 w-full max-w-md transition-transform duration-500 hover:scale-[1.02]">
-                <img
-                  alt="Secure Credify banking card"
-                  className="w-full h-auto drop-shadow-2xl rounded-xl"
-                  src="/credify_card_custom.png"
-                />
+              <div className="bg-transparent rounded-xl p-8 w-full max-w-md flex justify-center items-center relative h-[300px]">
+                {/* Pure CSS Card matching the Hero section */}
+                <div className="bg-gradient-to-br from-[#2d2d2d] to-black shadow-[30px_30px_70px_rgba(0,0,0,0.35)] hover:scale-105 transition-transform duration-500 w-[380px] h-[230px] rounded-[2.5rem] p-8 text-white flex flex-col justify-between overflow-hidden border border-white/10 relative">
+                  {/* Card Gloss/Reflection */}
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/5 to-transparent pointer-events-none rounded-[2.5rem]"></div>
+                  
+                  <div className="flex justify-between items-start relative z-10">
+                    <span className="text-2xl font-extrabold tracking-tighter italic">
+                      Credify
+                    </span>
+                    <div className="w-14 h-10 bg-yellow-500/20 rounded-xl border border-yellow-500/30 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-8 h-6 bg-yellow-600/40 rounded-md"></div>
+                    </div>
+                  </div>
+                  <div className="relative z-10">
+                    <p className="tracking-widest text-xl font-medium mb-3 shadow-sm">
+                      1234 5678 9101 0000
+                    </p>
+                    <div className="flex justify-between items-end">
+                      <p className="text-sm opacity-60 uppercase tracking-widest font-light">
+                        CARDHOLDER NAME
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

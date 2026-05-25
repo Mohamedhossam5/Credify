@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -35,7 +36,7 @@ const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1.2fr] gap-20 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-20 mb-20">
           <div>
             <p className="text-f-text-dim text-base leading-[1.8] mb-[30px]">
               Redefining the digital banking landscape with secure, transparent, and ultra-fast financial solutions for the next generation.
@@ -52,22 +53,19 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="text-[15px] font-extrabold mb-[35px] bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">PLATFORM</h4>
+            <h4 className="text-[15px] font-extrabold mb-[35px] bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">QUICK LINKS</h4>
             <ul className="list-none p-0 m-0 space-y-4">
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Digital Card</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Stock Trading</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Crypto Wallet</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Direct Deposit</a></li>
+              <li><Link to="/" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Home</Link></li>
+              <li><Link to="/payments" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Payments</Link></li>
+              <li><Link to="/about" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">About Us</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-[15px] font-extrabold mb-[35px] bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">RESOURCES</h4>
+            <h4 className="text-[15px] font-extrabold mb-[35px] bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">ACCOUNT</h4>
             <ul className="list-none p-0 m-0 space-y-4">
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Support Center</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">System Status</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Bug Bounty</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Community</a></li>
+              <li><Link to="/login" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Login</Link></li>
+              <li><Link to="/register" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Register</Link></li>
             </ul>
           </div>
 
@@ -76,8 +74,6 @@ const Footer: React.FC = () => {
             <ul className="list-none p-0 m-0 space-y-4">
               <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Privacy Policy</a></li>
               <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Terms of Use</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Risk Disclosure</a></li>
-              <li><a href="#" className="text-f-text-dim no-underline text-[15px] transition-colors duration-300 hover:text-white relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-f-primary after:transition-all after:duration-300 hover:after:w-full">Cookie Policy</a></li>
             </ul>
           </div>
         </div>

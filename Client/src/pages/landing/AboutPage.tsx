@@ -59,6 +59,53 @@ const AboutPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Eligibility Section */}
+      <div className="py-24 bg-white border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-12">
+          <div className="bg-[#E0F2FE] rounded-3xl p-10 md:p-14 border border-[#DCFCE7] shadow-sm">
+            <h2 className="text-3xl font-[900] text-slate-900 mb-6 tracking-tight">Who is eligible to join Credify?</h2>
+            <p className="text-lg text-slate-600 mb-10 leading-relaxed max-w-3xl">
+              Opening a Credify account is fast and completely digital. To ensure a secure environment for all our users and comply with financial regulations, you must meet a few simple requirements:
+            </p>
+            <ul className="grid md:grid-cols-2 gap-6">
+              {[
+                { title: 'Age Requirement', desc: 'You must be at least 18 years old to open a primary account.' },
+                { title: 'Valid Identity', desc: 'A valid, non-expired government-issued ID (National ID or Passport).' },
+                { title: 'Supported Residency', desc: 'You must reside in a country currently supported by our infrastructure.' },
+                { title: 'Clean Financial Record', desc: 'No history of fraud or previous suspensions on our banking network.' }
+              ].map((item, idx) => (
+                <li key={idx} className="flex gap-5 items-start bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                  <div className="w-12 h-12 rounded-full bg-[#DCFCE7] flex items-center justify-center shrink-0">
+                    <svg className="w-6 h-6 text-[#22c55e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-slate-900 mb-1.5">{item.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="mt-10 p-5 bg-white/60 rounded-xl border border-blue-200/50 text-center">
+              <p className="text-slate-600 text-[15px] font-medium">
+                For more details on financial regulations, please visit the{' '}
+                <a 
+                  href="https://www.cbe.org.eg/ar/financial-literacy/learn" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 underline underline-offset-4 decoration-blue-300 hover:decoration-blue-600 transition-colors"
+                >
+                  Central Bank of Egypt
+                </a>
+                {' '}site.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Team Section */}
       <div className="py-24 max-w-7xl mx-auto px-12">
         <div className="text-center mb-20">

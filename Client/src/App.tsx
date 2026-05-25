@@ -5,6 +5,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useDynamicTitle } from './hooks/useDynamicTitle';
 import { queryClient } from './lib/queryClient';
+import ScrollToTop from './components/shared/ScrollToTop';
 
 // Keep Layouts static (CRITICAL UI SHELLS)
 import AuthLayout from './pages/auth/AuthLayout';
@@ -14,7 +15,6 @@ import AdminLayout from './components/layout/AdminLayout';
 // Lazy load Pages ONLY
 const Landing = React.lazy(() => import('./pages/landing/Landing'));
 const AboutPage = React.lazy(() => import('./pages/landing/AboutPage'));
-const PersonalPage = React.lazy(() => import('./pages/landing/PersonalPage'));
 const PaymentsPage = React.lazy(() => import('./pages/landing/PaymentsPage'));
 const Dashboard = React.lazy(() => import('./pages/dashboard/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/dashboard/Transactions'));
@@ -47,7 +47,6 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<AboutPage />} />
-        <Route path="/personal" element={<PersonalPage />} />
         <Route path="/payments" element={<PaymentsPage />} />
         <Route path="/login" element={<AuthLayout />} />
         <Route path="/register" element={<AuthLayout />} />
@@ -87,6 +86,7 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <Toaster position="top-right" />
         <AppContent />
       </BrowserRouter>
