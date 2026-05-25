@@ -1,45 +1,45 @@
 import React from 'react';
 import Navbar from '../../components/shared/Navbar';
 import Footer from '../../components/shared/Footer';
-import mahmoudPhoto from '../../assets/team/mahmoud.png';
+import nadyPhoto from '../../assets/team/nady.png';
 import mohamedPhoto from '../../assets/team/mohamed.png';
-import sarahPhoto from '../../assets/team/sarah.png';
-import emilyPhoto from '../../assets/team/emily.png';
-import davidPhoto from '../../assets/team/david.png';
-import sophiaPhoto from '../../assets/team/sophia.png';
+import hossPhoto from '../../assets/team/hoss.png';
+import karimPhoto from '../../assets/team/karim.png';
+import yehiaPhoto from '../../assets/team/yehia1.png';
+import zedPhoto from '../../assets/team/zed.png';
 
 const AboutPage: React.FC = () => {
   const team = [
     {
       name: 'Mohamed Badawy',
       role: 'Team Leader & Backend Developer',
-      photo: mahmoudPhoto,
+      photo: mohamedPhoto,
     },
 
     {
       name: 'Mohamed Hossam',
       role: 'Backend Developer',
-      photo: mohamedPhoto,
+      photo: hossPhoto,
     },
     {
       name: 'Mahmoud Nady',
       role: 'Frontend Developer',
-      photo: sarahPhoto,
+      photo: nadyPhoto,
     },
     {
       name: 'Karim Akram',
       role: 'Frontend Developer',
-      photo: emilyPhoto,
+      photo: karimPhoto,
     },
     {
       name: 'Yehia Khatab',
       role: 'Business Analyst',
-      photo: davidPhoto,
+      photo: yehiaPhoto,
     },
     {
       name: 'Mostafa Yasser',
       role: 'System Analyst',
-      photo: sophiaPhoto,
+      photo: zedPhoto,
     }
   ];
 

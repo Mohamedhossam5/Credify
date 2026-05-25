@@ -14,6 +14,8 @@ import AdminLayout from './components/layout/AdminLayout';
 // Lazy load Pages ONLY
 const Landing = React.lazy(() => import('./pages/landing/Landing'));
 const AboutPage = React.lazy(() => import('./pages/landing/AboutPage'));
+const PersonalPage = React.lazy(() => import('./pages/landing/PersonalPage'));
+const PaymentsPage = React.lazy(() => import('./pages/landing/PaymentsPage'));
 const Dashboard = React.lazy(() => import('./pages/dashboard/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/dashboard/Transactions'));
 const TransfersPage = React.lazy(() => import('./pages/dashboard/TransfersPage'));
@@ -45,6 +47,8 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/personal" element={<PersonalPage />} />
+        <Route path="/payments" element={<PaymentsPage />} />
         <Route path="/login" element={<AuthLayout />} />
         <Route path="/register" element={<AuthLayout />} />
         <Route path="/pending-approval" element={<PendingApprovalPage />} />

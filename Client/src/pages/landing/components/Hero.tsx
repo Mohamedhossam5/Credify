@@ -82,9 +82,9 @@ const Hero: React.FC = () => {
           {/* White Card (Back) */}
           <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-[5] animate-float-card-secondary absolute w-[380px] h-[230px] rounded-[2.5rem] p-8 flex flex-col justify-end translate-x-12 translate-y-12">
             <p className="text-slate-400 tracking-widest font-medium text-lg">
-              0000 0000 0000 0000
+              1234 5678 9101 0000
             </p>
-            <p className="text-slate-400 text-sm mt-1 uppercase font-semibold">Mahmoud Nady</p>
+            <p className="text-slate-400 text-sm mt-1 uppercase font-semibold">CARDHOLDER NAME</p>
           </div>
 
           {/* Black Card (Front) */}
@@ -99,11 +99,11 @@ const Hero: React.FC = () => {
             </div>
             <div>
               <p className="tracking-widest text-xl font-medium mb-3">
-                0000 0000 0000 0000
+                1234 5678 9101 0000
               </p>
               <div className="flex justify-between items-end">
                 <p className="text-sm opacity-60 uppercase tracking-widest font-light">
-                  Mahmoud Nady
+                  CARDHOLDER NAME
                 </p>
               </div>
             </div>
