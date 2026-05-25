@@ -1,47 +1,30 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, LogIn } from 'lucide-react';
+import { Clock, Home } from 'lucide-react';
 import { useAuthStore } from '../../../store/authStore';
-import { authService } from '../../../services/auth.service';
-
-const POLL_INTERVAL_MS = 5000;
+import { useAuth } from '../../../hooks/useAuth';
 
 export const KycPendingApproval: React.FC = () => {
   const navigate = useNavigate();
   const reset = useAuthStore((s) => s.reset);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { logout } = useAuth();
+  const [countdown, setCountdown] = useState(10);
 
-  // Poll for KYC status changes so the user sees rejection/approval immediately
-  useEffect(() => {
-    const checkStatus = async () => {
-      try {
-        const { user } = await authService.getMe();
-        // Keep local store in sync
-        useAuthStore.getState().setUser(user);
-
-        if (user.kycStatus === 'REJECTED') {
-          navigate('/rejected', { replace: true });
-        } else if (user.kycStatus === 'APPROVED') {
-          navigate('/dashboard', { replace: true });
-        }
-      } catch {
-        // Silently ignore — will retry on next interval
-      }
-    };
-
-    // Check immediately on mount
-    checkStatus();
-    intervalRef.current = setInterval(checkStatus, POLL_INTERVAL_MS);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [navigate]);
-
-  const handleGoToLogin = () => {
+  const handleBackToHome = () => {
     reset();
-    navigate('/login');
+    logout();
+    navigate('/');
   };
+
+  // Auto-redirect to landing page after 3 seconds
+  useEffect(() => {
+    if (countdown <= 0) {
+      handleBackToHome();
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-[40px_44px] bg-auth-form z-10">
@@ -67,14 +50,15 @@ export const KycPendingApproval: React.FC = () => {
         <span className="text-[0.7rem] font-semibold text-auth-teal tracking-[0.3px]">Under Review</span>
       </div>
 
-      {/* Go to Login button */}
+      {/* Back to Home */}
       <button
-        onClick={handleGoToLogin}
+        onClick={handleBackToHome}
         className="flex items-center gap-2 text-[0.8rem] font-semibold text-auth-teal hover:text-auth-text-dark transition-colors duration-200 cursor-pointer bg-transparent border-none p-0"
       >
-        <LogIn className="w-[14px] h-[14px]" />
-        Go to Login
+        <Home className="w-[14px] h-[14px]" />
+        Back to Home
       </button>
+      <p className="text-[0.7rem] text-auth-text-light mt-3">Redirecting in {countdown}s…</p>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, LogOut } from 'lucide-react';
+import { Clock, Home } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { authService } from '../../services/auth.service';
@@ -12,6 +12,7 @@ const PendingApprovalPage: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [countdown, setCountdown] = useState(10);
 
   // Poll for KYC status changes so the user sees rejection/approval immediately
   useEffect(() => {
@@ -40,10 +41,20 @@ const PendingApprovalPage: React.FC = () => {
     };
   }, [navigate]);
 
-  const handleSignOut = () => {
+  const handleBackToHome = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
+
+  // Auto-redirect to landing page after 3 seconds
+  useEffect(() => {
+    if (countdown <= 0) {
+      handleBackToHome();
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   return (
     <div className="min-h-screen bg-auth-bg auth-bg flex items-center justify-center overflow-x-hidden overflow-y-auto font-b p-4 md:p-8">
@@ -78,14 +89,15 @@ const PendingApprovalPage: React.FC = () => {
             <span className="text-[0.72rem] font-semibold text-auth-teal tracking-[0.3px]">Under Review</span>
           </div>
 
-          {/* Sign out */}
+          {/* Back to Home */}
           <button
-            onClick={handleSignOut}
+            onClick={handleBackToHome}
             className="flex items-center gap-2 text-[0.8rem] font-medium text-auth-text-light hover:text-auth-text-dark transition-colors duration-200 cursor-pointer bg-transparent border-none p-0"
           >
-            <LogOut className="w-[14px] h-[14px]" />
-            Sign Out
+            <Home className="w-[14px] h-[14px]" />
+            Back to Home
           </button>
+          <p className="text-[0.7rem] text-auth-text-light mt-3">Redirecting in {countdown}s…</p>
         </div>
       </div>
     </div>
