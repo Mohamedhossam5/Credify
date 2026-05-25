@@ -6,6 +6,10 @@ import { CreditCard, Smartphone, Link as LinkIcon, QrCode } from 'lucide-react';
 import applePayMockup from '../../assets/apple_pay_mockup.png';
 import paymentsHero from '../../assets/payments_hero.png';
 
+// Preload the hero image immediately when the JS chunk is downloaded (before React renders)
+const preloadHero = new Image();
+preloadHero.src = paymentsHero;
+
 const PaymentsPage: React.FC = () => {
   const features = [
     {
@@ -74,7 +78,13 @@ const PaymentsPage: React.FC = () => {
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-[#4ade80]/20 to-[#3b82f6]/20 rounded-full blur-[80px]"></div>
               
               {/* Hero Image */}
-              <img src={paymentsHero} alt="Global Payments Dashboard" className="relative z-10 w-[104%] -ml-[2%] object-contain mix-blend-multiply hover:scale-[1.02] transition-transform duration-700 ease-out contrast-125 brightness-110 [clip-path:inset(2%)]" />
+              <img 
+                src={paymentsHero} 
+                alt="Global Payments Dashboard" 
+                fetchPriority="high"
+                loading="eager"
+                className="relative z-10 w-[104%] -ml-[2%] object-contain mix-blend-multiply hover:scale-[1.02] transition-transform duration-700 ease-out contrast-125 brightness-110 [clip-path:inset(2%)]" 
+              />
             </div>
           </div>
         </div>
