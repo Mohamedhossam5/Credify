@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Mail, Phone, ArrowRight } from 'lucide-react';
+import { User, Mail, Phone, IdCard, ArrowRight } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { useRegisterStep1 } from '../../hooks/useRegisterStep1';
@@ -33,7 +33,6 @@ export const RegisterStep1: React.FC = () => {
         </h1>
         <p className="text-[0.8rem] text-auth-text-light mb-[22px] leading-[1.55]">
           Step 1 of 3 — the basics.
-
         </p>
       </div>
 
@@ -61,6 +60,7 @@ export const RegisterStep1: React.FC = () => {
             {...register('middleName')}
           />
         </div>
+        
         <Input
           label="Last name"
           placeholder="Khalil"
@@ -84,14 +84,22 @@ export const RegisterStep1: React.FC = () => {
           error={focusedError === 'phone' ? errors.phone?.message : undefined}
           {...register('phone')}
         />
+        <Input
+          label="National ID"
+          placeholder="29xxxxxxxxxxxxxx"
+          maxLength={14}
+          icon={IdCard}
+          error={focusedError === 'nationalId' ? errors.nationalId?.message : undefined}
+          {...register('nationalId')}
+        />
 
         <div className="w-full mb-2 text-left group">
           <label className="block text-[0.64rem] font-bold tracking-[0.7px] uppercase mb-[6px] transition-colors duration-220 text-auth-text-light group-focus-within:text-auth-teal">
             Gender
           </label>
           <div className="flex gap-[11px] w-full">
-            <label className="flex-1 cursor-pointer">
-              <input type="radio" value="male" className="peer sr-only" {...register('gender')} />
+            <label className="flex-1 cursor-not-allowed opacity-80">
+              <input type="radio" value="male" className="peer sr-only" disabled {...register('gender')} />
               <div className={`h-[48px] rounded-[13px] border-[1.5px] bg-white transition-all duration-200 active:scale-[0.98] flex items-center justify-center text-auth-text-light font-medium text-[0.9rem] ${errors.gender
                   ? 'border-auth-red bg-auth-red-dim text-auth-red'
                   : 'border-auth-border hover:border-auth-teal/40 hover:shadow-[0_2px_8px_rgba(16,185,129,0.06)]'
@@ -99,8 +107,8 @@ export const RegisterStep1: React.FC = () => {
                 Male
               </div>
             </label>
-            <label className="flex-1 cursor-pointer">
-              <input type="radio" value="female" className="peer sr-only" {...register('gender')} />
+            <label className="flex-1 cursor-not-allowed opacity-80">
+              <input type="radio" value="female" className="peer sr-only" disabled {...register('gender')} />
               <div className={`h-[48px] rounded-[13px] border-[1.5px] bg-white transition-all duration-200 active:scale-[0.98] flex items-center justify-center text-auth-text-light font-medium text-[0.9rem] ${errors.gender
                   ? 'border-auth-red bg-auth-red-dim text-auth-red'
                   : 'border-auth-border hover:border-auth-teal/40 hover:shadow-[0_2px_8px_rgba(16,185,129,0.06)]'

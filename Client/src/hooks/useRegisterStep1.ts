@@ -8,22 +8,25 @@ export const useRegisterStep1 = () => {
   const { currentStep, setCurrentStep, step1Data, setStep1Data } = useAuthStore();
   const [focusedError, setFocusedError] = useState<keyof RegisterStep1Data | null>(null);
 
-  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterStep1Data>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<RegisterStep1Data>({
     resolver: zodResolver(registerStep1Schema),
     defaultValues: step1Data || {},
-    mode: 'onSubmit',
+    mode: 'onChange',
   });
 
-  const nationalId = watch('nationalId');
-
-  useEffect(() => {
-    if (nationalId && nationalId.length === 14) {
-      const thirteenthDigit = parseInt(nationalId[12], 10);
-      if (!isNaN(thirteenthDigit)) {
-        setValue('gender', thirteenthDigit % 2 !== 0 ? 'male' : 'female', { shouldValidate: true });
+    useEffect(() => {
+    const subscription = watch((value, { name }) => {
+      if (name === 'nationalId') {
+        const id = value.nationalId;
+        if (id && id.length >= 13) {
+          const thirteenthDigit = parseInt(id[12], 10);
+          const gender = thirteenthDigit % 2 !== 0 ? 'male' : 'female';
+          setValue('gender', gender, { shouldValidate: true });
+        }
       }
-    }
-  }, [nationalId, setValue]);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch, setValue]);
 
   const onSubmit = (data: RegisterStep1Data) => {
     setFocusedError(null);
@@ -31,7 +34,7 @@ export const useRegisterStep1 = () => {
     setCurrentStep(2);
   };
 
-  const fieldOrder: (keyof RegisterStep1Data)[] = ['firstName', 'middleName', 'lastName', 'email', 'phone', 'nationalId', 'gender'];
+  const fieldOrder: (keyof RegisterStep1Data)[] = ['firstName', 'middleName', 'lastName', 'nationalId', 'email', 'phone', 'gender'];
 
   const onError = (errs: FieldErrors<RegisterStep1Data>) => {
     const firstError = fieldOrder.find(key => errs[key]);
