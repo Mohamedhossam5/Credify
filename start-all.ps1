@@ -17,7 +17,7 @@ Write-Host "4/5 Starting Frontend (Vite)..." -ForegroundColor Green
 Start-Process powershell -WorkingDirectory $RepoRoot -ArgumentList "-NoExit -Command `"cd Client; npm run dev`""
 
 Write-Host "5/5 Starting Face Verification Service (Port 8000)..." -ForegroundColor Green
-Start-Process powershell -WorkingDirectory $RepoRoot -ArgumentList "-NoExit -Command `"cd Server\face-service; .\.venv\Scripts\activate.ps1; py -m uvicorn main:app --port 8000`""
+Start-Process powershell -WorkingDirectory $RepoRoot -ArgumentList "-NoExit -Command `"cd Server\face-service; .\.venv\Scripts\activate.ps1; python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload`""
 
 Write-Host "Success! All services have been started in separate terminal windows." -ForegroundColor Cyan
 Write-Host "You can close this window now." -ForegroundColor Gray

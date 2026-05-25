@@ -404,6 +404,36 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
       return;
     }
 
+    // ─── Dev bypass: skip OTP when SKIP_OTP=true ─────────────
+    if (process.env.SKIP_OTP === "true") {
+      const token = generateToken(user);
+      const account = await Account.findByUserId(user.id);
+
+      res.json({
+        message: "Login successful.",
+        otpRequired: false,
+        user: {
+          id: user.id,
+          firstName: user.first_name,
+          middleName: user.middle_name,
+          lastName: user.last_name,
+          email: user.email,
+          phoneNumber: user.phone_number,
+          gender: user.gender,
+          phoneVerified: user.phone_verified,
+          emailVerified: user.email_verified,
+          kycStatus: user.kyc_status,
+          role: user.role,
+          account: account ? {
+            accountId: account.account_id,
+            balance: account.balance
+          } : null
+        },
+        token,
+      });
+      return;
+    }
+
     // ─── Regular user: generate OTP and send via Brevo ────────
     const otp = generateOtp(email);
 

@@ -184,7 +184,7 @@ const KYCPage: React.FC = () => {
                               <div style={{ fontSize: '14px', fontWeight: 800, color: facePassed ? 'var(--success, #00e88f)' : 'var(--danger, #ff4d6a)' }}>{facePassed ? 'MATCH' : 'NO MATCH'}</div>
                             </div>
                             <div>
-                              <span style={{ fontSize: '10px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600 }}>Distance Score</span>
+                              <span style={{ fontSize: '10px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600 }}>Similarity Score</span>
                               <div style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace' }}>{rawScore?.toFixed(4)}</div>
                             </div>
                             <div>

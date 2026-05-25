@@ -260,8 +260,8 @@ async function triggerFaceVerification(userId: number): Promise<void> {
       return;
     }
 
-    const result = await response.json() as { verified: boolean; distance: number };
-    await KycApplication.updateFaceVerification(userId, result.distance, result.verified);
+    const result = await response.json() as { verified: boolean; similarity: number };
+    await KycApplication.updateFaceVerification(userId, result.similarity, result.verified);
 
     // Always send to admin for final review instead of auto-approving/rejecting
     const note = result.verified
