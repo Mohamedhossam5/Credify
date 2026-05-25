@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useDynamicTitle } from './hooks/useDynamicTitle';
 import { queryClient } from './lib/queryClient';
 import ScrollToTop from './components/shared/ScrollToTop';
@@ -90,8 +89,6 @@ const App: React.FC = () => {
         <Toaster position="top-right" />
         <AppContent />
       </BrowserRouter>
-      {/* Devtools will only be visible in development */}
-      <ReactQueryDevtools initialIsOpen={false} position="bottom" />
     </QueryClientProvider>
   );
 };
