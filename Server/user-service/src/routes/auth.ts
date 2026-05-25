@@ -86,7 +86,7 @@ router.post("/register", registerValidation, async (req: Request, res: Response)
       return;
     }
 
-    const salt = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
     const user = await User.create({
@@ -359,6 +359,19 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
 
     if (user.failed_login_attempts > 0) {
       await User.resetFailedLogins(user.id);
+    }
+
+    // ─── Re-hash with lower cost if needed (background, after response) ──
+    const TARGET_ROUNDS = 10;
+    const currentRounds = bcrypt.getRounds(user.password_hash!);
+    if (currentRounds > TARGET_ROUNDS) {
+      setImmediate(async () => {
+        try {
+          const salt = await bcrypt.genSalt(TARGET_ROUNDS);
+          const newHash = await bcrypt.hash(password, salt);
+          await User.updatePassword(user.id, newHash);
+        } catch (_) { /* best-effort migration */ }
+      });
     }
 
     // ─── Admin bypass: skip OTP entirely ─────────────────────
@@ -664,7 +677,7 @@ router.post("/reset-password", [
     }
 
     // Hash new password and save
-    const salt = await bcrypt.genSalt(12);
+    const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(newPassword, salt);
     await User.updatePassword(user.id, passwordHash);
 

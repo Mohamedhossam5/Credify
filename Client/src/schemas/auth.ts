@@ -25,8 +25,18 @@ const confirmPasswordSchema = z.string();
 /* ===================== CONTACT ===================== */
 const phoneSchema = z
   .string()
-  .regex(/^\+201[0-2,5][0-9]{8}$/, 'Enter a valid Egyptian phone number')
-  .transform((val) => val.replace(/\s+/g, ''));
+  .transform((val) => val.replace(/[\s\-()]/g, ''))
+  .pipe(
+    z.string().regex(
+      /^(?:\+?20)?0?1[0-25][0-9]{8}$/,
+      'Enter a valid Egyptian phone number (e.g. 01012345678)'
+    )
+  )
+  .transform((val) => {
+    // Strip everything to just the 10-digit local number, then prepend +20
+    const cleaned = val.replace(/^\+?20/, '').replace(/^0/, '');
+    return `+20${cleaned}`;
+  });
 
 /* ===================== IDENTIFICATION ===================== */
 const nationalIdSchema = z
@@ -61,13 +71,13 @@ export const registerStep1Schema = z.object({
   lastName: nameSchema,
   email: emailSchema,
   phone: phoneSchema,
+  nationalId: nationalIdSchema,
   gender: GenderEnum,
 });
 
 /* ===================== REGISTER STEP 2 ===================== */
 export const registerStep2Schema = z
   .object({
-    nationalId: nationalIdSchema,
     address: z.string().min(10, 'Address is too short'),
     dob: dobSchema,
     password: passwordSchema,

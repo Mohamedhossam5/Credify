@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { type RegisterStep1Data, type RegisterStep2Data } from '../schemas/auth';
 import { type UserData } from '../services/auth.service';
+import { queryClient } from '../lib/queryClient';
 
 type KycState = 'idle' | 'processing' | 'pending' | 'approved' | 'rejected';
 
@@ -110,6 +111,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('credify_token');
     localStorage.removeItem('credify_user');
+    queryClient.clear();
     set({ token: null, user: null, isAuthenticated: false, loginEmail: null, otpRequired: false });
   },
   reset: () => set({

@@ -38,7 +38,7 @@ export const useRegisterStep2 = () => {
         email: step1Data.email,
         phoneNumber: step1Data.phone,
         gender: step1Data.gender.toUpperCase() as 'MALE' | 'FEMALE',
-        idNumber: data.nationalId,
+        idNumber: step1Data.nationalId,
         birthdate: data.dob,
         address: data.address,
         password: data.password,
@@ -67,7 +67,7 @@ export const useRegisterStep2 = () => {
     }
   };
 
-  const fieldOrder: (keyof RegisterStep2Data)[] = ['nationalId', 'address', 'dob', 'password', 'confirmPassword'];
+  const fieldOrder: (keyof RegisterStep2Data)[] = ['address', 'dob', 'password', 'confirmPassword'];
 
   const onError = (errs: FieldErrors<RegisterStep2Data>) => {
     const firstError = fieldOrder.find(key => errs[key]);

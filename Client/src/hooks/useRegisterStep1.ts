@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from '../store/authStore';
@@ -8,11 +8,22 @@ export const useRegisterStep1 = () => {
   const { currentStep, setCurrentStep, step1Data, setStep1Data } = useAuthStore();
   const [focusedError, setFocusedError] = useState<keyof RegisterStep1Data | null>(null);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterStep1Data>({
+  const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<RegisterStep1Data>({
     resolver: zodResolver(registerStep1Schema),
     defaultValues: step1Data || {},
     mode: 'onSubmit',
   });
+
+  const nationalId = watch('nationalId');
+
+  useEffect(() => {
+    if (nationalId && nationalId.length === 14) {
+      const thirteenthDigit = parseInt(nationalId[12], 10);
+      if (!isNaN(thirteenthDigit)) {
+        setValue('gender', thirteenthDigit % 2 !== 0 ? 'male' : 'female', { shouldValidate: true });
+      }
+    }
+  }, [nationalId, setValue]);
 
   const onSubmit = (data: RegisterStep1Data) => {
     setFocusedError(null);
@@ -20,7 +31,7 @@ export const useRegisterStep1 = () => {
     setCurrentStep(2);
   };
 
-  const fieldOrder: (keyof RegisterStep1Data)[] = ['firstName', 'middleName', 'lastName', 'email', 'phone'];
+  const fieldOrder: (keyof RegisterStep1Data)[] = ['firstName', 'middleName', 'lastName', 'email', 'phone', 'nationalId', 'gender'];
 
   const onError = (errs: FieldErrors<RegisterStep1Data>) => {
     const firstError = fieldOrder.find(key => errs[key]);

@@ -65,7 +65,6 @@ export const RegisterStep2: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <Input label="National ID" placeholder="29xxxxxxxxxxxxxx" maxLength={14} icon={IdCard} error={focusedError === 'nationalId' ? errors.nationalId?.message : undefined} {...register('nationalId')} />
         <Input label="Current address" placeholder="123 Street, Cairo" icon={MapPin} error={focusedError === 'address' ? errors.address?.message : undefined} {...register('address')} />
         <Input
           label="Date of birth"

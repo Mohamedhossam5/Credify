@@ -6,11 +6,12 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   label: string;
   icon?: LucideIcon;
   error?: string;
+  prefix?: string;
   containerClassName?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, icon: Icon, error, containerClassName, id, ...props }, ref) => {
+  ({ className, label, icon: Icon, error, prefix, containerClassName, id, ...props }, ref) => {
     const generatedId = useId();
     const inputId = id || generatedId;
 
@@ -35,6 +36,18 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               )} 
             />
           )}
+
+          {prefix && (
+            <span
+              className={cn(
+                'absolute z-[2] text-[0.9rem] font-semibold select-none pointer-events-none transition-colors duration-220',
+                Icon ? 'left-[38px]' : 'left-[15px]',
+                error ? 'text-auth-red/60' : 'text-auth-text-mid group-focus-within:text-auth-teal'
+              )}
+            >
+              {prefix}
+            </span>
+          )}
           
           <input
             id={inputId}
@@ -44,7 +57,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               'placeholder:text-auth-text-light placeholder:font-light',
               'focus:bg-white focus:border-auth-teal focus:shadow-[0_0_0_3.5px_rgba(16,185,129,0.09),0_2px_8px_rgba(16,185,129,0.1)]',
               error && 'border-auth-red bg-auth-red-dim focus:border-auth-red focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]',
-              !Icon && 'pl-4',
+              !Icon && !prefix && 'pl-4',
+              prefix && Icon && 'pl-[62px]',
+              prefix && !Icon && 'pl-[42px]',
               className
             )}
             {...props}
