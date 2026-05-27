@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
   return (
     <header className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 ${isOverFooter ? 'bg-transparent border-transparent' : 'bg-white/30 backdrop-blur-md border-b border-white/20'
       }`}>
-      <nav className="flex justify-between items-center px-12 py-4 max-w-7xl mx-auto">
+      <nav className="flex justify-between items-center px-12 py-4 max-w-7xl mx-auto relative">
 
 
         <Link to="/" className="flex items-center h-16 cursor-pointer">
@@ -42,7 +42,7 @@ const Navbar: React.FC = () => {
         </Link>
 
 
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-10 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {['Home', 'Payments', 'About'].map((item) => {
             const className = `font-medium transition-colors duration-500 relative group ${isOverFooter ? 'text-white' : 'text-slate-600 hover:text-slate-900'
               }`;
@@ -63,12 +63,20 @@ const Navbar: React.FC = () => {
         </div>
 
 
-        <Link to="/login" className={`px-8 py-2 border-2 rounded-xl font-bold transition-all duration-300 active:scale-95 flex items-center justify-center ${isOverFooter
-            ? 'border-white text-white hover:bg-white hover:text-slate-900'
-            : 'border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white'
-          }`}>
-          Login
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/login" className={`px-6 py-2.5 border-2 rounded-xl font-semibold text-sm transition-all duration-300 active:scale-95 flex items-center justify-center ${isOverFooter
+              ? 'border-white text-white hover:bg-white hover:text-slate-900'
+              : 'border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white'
+            }`}>
+            Login
+          </Link>
+          <Link to="/register" className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 active:scale-95 flex items-center justify-center border-2 ${isOverFooter
+              ? 'bg-white text-slate-900 border-white hover:bg-transparent hover:text-white'
+              : 'bg-slate-900 text-white border-slate-900 hover:bg-slate-800 hover:border-slate-800'
+            }`}>
+            Become a Customer
+          </Link>
+        </div>
 
       </nav>
     </header>
