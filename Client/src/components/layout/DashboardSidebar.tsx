@@ -1,6 +1,16 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+
+// Preload map: hovering a sidebar item triggers the lazy-loaded chunk to download
+const preloadMap: Record<string, () => void> = {
+  '/dashboard': () => import('../../pages/dashboard/Dashboard'),
+  '/transactions': () => import('../../pages/dashboard/Transactions'),
+  '/transfers': () => import('../../pages/dashboard/TransfersPage'),
+  '/accounts': () => import('../../pages/dashboard/AccountsPage'),
+  '/exchange': () => import('../../pages/dashboard/ExchangePage'),
+  '/settings': () => import('../../pages/dashboard/SettingsPage'),
+};
 
 interface DashboardSidebarProps {
   isOpen: boolean;
@@ -11,6 +21,10 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
+
+  const handlePreload = useCallback((path: string) => {
+    preloadMap[path]?.();
+  }, []);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -45,6 +59,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/dashboard' ? 'active' : ''}`}
             onClick={() => handleNavigate('/dashboard')}
+            onMouseEnter={() => handlePreload('/dashboard')}
+            onTouchStart={() => handlePreload('/dashboard')}
           >
             <svg
               className="nav-icon"
@@ -64,6 +80,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/transactions' ? 'active' : ''}`}
             onClick={() => handleNavigate('/transactions')}
+            onMouseEnter={() => handlePreload('/transactions')}
+            onTouchStart={() => handlePreload('/transactions')}
           >
             <svg
               className="nav-icon"
@@ -84,6 +102,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/transfers' ? 'active' : ''}`}
             onClick={() => handleNavigate('/transfers')}
+            onMouseEnter={() => handlePreload('/transfers')}
+            onTouchStart={() => handlePreload('/transfers')}
           >
             <svg
               className="nav-icon"
@@ -100,6 +120,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/accounts' ? 'active' : ''}`}
             onClick={() => handleNavigate('/accounts')}
+            onMouseEnter={() => handlePreload('/accounts')}
+            onTouchStart={() => handlePreload('/accounts')}
           >
             <svg
               className="nav-icon"
@@ -117,6 +139,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/exchange' ? 'active' : ''}`}
             onClick={() => handleNavigate('/exchange')}
+            onMouseEnter={() => handlePreload('/exchange')}
+            onTouchStart={() => handlePreload('/exchange')}
           >
             <svg
               className="nav-icon"
@@ -138,6 +162,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           <div
             className={`nav-item ${location.pathname === '/settings' ? 'active' : ''}`}
             onClick={() => handleNavigate('/settings')}
+            onMouseEnter={() => handlePreload('/settings')}
+            onTouchStart={() => handlePreload('/settings')}
           >
             <svg
               className="nav-icon"

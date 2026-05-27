@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Users, DollarSign, ArrowUpRight, ArrowDownLeft, ShieldCheck, Clock, Loader2, ChevronRight, AlertTriangle } from 'lucide-react';
 import { api } from '../../../lib/api';
 
@@ -38,26 +39,26 @@ const fmt = (n: number) => n.toLocaleString('en-US', { minimumFractionDigits: 2,
 
 const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [dashRes, txRes] = await Promise.all([
-          api.get('/admin/dashboard'),
-          api.get('/transactions?global=true'),
-        ]);
-        setUsers(dashRes.data.users || []);
-        setTransactions(txRes.data.transactions || []);
-      } catch (err) {
-        console.error('[Admin Dashboard] Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/dashboard');
+      return (data.users || []) as AdminUser[];
+    },
+  });
+
+  const { data: txData, isLoading: isLoadingTx } = useQuery({
+    queryKey: ['admin-transactions'],
+    queryFn: async () => {
+      const { data } = await api.get('/transactions?global=true');
+      return (data.transactions || []) as Transaction[];
+    },
+  });
+
+  const users = usersData ?? [];
+  const transactions = txData ?? [];
+  const loading = isLoadingUsers || isLoadingTx;
 
   // ── Derived stats ──
   const totalUsers = users.filter(u => u.role !== 'ADMIN').length;

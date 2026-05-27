@@ -42,40 +42,36 @@ const AppContent: React.FC = () => {
   useDynamicTitle();
 
   return (
-    <Suspense fallback={<PageLoader />}>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/payments" element={<PaymentsPage />} />
-        <Route path="/login" element={<AuthLayout />} />
-        <Route path="/register" element={<AuthLayout />} />
-        <Route path="/pending-approval" element={<PendingApprovalPage />} />
-        <Route path="/rejected" element={<RejectedPage />} />
+    <Routes>
+      {/* Public routes — keep outer Suspense for first load */}
+      <Route path="/" element={<Suspense fallback={<PageLoader />}><Landing /></Suspense>} />
+      <Route path="/about" element={<Suspense fallback={<PageLoader />}><AboutPage /></Suspense>} />
+      <Route path="/payments" element={<Suspense fallback={<PageLoader />}><PaymentsPage /></Suspense>} />
+      <Route path="/login" element={<AuthLayout />} />
+      <Route path="/register" element={<AuthLayout />} />
+      <Route path="/pending-approval" element={<Suspense fallback={<PageLoader />}><PendingApprovalPage /></Suspense>} />
+      <Route path="/rejected" element={<Suspense fallback={<PageLoader />}><RejectedPage /></Suspense>} />
 
-        {/* Dashboard Routes (Protected) */}
-        <Route element={<DashboardLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          {/* Phase 2 Routes */}
-          <Route path="/transfers" element={<TransfersPage />} />
-          <Route path="/accounts" element={<AccountsPage />} />
+      {/* Dashboard Routes — layout stays mounted, only <Outlet> swaps */}
+      <Route element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
+        <Route path="/transactions" element={<Suspense fallback={<PageLoader />}><Transactions /></Suspense>} />
+        <Route path="/transfers" element={<Suspense fallback={<PageLoader />}><TransfersPage /></Suspense>} />
+        <Route path="/accounts" element={<Suspense fallback={<PageLoader />}><AccountsPage /></Suspense>} />
+        <Route path="/exchange" element={<Suspense fallback={<PageLoader />}><ExchangePage /></Suspense>} />
+        <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
+      </Route>
 
-          {/* Phase 3 Routes */}
-          <Route path="/exchange" element={<ExchangePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-
-        {/* Admin Dashboard Routes (Protected) */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<AdminDashboardPage />} />
-          <Route path="accounts" element={<AccountsAdminPage />} />
-          <Route path="transactions" element={<TransactionsAdminPage />} />
-          <Route path="fraud" element={<AdminFraudPage />} />
-          <Route path="kyc" element={<KYCPage />} />
-          <Route path="settings" element={<SettingsAdminPage />} />
-        </Route>
-      </Routes>
-    </Suspense>
+      {/* Admin Routes — layout stays mounted, only <Outlet> swaps */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="dashboard" element={<Suspense fallback={<PageLoader />}><AdminDashboardPage /></Suspense>} />
+        <Route path="accounts" element={<Suspense fallback={<PageLoader />}><AccountsAdminPage /></Suspense>} />
+        <Route path="transactions" element={<Suspense fallback={<PageLoader />}><TransactionsAdminPage /></Suspense>} />
+        <Route path="fraud" element={<Suspense fallback={<PageLoader />}><AdminFraudPage /></Suspense>} />
+        <Route path="kyc" element={<Suspense fallback={<PageLoader />}><KYCPage /></Suspense>} />
+        <Route path="settings" element={<Suspense fallback={<PageLoader />}><SettingsAdminPage /></Suspense>} />
+      </Route>
+    </Routes>
   );
 };
 

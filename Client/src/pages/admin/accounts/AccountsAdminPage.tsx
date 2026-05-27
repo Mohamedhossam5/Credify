@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { Loader2 } from 'lucide-react';
 
@@ -26,29 +27,22 @@ interface AdminUser {
 const initials = (name: string) => name.split(" ").map(n => n[0]).join("");
 
 const AccountsAdminPage: React.FC = () => {
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data: usersData, isLoading: loading } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/dashboard');
+      return (data.users || []) as AdminUser[];
+    },
+  });
+
+  const users = (usersData ?? []).filter((u: AdminUser) => u.role !== 'ADMIN');
 
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
-
   const [frozenAccounts, setFrozenAccounts] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedAcc, setSelectedAcc] = useState<AdminUser | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const dashRes = await api.get('/admin/dashboard');
-        // Filter out ADMIN users for accounts view
-        setUsers((dashRes.data.users || []).filter((u: AdminUser) => u.role !== 'ADMIN'));
-      } catch (err) {
-        console.error('[Admin Dashboard] Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   const getDisplayStatus = (a: AdminUser) => {
     if (a.is_locked) return "locked";
@@ -84,9 +78,8 @@ const AccountsAdminPage: React.FC = () => {
   const handleUnlockAccount = async (userId: number) => {
     try {
       await api.put(`/admin/users/${userId}/unlock`);
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_locked: false, failed_login_attempts: 0 } : u));
+      await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setDrawerOpen(false);
-      // Optional: Add a toast notification here if desired
     } catch (err) {
       console.error("Failed to unlock account", err);
     }

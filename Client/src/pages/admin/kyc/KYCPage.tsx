@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, CheckCircle2, XCircle, AlertTriangle, Eye, ShieldCheck, ShieldAlert, RefreshCw } from 'lucide-react';
 import { api } from '../../../lib/api';
 import toast from 'react-hot-toast';
@@ -25,27 +26,22 @@ interface KycUser {
 }
 
 const KYCPage: React.FC = () => {
-  const [users, setUsers] = useState<KycUser[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [openRejectId, setOpenRejectId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [previewImage, setPreviewImage] = useState<{ url: string; label: string } | null>(null);
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
 
-  const fetchData = async () => {
-    try {
+  const { data: usersData, isLoading: loading, refetch: fetchData } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
       const { data } = await api.get('/admin/dashboard');
-      setUsers(data.users || []);
-    } catch (err) {
-      console.error('[KYC Page] Error:', err);
-      toast.error('Failed to load KYC data');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return (data.users || []) as KycUser[];
+    },
+  });
 
-  useEffect(() => { fetchData(); }, []);
+  const users = usersData ?? [];
 
   const pendingUsers = users.filter(u => u.kyc_app_status === 'PENDING_ADMIN_REVIEW');
   const allKycUsers = users.filter(u => u.role !== 'ADMIN' && u.kyc_app_status && u.kyc_app_status !== 'PENDING');
@@ -108,7 +104,7 @@ const KYCPage: React.FC = () => {
               <p className="page-subtitle">Identity Review · Document Approval · {pendingUsers.length} pending</p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button onClick={() => { setLoading(true); fetchData(); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+              <button onClick={() => { queryClient.invalidateQueries({ queryKey: ['admin-users'] }); }} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
                 <RefreshCw size={13} /> Refresh
               </button>
               {pendingUsers.length > 0 && <span className="badge badge-yellow">{pendingUsers.length} PENDING</span>}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { Loader2 } from 'lucide-react';
 
@@ -39,27 +40,21 @@ const statusBadge = (status: string) => {
 };
 
 const TransactionsAdminPage: React.FC = () => {
-  const [txnData, setTxnData] = useState<TransactionRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: txnDataRaw, isLoading: loading } = useQuery({
+    queryKey: ['admin-transactions'],
+    queryFn: async () => {
+      const { data } = await api.get('/transactions?global=true');
+      return (data.transactions || []) as TransactionRecord[];
+    },
+  });
+
+  const txnData = txnDataRaw ?? [];
 
   const [txnActiveStatusChip, setTxnActiveStatusChip] = useState("all");
   const [txnActiveTypeChip, setTxnActiveTypeChip] = useState("all");
   const [search, setSearch] = useState("");
   const [flaggedTransactions, setFlaggedTransactions] = useState<Set<number>>(new Set());
   const [selectedTxnId, setSelectedTxnId] = useState<number | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const txRes = await api.get('/transactions?global=true');
-        setTxnData(txRes.data.transactions || []);
-      } catch (err) {
-        console.error('[Admin Transactions] Error:', err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
 
   const getFilteredTxns = () => {
     return txnData.filter((t) => {
