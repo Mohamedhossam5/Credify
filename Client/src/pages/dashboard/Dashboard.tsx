@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
         <div style={{ fontSize: '22px', fontWeight: 800, fontFamily: f, letterSpacing: '-0.5px', lineHeight: 1.3 }}>
           <span style={{ color: 'var(--text-primary)' }}>Welcome back, </span>
           <span style={{ background: 'linear-gradient(135deg, var(--teal), var(--blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.firstName ?? 'User'}</span>
-          <span style={{ marginLeft: '6px', display: 'inline-block', animation: 'wave 1.8s ease-in-out infinite', transformOrigin: '70% 70%' }}>👋</span>
+          <span style={{ marginLeft: '6px', display: 'inline-block', animation: 'wave 1.8s ease-in-out infinite', transformOrigin: '70% 70%' }}></span>
         </div>
       </div>
 
