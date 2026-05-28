@@ -144,6 +144,7 @@ app.post("/api/kyc/verify", express.json(), (req, res) => forwardJSON(KYC_SERVIC
 app.post("/api/kyc/upload/national-id", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/national-id", req, res));
 app.post("/api/kyc/upload/face-selfie", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/face-selfie", req, res));
 app.post("/api/kyc/upload/proof-of-address", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/proof-of-address", req, res));
+app.post("/api/kyc/upload/digital-signature", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/digital-signature", req, res));
 
 // ─── Admin Routes ──────────────────────────────────────────────
 

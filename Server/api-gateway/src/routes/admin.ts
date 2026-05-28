@@ -33,6 +33,7 @@ router.get("/dashboard", async (req: Request, res: Response): Promise<void> => {
         national_id_back_file: kyc ? kyc.national_id_back_file : null,
         face_selfie_file: kyc ? kyc.face_selfie_file : null,
         proof_of_address_file: kyc ? kyc.proof_of_address_file : null,
+        digital_signature_file: kyc ? kyc.digital_signature_file : null,
       };
     });
 

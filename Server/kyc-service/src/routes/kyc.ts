@@ -91,6 +91,7 @@ router.get("/status", async (req: AuthenticatedRequest, res: Response): Promise<
         nationalIdBack: !!application.national_id_back,
         faceSelfie: !!application.face_selfie,
         proofOfAddress: !!application.proof_of_address,
+        digitalSignature: !!application.digital_signature,
       },
       faceVerification: {
         score: application.face_match_score,
@@ -206,6 +207,38 @@ router.post(
       });
     } catch (err) {
       console.error("[KYC Upload Proof of Address] Error:", err);
+      res.status(500).json({ error: "Internal server error." });
+    }
+  }
+);
+
+// ─── POST /api/kyc/upload/digital-signature ──────────────────
+
+router.post(
+  "/upload/digital-signature",
+  upload.single("signature"),
+  async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+    try {
+      if (!req.file) {
+        res.status(400).json({ error: "Digital signature image is required." });
+        return;
+      }
+
+      await KycApplication.findOrCreate(req.user!.id);
+      await resetIfRejected(req.user!.id);
+      const application = await KycApplication.uploadDigitalSignature(req.user!.id, req.file.path);
+
+      const complete = await KycApplication.areDocumentsComplete(req.user!.id);
+      if (complete) {
+        await KycApplication.updateStatus(req.user!.id, "DOCUMENTS_UPLOADED");
+      }
+
+      res.json({
+        message: "Digital signature uploaded successfully.",
+        documents: { digitalSignature: !!application.digital_signature },
+      });
+    } catch (err) {
+      console.error("[KYC Upload Digital Signature] Error:", err);
       res.status(500).json({ error: "Internal server error." });
     }
   }

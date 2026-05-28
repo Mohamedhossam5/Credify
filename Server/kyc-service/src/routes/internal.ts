@@ -32,6 +32,7 @@ router.get("/kyc/all", async (_req: Request, res: Response): Promise<void> => {
       national_id_back_file: r.national_id_back ? path.basename(r.national_id_back) : null,
       face_selfie_file: r.face_selfie ? path.basename(r.face_selfie) : null,
       proof_of_address_file: r.proof_of_address ? path.basename(r.proof_of_address) : null,
+      digital_signature_file: r.digital_signature ? path.basename(r.digital_signature) : null,
     }));
     res.json({ records: mapped });
   } catch (err: any) {

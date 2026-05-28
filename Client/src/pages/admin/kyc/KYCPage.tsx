@@ -22,6 +22,7 @@ interface KycUser {
   national_id_back_file: string | null;
   face_selfie_file: string | null;
   proof_of_address_file: string | null;
+  digital_signature_file: string | null;
   created_at: string;
 }
 
@@ -227,6 +228,52 @@ const KYCPage: React.FC = () => {
                           );
                         })}
                       </div>
+
+                      {/* Digital Signature */}
+                      <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted, var(--text-secondary))', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                        Digital Signature
+                      </div>
+                      {(() => {
+                        const sigUrl = getImageUrl(u.digital_signature_file);
+                        return (
+                          <div
+                            onClick={() => sigUrl && setPreviewImage({ url: sigUrl, label: `Digital Signature — ${u.first_name} ${u.last_name}` })}
+                            style={{
+                              borderRadius: '12px',
+                              border: '1px solid var(--border, var(--glass-border))',
+                              overflow: 'hidden',
+                              cursor: sigUrl ? 'pointer' : 'default',
+                              transition: 'all 0.2s ease',
+                              marginBottom: '20px',
+                              maxWidth: '280px',
+                              background: sigUrl ? '#fff' : 'var(--bg-base, rgba(255,255,255,0.02))',
+                            }}
+                          >
+                            {sigUrl ? (
+                              <div style={{ position: 'relative' }}>
+                                <img
+                                  src={sigUrl}
+                                  alt="Digital Signature"
+                                  style={{ width: '100%', height: '80px', objectFit: 'contain', display: 'block', padding: '8px', background: '#fff' }}
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                />
+                                <div style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '6px', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <Eye size={12} style={{ color: '#fff' }} />
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted, var(--text-secondary))' }}>
+                                <XCircle size={20} />
+                              </div>
+                            )}
+                            <div style={{ padding: '6px 8px', fontSize: '10px', fontWeight: 700, color: sigUrl ? 'var(--text-primary)' : 'var(--text-muted, var(--text-secondary))', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.5px', borderTop: '1px solid var(--border, var(--glass-border))' }}>
+                              Signature
+                              {!sigUrl && <span style={{ display: 'block', fontSize: '9px', fontWeight: 500, color: 'var(--danger, #ff4d6a)' }}>Not provided</span>}
+                            </div>
+                          </div>
+                        );
+                      })()}
 
                       {/* Actions */}
                       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>

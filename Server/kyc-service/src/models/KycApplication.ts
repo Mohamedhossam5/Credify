@@ -8,6 +8,7 @@ export interface KycRecord {
   national_id_back: string | null;
   face_selfie: string | null;
   proof_of_address: string | null;
+  digital_signature: string | null;
   face_match_score: number | null;
   face_match_passed: boolean | null;
   rejection_reason: string | null;
@@ -70,6 +71,16 @@ class KycApplication {
     return rows[0];
   }
 
+  static async uploadDigitalSignature(userId: number, signaturePath: string): Promise<KycRecord> {
+    const { rows } = await pool.query(
+      `UPDATE kyc_applications 
+       SET digital_signature = $1, updated_at = NOW()
+       WHERE user_id = $2 RETURNING *`,
+      [signaturePath, userId]
+    );
+    return rows[0];
+  }
+
   static async updateStatus(userId: number, status: string, rejectionReason: string | null = null): Promise<KycRecord> {
     const { rows } = await pool.query(
       `UPDATE kyc_applications 
@@ -93,7 +104,7 @@ class KycApplication {
   static async areDocumentsComplete(userId: number): Promise<boolean> {
     const app = await this.findByUserId(userId);
     if (!app) return false;
-    return !!(app.national_id_front && app.national_id_back && app.face_selfie && app.proof_of_address);
+    return !!(app.national_id_front && app.national_id_back && app.face_selfie && app.proof_of_address && app.digital_signature);
   }
 
   static async deleteByUserId(userId: number): Promise<void> {

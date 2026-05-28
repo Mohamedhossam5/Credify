@@ -21,12 +21,16 @@ const migration = `
     national_id_back    VARCHAR(500),
     face_selfie         VARCHAR(500),
     proof_of_address    VARCHAR(500),
+    digital_signature   VARCHAR(500),
     face_match_score    DECIMAL(5,4),
     face_match_passed   BOOLEAN,
     rejection_reason    TEXT,
     created_at          TIMESTAMP     DEFAULT NOW(),
     updated_at          TIMESTAMP     DEFAULT NOW()
   );
+
+  -- Add digital_signature column to existing tables
+  ALTER TABLE kyc_applications ADD COLUMN IF NOT EXISTS digital_signature VARCHAR(500);
 `;
 
 async function runMigration(): Promise<void> {
