@@ -7,6 +7,7 @@ import hossPhoto from '../../assets/team/hoss.png';
 import karimPhoto from '../../assets/team/karim.png';
 import yehiaPhoto from '../../assets/team/yehia1.png';
 import zedPhoto from '../../assets/team/zed.png';
+import digitalIdentityImg from '../../assets/digital-identity-egypt.png';
 
 const AboutPage: React.FC = () => {
   const team = [
@@ -87,13 +88,73 @@ const AboutPage: React.FC = () => {
                 </li>
               ))}
             </ul>
-            
+
+            {/* Egyptian Digital Identity Section */}
+            <div className="mt-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 md:p-10 border border-blue-200/60 shadow-sm">
+              <div className="flex flex-col lg:flex-row gap-8 items-center">
+                <div className="lg:w-2/5 shrink-0">
+                  <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-white/80 hover:scale-[1.02] transition-transform duration-300">
+                    <img
+                      src={digitalIdentityImg}
+                      alt="Egypt Digital Identity Application - الهوية الرقمية"
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+                </div>
+                <div className="lg:w-3/5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-[900] text-slate-900 tracking-tight">
+                      🇪🇬 Egypt's Digital Identity Application
+                    </h3>
+                  </div>
+                  <p className="text-slate-600 leading-relaxed mb-4">
+                    Egypt has launched its groundbreaking <strong>Digital Identity (الهوية الرقمية)</strong> application — a major national initiative that enables citizens to verify their identity digitally using a secure, government-backed platform. This is a game-changer for digital banking and financial services in Egypt.
+                  </p>
+                  <p className="text-slate-600 leading-relaxed mb-4">
+                    For Credify, the Digital Identity app plays a <strong>critical role in securing digital banking</strong>. It strengthens our Know Your Customer (KYC) verification process by providing a trusted, tamper-proof digital identity that is directly linked to Egypt's national civil registry. This means:
+                  </p>
+                  <ul className="space-y-2 mb-5">
+                    {[
+                      'Faster and more reliable identity verification during account opening',
+                      'Elimination of forged or expired document risks',
+                      'Stronger fraud prevention through biometric-backed authentication',
+                      'Seamless compliance with Central Bank of Egypt regulations',
+                      'A more inclusive financial ecosystem for all Egyptian citizens'
+                    ].map((point, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                        <svg className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                  <a
+                    href="https://di.gov.eg/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Visit Digital Identity Portal
+                  </a>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-10 p-5 bg-white/60 rounded-xl border border-blue-200/50 text-center">
               <p className="text-slate-600 text-[15px] font-medium">
                 For more details on financial regulations, please visit the{' '}
-                <a 
-                  href="https://www.cbe.org.eg/ar/financial-literacy/learn" 
-                  target="_blank" 
+                <a
+                  href="https://www.cbe.org.eg/ar/financial-literacy/learn"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:text-blue-700 underline underline-offset-4 decoration-blue-300 hover:decoration-blue-600 transition-colors"
                 >

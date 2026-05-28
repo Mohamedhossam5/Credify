@@ -11,6 +11,7 @@ interface KycUser {
   middle_name: string | null;
   last_name: string;
   email: string;
+  role: string;
   phone_number: string;
   gender: string;
   kyc_status: string;
