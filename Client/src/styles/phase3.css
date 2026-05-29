@@ -392,3 +392,66 @@
     padding: 16px 20px;
   }
 }
+
+/* ─── MODERN NON-CONFLICTING TOGGLE SWITCH ─── */
+.modern-toggle-label {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.modern-toggle-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.modern-toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--glass-border);
+}
+
+[data-theme="light"] .modern-toggle-slider {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Single White Circular Thumb */
+.modern-toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.25s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .modern-toggle-slider::before {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Checked state: smooth transition to brand gradient */
+.modern-toggle-label input:checked + .modern-toggle-slider {
+  background: linear-gradient(90deg, var(--teal), var(--blue));
+  border-color: transparent;
+}
+
+/* Checked state: slide dot perfectly to the right */
+.modern-toggle-label input:checked + .modern-toggle-slider::before {
+  transform: translateX(20px);
+  background: #fff;
+}

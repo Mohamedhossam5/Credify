@@ -175,9 +175,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Two-Factor Authentication</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Add extra layer of security</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.twoFa} onChange={e => handleChange('twoFa', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
 
@@ -186,9 +186,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Biometric Login</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Use fingerprint or face ID</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.biometric} onChange={e => handleChange('biometric', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
 
@@ -197,9 +197,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Login Notifications</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Get alerted on new logins</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.loginNotif} onChange={e => handleChange('loginNotif', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
 
@@ -208,9 +208,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Transaction Alerts</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>SMS for every transaction</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.txAlerts} onChange={e => handleChange('txAlerts', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
 
@@ -318,9 +318,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Email Notifications</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Receive updates via email</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.emailNotif} onChange={e => handleChange('emailNotif', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
             <div className="security-row">
@@ -328,9 +328,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Push Notifications</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>In-app alerts and reminders</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.pushNotif} onChange={e => handleChange('pushNotif', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
             <div className="security-row">
@@ -338,9 +338,9 @@ const SettingsPage: React.FC = () => {
                 <div className="text-[var(--text-primary)]" style={{ fontWeight: 600, fontSize: '14px', fontFamily: '"Inter", sans-serif' }}>Marketing Emails</div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>Offers and promotional content</div>
               </div>
-              <label className="toggle">
+              <label className="modern-toggle-label">
                 <input type="checkbox" className="settings-toggle" checked={formValues.marketing} onChange={e => handleChange('marketing', e.target.checked)} />
-                <span className="toggle-slider"></span>
+                <span className="modern-toggle-slider"></span>
               </label>
             </div>
           </div>
