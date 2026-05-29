@@ -122,7 +122,7 @@ const TransactionsAdminPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid-3" style={{ marginBottom: "16px" }}>
+        <div className="txn-stats-grid" style={{ marginBottom: "12px" }}>
           <div className="card" style={{ padding: "18px" }}>
             <div style={{ fontSize: "10px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "1px", marginBottom: "6px" }}>TOTAL VOLUME</div>
             <div style={{ fontSize: "22px", fontWeight: 800, fontFamily: "var(--font-mono)", color: "var(--accent-3)" }}>
@@ -207,31 +207,54 @@ const TransactionsAdminPage: React.FC = () => {
         {/* Mobile Cards */}
         <div className="mobile-card-list mobile-card-container">
           {filtered.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>No transactions match filters</div>
+            <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)", fontFamily: "var(--font-mono)", background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: "var(--radius-lg)" }}>
+              No transactions match filters
+            </div>
           ) : (
             filtered.map(t => {
               const flagged = flaggedTransactions.has(t.id);
               const tc = typeColor(t.type);
               const senderName = `${t.sender_first_name} ${t.sender_last_name}`;
               return (
-                <div key={t.id} className="mobile-card-item" onClick={() => setSelectedTxnId(t.id)}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px", flexWrap: "wrap", gap: "6px" }}>
+                <div key={t.id} className="txn-mobile-card" onClick={() => setSelectedTxnId(t.id)}>
+                  <div className="card-top">
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--accent)", fontWeight: 700 }}>TXN-{t.id}</span>
                     <div style={{ display: "flex", gap: "6px" }}>
                       {statusBadge(flagged ? "flagged" : "completed")}
                       <span className="badge" style={{ background: `${tc}14`, color: tc }}>{t.type.replace(/_/g, ' ').toUpperCase()}</span>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "6px" }}>
+                  
+                  <div className="card-mid">
                     <div>
-                      <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--text-primary)" }}>{senderName}</div>
-                      <div style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>→ {t.recipient_name}</div>
+                      <div style={{ fontSize: "14px", fontWeight: 700, color: "var(--text-primary)" }}>{senderName}</div>
+                      <div style={{ fontSize: "11.5px", color: "var(--text-muted)", fontFamily: "var(--font-mono)", marginTop: "2px" }}>→ {t.recipient_name}</div>
                     </div>
-                    <div style={{ fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: "15px", color: "var(--text-primary)" }}>
-                      ${parseFloat(t.amount.toString()).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    <div style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+                      {new Date(t.created_at).toLocaleString()}
                     </div>
                   </div>
-                  <div style={{ fontSize: "11px", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{new Date(t.created_at).toLocaleString()}</div>
+
+                  <div className="card-divider"></div>
+
+                  <div className="card-bottom">
+                    <div>
+                      <div style={{ fontSize: "9px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.5px", marginBottom: "2px" }}>AMOUNT</div>
+                      <div style={{ fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: "15px", color: "var(--text-primary)" }}>
+                        ${parseFloat(t.amount.toString()).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      </div>
+                    </div>
+
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <button
+                        className="btn-details"
+                        style={{ padding: "8px 16px", borderRadius: "8px", fontSize: "12px", fontWeight: 700 }}
+                        onClick={() => setSelectedTxnId(t.id)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )
             })

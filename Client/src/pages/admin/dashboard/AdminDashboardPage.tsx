@@ -122,15 +122,15 @@ const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+      <div className="admin-dashboard-grid">
         {/* ── Users Table ── */}
         <div className="admin-card" style={{ padding: '20px', overflow: 'hidden' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div className="section-title" style={{ margin: 0 }}>All Users</div>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600, fontFamily: mono }}>{totalUsers} total</span>
+            <button onClick={() => navigate('/admin/accounts')} style={{ fontSize: '11px', color: 'var(--teal, #0ecbcb)', fontWeight: 600, fontFamily: f, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>View All <ChevronRight size={12} /></button>
           </div>
           <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
-            {users.filter(u => u.role !== 'ADMIN').map(u => {
+            {users.filter(u => u.role !== 'ADMIN').slice(0, 3).map(u => {
               const statusColor = u.kyc_status === 'APPROVED' ? 'var(--success, #00e88f)' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? '#f59e0b' : u.kyc_status === 'REJECTED' ? 'var(--danger, #ff4d6a)' : 'var(--text-muted, var(--text-secondary))';
               const statusLabel = u.kyc_status === 'APPROVED' ? 'APPROVED' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? 'PENDING REVIEW' : u.kyc_status === 'REJECTED' ? 'REJECTED' : u.kyc_app_status?.replace(/_/g, ' ') || 'PENDING';
               const initials = (u.first_name[0] + u.last_name[0]).toUpperCase();

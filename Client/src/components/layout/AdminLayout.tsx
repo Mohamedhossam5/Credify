@@ -8,7 +8,7 @@ import '../../styles/admin.css';
 
 const AdminLayout: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => window.innerWidth < 1024);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("credify_theme") || "light";
@@ -39,7 +39,7 @@ const AdminLayout: React.FC = () => {
   }
 
   const toggleSidebar = () => {
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 1024) {
       setMobileOpen(!mobileOpen);
     } else {
       setCollapsed(!collapsed);
@@ -55,17 +55,17 @@ const AdminLayout: React.FC = () => {
   return (
     <div className="admin-body">
       <div id="admin-app">
-        <AdminSidebar 
-          collapsed={collapsed} 
-          mobileOpen={mobileOpen} 
-          onCloseMobile={() => setMobileOpen(false)} 
+        <AdminSidebar
+          collapsed={collapsed && window.innerWidth >= 1024}
+          mobileOpen={mobileOpen}
+          onCloseMobile={() => setMobileOpen(false)}
         />
-        
+
         <div id="admin-main">
-          <AdminNavbar 
-            onToggleSidebar={toggleSidebar} 
-            onToggleTheme={toggleTheme} 
-            theme={theme} 
+          <AdminNavbar
+            onToggleSidebar={toggleSidebar}
+            onToggleTheme={toggleTheme}
+            theme={theme}
           />
           <main id="admin-content">
             <ErrorBoundary>

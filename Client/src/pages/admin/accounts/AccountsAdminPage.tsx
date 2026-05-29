@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, Eye, Edit2, Snowflake, ChevronRight } from 'lucide-react';
 
 // ── Types ──
 interface AdminUser {
@@ -134,68 +134,129 @@ const AccountsAdminPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="modern-table-card desktop-table">
-        <div style={{ overflowX: 'auto' }}>
-          <table className="data-table">
-            <thead>
-              <tr><th>USER</th><th>EMAIL</th><th>BALANCE</th><th>STATUS</th><th>PHONE</th><th>JOINED</th><th>KYC</th></tr>
-            </thead>
-            <tbody>
-              {filteredAccounts.length === 0 ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>No accounts match the current filters</td></tr>
-              ) : filteredAccounts.map(a => {
-                const ds = getDisplayStatus(a);
-                const fullName = `${a.first_name} ${a.last_name}`;
-                return (
-                  <tr key={a.id} onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>{initials(fullName)}</div>
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>{fullName}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{a.account_id || 'N/A'}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}>{a.email}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '13px' }}>{a.balance ? `$${parseFloat(a.balance).toLocaleString("en-US", { minimumFractionDigits: 2 })}` : '-'}</td>
-                    <td>{statusBadge(ds)}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-secondary)' }}>{a.phone_number}</td>
-                    <td style={{ fontSize: '12.5px', color: 'var(--text-secondary)' }}>{new Date(a.created_at).toLocaleDateString()}</td>
-                    <td>{kycBadge(a.kyc_status)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="mobile-card-list mobile-card-container">
-        {filteredAccounts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>No accounts match filters</div>
-        ) : filteredAccounts.map(a => {
-          const ds = getDisplayStatus(a);
-          const fullName = `${a.first_name} ${a.last_name}`;
-          return (
-            <div className="mobile-card-item" key={a.id} onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '10px' }}>
-                <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>{initials(fullName)}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-primary)' }}>{fullName}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.email}</div>
-                </div>
-                {statusBadge(ds)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
-                <div><div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '3px' }}>BALANCE</div><div style={{ fontSize: '13px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--accent-3)' }}>{a.balance ? `$${parseFloat(a.balance).toLocaleString("en-US", { minimumFractionDigits: 0 })}` : '-'}</div></div>
-                <div><div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '3px' }}>PHONE</div><div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{a.phone_number}</div></div>
-                <div><div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '3px' }}>KYC</div>{kycBadge(a.kyc_status)}</div>
-              </div>
+      <div className="accounts-container">
+        {/* Desktop & Tablet List */}
+        <div className="desktop-accounts-list">
+          {filteredAccounts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+              No accounts match the current filters
             </div>
-          );
-        })}
+          ) : filteredAccounts.map(a => {
+            const ds = getDisplayStatus(a);
+            const fullName = `${a.first_name} ${a.last_name}`;
+            return (
+              <div key={a.id} className="account-wide-card" onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+                {/* 1. User Info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                    {initials(fullName)}
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)' }}>{fullName}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{a.middle_name || 'N/A'}</div>
+                  </div>
+                </div>
+
+                {/* 2. Email Block */}
+                <div>
+                  <div className="col-label">Email</div>
+                  <div className="col-value-mono" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.email}</div>
+                </div>
+
+                {/* 3. Balance Block */}
+                <div>
+                  <div className="col-label">Balance</div>
+                  <div className="col-value" style={{ fontWeight: 800 }}>
+                    {a.balance ? `$${parseFloat(a.balance).toLocaleString("en-US", { minimumFractionDigits: 2 })}` : '-'}
+                  </div>
+                </div>
+
+                {/* 4. Phone Block */}
+                <div className="col-phone">
+                  <div className="col-label">Phone</div>
+                  <div className="col-value-mono">{a.phone_number}</div>
+                </div>
+
+                {/* 5. KYC Block */}
+                <div>
+                  <div className="col-label">KYC</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px', marginTop: '4px' }}>
+                    {kycBadge(a.kyc_status)}
+                  </div>
+                </div>
+
+                {/* 6. Action Buttons */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }} onClick={(e) => e.stopPropagation()}>
+                  <button className="btn-details" onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+                    View Details
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile Cards List */}
+        <div className="mobile-accounts-list">
+          {filteredAccounts.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
+              No accounts match filters
+            </div>
+          ) : filteredAccounts.map(a => {
+            const ds = getDisplayStatus(a);
+            const fullName = `${a.first_name} ${a.last_name}`;
+            return (
+              <div className="account-mobile-card" key={a.id} onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+                <div className="card-top">
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+                    {initials(fullName)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)' }}>{fullName}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{a.middle_name || 'N/A'}</div>
+                  </div>
+                  {statusBadge(ds)}
+                </div>
+
+                <div className="card-mid">
+                  <div style={{ fontSize: '12px' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>Phone: </span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{a.phone_number}</span>
+                  </div>
+                  <div style={{ fontSize: '12px' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>Email: </span>
+                    <span style={{ fontFamily: 'var(--font-mono)' }}>{a.email}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>KYC: </span>
+                    {kycBadge(a.kyc_status)}
+                  </div>
+                </div>
+
+                <div className="card-divider"></div>
+
+                <div className="card-bottom">
+                  <div>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.5px', marginBottom: '2px' }}>BALANCE</div>
+                    <div style={{ fontSize: '14px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--accent-3)' }}>
+                      {a.balance ? `$${parseFloat(a.balance).toLocaleString("en-US", { minimumFractionDigits: 0 })}` : '-'}
+                    </div>
+                  </div>
+
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <button
+                      className="btn-details"
+                      style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}
+                      onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}
+                    >
+                      View Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Drawer */}

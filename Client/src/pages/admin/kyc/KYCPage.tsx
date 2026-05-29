@@ -319,19 +319,19 @@ const KYCPage: React.FC = () => {
                 const isApproved = u.kyc_status === 'APPROVED';
                 const isRejected = u.kyc_status === 'REJECTED';
                 return (
-                  <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isApproved ? 'rgba(0,232,143,0.12)' : 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={u.id} className="kyc-reviewed-row">
+                    <div className="kyc-reviewed-left">
+                      <div className="kyc-status-circle" style={{ width: '32px', height: '32px', borderRadius: '50%', background: isApproved ? 'rgba(0,232,143,0.12)' : 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {isApproved ? <CheckCircle2 size={14} style={{ color: 'var(--success, #00e88f)' }} /> : <XCircle size={14} style={{ color: 'var(--danger, #ff4d6a)' }} />}
                       </div>
-                      <div>
-                        <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{u.first_name} {u.last_name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted, var(--text-secondary))', fontFamily: '"DM Mono", monospace' }}>{u.email}</div>
+                      <div className="kyc-reviewed-info">
+                        <div className="kyc-reviewed-name">{u.first_name} {u.last_name}</div>
+                        <div className="kyc-reviewed-email">{u.email}</div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      {u.rejection_reason && <span style={{ fontSize: '11px', color: 'var(--danger, #ff4d6a)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.rejection_reason}</span>}
-                      <span style={{ fontSize: '10px', fontWeight: 700, padding: '3px 10px', borderRadius: '6px', color: isApproved ? 'var(--success, #00e88f)' : 'var(--danger, #ff4d6a)', background: isApproved ? 'rgba(0,232,143,0.1)' : 'rgba(255,77,106,0.1)' }}>
+                    <div className="kyc-reviewed-right">
+                      {u.rejection_reason && <span className="kyc-reject-reason">{u.rejection_reason}</span>}
+                      <span className={`kyc-status-pill ${isApproved ? 'approved' : isRejected ? 'rejected' : 'pending'}`}>
                         {isApproved ? 'APPROVED' : isRejected ? 'REJECTED' : u.kyc_app_status?.replace(/_/g, ' ')}
                       </span>
                     </div>
