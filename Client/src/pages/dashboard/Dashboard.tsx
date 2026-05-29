@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUpRight, ArrowDownLeft, ChevronRight, BarChart3, Loader2, Plus, CreditCard } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, ChevronRight, BarChart3, Loader2, Plus, CreditCard, Send, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { financeService } from '../../services/finance.service';
 import { useTransactions } from '../../hooks/useTransactions';
@@ -57,14 +57,29 @@ const Dashboard: React.FC = () => {
     return { totalReceived: received, totalSent: sent };
   }, [payments]);
 
+  const totalActivity = totalReceived + totalSent || 1; // Prevent division by zero
+  const receivedPct = Math.round((totalReceived / totalActivity) * 100);
+  const sentPct = Math.round((totalSent / totalActivity) * 100);
+
   return (
     <section id="dashboard" className="page active">
       {/* Welcome Message */}
-      <div style={{ marginBottom: '24px' }}>
-        <div style={{ fontSize: '22px', fontWeight: 800, fontFamily: f, letterSpacing: '-0.5px', lineHeight: 1.3 }}>
-          <span style={{ color: 'var(--text-primary)' }}>Welcome back, </span>
-          <span style={{ background: 'linear-gradient(135deg, var(--teal), var(--blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.firstName ?? 'User'}</span>
-          <span style={{ marginLeft: '6px', display: 'inline-block', animation: 'wave 1.8s ease-in-out infinite', transformOrigin: '70% 70%' }}></span>
+      <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <div style={{ fontSize: '26px', fontWeight: 800, fontFamily: f, letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+            <span style={{ color: 'var(--text-primary)' }}>Welcome back, </span>
+            <span style={{ background: 'linear-gradient(135deg, var(--teal), var(--blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{user?.firstName ?? 'User'}</span>
+            <span style={{ marginLeft: '8px', display: 'inline-block', animation: 'wave 1.8s ease-in-out infinite', transformOrigin: '70% 70%' }}></span>
+          </div>
+          <p style={{ fontFamily: f, color: 'var(--text-secondary)', fontSize: '14px', marginTop: '4px', margin: '4px 0 0 0' }}>
+            Here is what's happening with your finances today.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={() => navigate('/transfers')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '13px', borderRadius: '10px' }}>
+            <Send size={16} /> Send Money
+          </button>
         </div>
       </div>
 
@@ -73,61 +88,107 @@ const Dashboard: React.FC = () => {
         {/* ─── LEFT COLUMN ──────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
-          {/* Balance Card */}
-          <div className="glass-card" style={{ padding: '24px 28px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ position: 'absolute', top: '-30px', right: '-30px', width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(14,203,203,0.08), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+          {/* Balance & Insights Row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f, letterSpacing: '0.3px' }}>Total Balance</span>
-            </div>
-            <div style={{ fontFamily: f, fontSize: '28px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-1px', marginBottom: '16px', fontVariantNumeric: 'tabular-nums' }}>
-              {isLoadingBalance ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
-                  <span style={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-secondary)' }}>Loading...</span>
+            {/* Balance Card */}
+            <div className="glass-card" style={{ padding: '24px 28px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, rgba(14,203,203,0.03), rgba(26,111,255,0.03))' }}>
+              <div style={{ position: 'absolute', top: '-30px', right: '-30px', width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(14,203,203,0.1), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+
+              {/* Shimmer effect overlay */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent)', transform: 'translateX(-100%)', animation: 'shimmer 3s infinite' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f, letterSpacing: '0.3px' }}>Available Balance</span>
+                <div style={{ padding: '4px 8px', background: 'var(--glass)', borderRadius: '6px', fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', border: '1px solid var(--glass-border)' }}>
+                  EGP
                 </div>
-              ) : `EGP ${formatEGP(balance)}`}
+              </div>
+              <div style={{ fontFamily: f, fontSize: '32px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-1.5px', marginBottom: '24px', fontVariantNumeric: 'tabular-nums' }}>
+                {isLoadingBalance ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--text-secondary)' }}>Loading...</span>
+                  </div>
+                ) : `£ ${formatEGP(balance)}`}
+              </div>
+
+              {/* Sparkline purely visual */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', height: '30px', gap: '4px', marginBottom: '16px', opacity: 0.6 }}>
+                {[40, 65, 45, 80, 55, 90, 75, 100].map((h, i) => (
+                  <div key={i} style={{ flex: 1, height: `${h}%`, background: 'linear-gradient(to top, var(--teal), var(--blue))', borderRadius: '2px 2px 0 0', opacity: i === 7 ? 1 : 0.4 }} />
+                ))}
+              </div>
+
+              {/* Account Number */}
+              {accountData && (
+                <div style={{ paddingTop: '16px', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, fontWeight: 500 }}>Account Number</span>
+                  <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontFamily: mono, fontWeight: 600, letterSpacing: '0.5px' }}>{accountData.accountId}</span>
+                </div>
+              )}
             </div>
 
-            <div style={{ display: 'flex', gap: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }} />
+            {/* Spending Insights Card */}
+            <div className="glass-card" style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>Money Flow</span>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, padding: '4px 8px', background: 'var(--glass)', borderRadius: '6px' }}>All Time</span>
+              </div>
+
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px' }}>
+                {/* Received */}
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontFamily: f, fontWeight: 500 }}>Received</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>EGP {formatEGP(totalReceived)}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(0,232,143,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--success)' }}>
+                        <ArrowDownLeft size={16} />
+                      </div>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Income</span>
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: mono }}>+EGP {formatEGP(totalReceived)}</span>
+                  </div>
+                  <div style={{ height: '6px', background: 'var(--glass)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: `${receivedPct}%`, height: '100%', background: 'var(--success)', borderRadius: '3px', transition: 'width 1s ease-out' }} />
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--danger)' }} />
+
+                {/* Sent */}
                 <div>
-                  <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontFamily: f, fontWeight: 500 }}>Sent</div>
-                  <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>EGP {formatEGP(totalSent)}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'rgba(255,77,106,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)' }}>
+                        <ArrowUpRight size={16} />
+                      </div>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Expenses</span>
+                    </div>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: mono }}>-EGP {formatEGP(totalSent)}</span>
+                  </div>
+                  <div style={{ height: '6px', background: 'var(--glass)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ width: `${sentPct}%`, height: '100%', background: 'var(--danger)', borderRadius: '3px', transition: 'width 1s ease-out' }} />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Account Number */}
-            {accountData && (
-              <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--glass-border)' }}>
-                <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: mono, fontWeight: 400, letterSpacing: '0.3px' }}>Acc. {accountData.accountId}</span>
-              </div>
-            )}
           </div>
 
           {/* Quick Actions */}
           <div className="glass-card" style={{ padding: '24px 28px' }}>
             <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f, display: 'block', marginBottom: '16px' }}>Quick Actions</span>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
               {[
                 { label: 'Send Money', icon: <ArrowUpRight size={18} style={{ color: 'var(--teal)' }} />, bg: 'rgba(14,203,203,0.12)', to: '/transfers' },
-                { label: 'View History', icon: <BarChart3 size={18} style={{ color: '#1a6fff' }} />, bg: 'rgba(26,111,255,0.12)', to: '/transactions' },
+                { label: 'History', icon: <BarChart3 size={18} style={{ color: '#1a6fff' }} />, bg: 'rgba(26,111,255,0.12)', to: '/transactions' },
+                { label: 'My Cards', icon: <CreditCard size={18} style={{ color: '#8b5cf6' }} />, bg: 'rgba(139,92,246,0.12)', to: '/accounts' },
+                { label: 'Exchange', icon: <TrendingUp size={18} style={{ color: '#f59e0b' }} />, bg: 'rgba(245,158,11,0.12)', to: '/exchange' },
               ].map((a) => (
                 <button key={a.label} onClick={() => navigate(a.to)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 18px', borderRadius: '12px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: f, fontSize: '13px', fontWeight: 600, transition: 'all 0.2s ease' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(14,203,203,0.1)'; e.currentTarget.style.borderColor = 'var(--teal)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--glass)'; e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '12px', padding: '16px', borderRadius: '14px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-primary)', cursor: 'pointer', fontFamily: f, fontSize: '13px', fontWeight: 600, transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--row-hover)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.08)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--glass)'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
                 >
-                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: a.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{a.icon}</div>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: a.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{a.icon}</div>
                   {a.label}
                 </button>
               ))}
@@ -142,7 +203,7 @@ const Dashboard: React.FC = () => {
 
           {/* ══════ MY CARDS SECTION ══════ */}
           <div className="glass-card" style={{ padding: '24px 0' }}>
-            <div style={{ padding: '0 24px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ padding: '0 24px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', fontFamily: f, letterSpacing: '-0.3px', margin: 0 }}>My Cards</h3>
               <button onClick={() => navigate('/accounts')}
                 style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 14px', borderRadius: '20px', border: '1px solid var(--glass-border)', background: 'transparent', color: 'var(--teal)', fontSize: '12px', fontWeight: 600, fontFamily: f, cursor: 'pointer', transition: 'all 0.2s' }}
@@ -159,9 +220,10 @@ const Dashboard: React.FC = () => {
                   <Loader2 size={24} style={{ color: 'var(--teal)', animation: 'spin 1s linear infinite' }} />
                 </div>
               ) : cards.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '28px 0' }}>
-                  <CreditCard size={32} style={{ color: 'var(--text-secondary)', marginBottom: '8px' }} />
-                  <p style={{ fontFamily: f, fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>No cards yet</p>
+                <div style={{ textAlign: 'center', padding: '28px 0', background: 'var(--glass)', borderRadius: '16px', border: '1px dashed var(--glass-border)' }}>
+                  <CreditCard size={32} style={{ color: 'var(--text-secondary)', marginBottom: '12px', opacity: 0.5 }} />
+                  <p style={{ fontFamily: f, fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>No cards yet</p>
+                  <p style={{ fontFamily: f, fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>Apply for a physical or virtual card.</p>
                 </div>
               ) : (() => {
                 const card = cards[0];
@@ -172,118 +234,136 @@ const Dashboard: React.FC = () => {
                 return (
                   <div>
                     <div onClick={() => navigate('/accounts')} style={{
-                      width: '100%', height: '185px', borderRadius: '18px',
-                      background: cardGrad, padding: '22px 24px', position: 'relative', overflow: 'hidden',
-                      cursor: 'pointer', transition: 'transform 0.28s ease, box-shadow 0.28s ease',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                      width: '100%', height: '190px', borderRadius: '20px',
+                      background: cardGrad, padding: '24px', position: 'relative', overflow: 'hidden',
+                      cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease',
+                      boxShadow: '0 12px 40px rgba(0,0,0,0.25)',
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      border: '1px solid rgba(255,255,255,0.1)'
                     }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px) scale(1.015)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.35)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.25)'; }}
                     >
-                      <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '140px', height: '140px', background: 'radial-gradient(circle, rgba(255,255,255,0.06), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
-                      <div style={{ position: 'absolute', bottom: '-30px', left: '-30px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(255,255,255,0.04), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+                      <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(255,255,255,0.08), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+                      <div style={{ position: 'absolute', bottom: '-30px', left: '-30px', width: '120px', height: '120px', background: 'radial-gradient(circle, rgba(255,255,255,0.05), transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '32px', height: '22px', borderRadius: '4px', background: 'linear-gradient(135deg, #f5d67b, #d4af37)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }} />
-                          <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.5)', fontFamily: f }}>{card.card_type}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: '38px', height: '26px', borderRadius: '6px', background: 'linear-gradient(135deg, #f5d67b, #d4af37)', boxShadow: '0 2px 5px rgba(0,0,0,0.4)', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '10px', left: 0, right: 0, height: '1px', background: 'rgba(0,0,0,0.2)' }} />
+                            <div style={{ position: 'absolute', top: '14px', left: 0, right: 0, height: '1px', background: 'rgba(0,0,0,0.2)' }} />
+                          </div>
+                          <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', fontFamily: f }}>{card.card_type}</span>
                         </div>
-                        <span style={{ fontFamily: f, fontSize: '12px', fontWeight: 800, letterSpacing: '1px', color: 'rgba(255,255,255,0.7)' }}>CREDIFY</span>
+                        <span style={{ fontFamily: f, fontSize: '13px', fontWeight: 800, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.9)' }}>CREDIFY</span>
                       </div>
 
-                      <div style={{ fontFamily: mono, fontSize: '16px', letterSpacing: '2.5px', color: 'rgba(255,255,255,0.8)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ fontFamily: mono, fontSize: '18px', letterSpacing: '3px', color: 'rgba(255,255,255,0.95)', fontVariantNumeric: 'tabular-nums', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
                         {card.card_number_masked}
                       </div>
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                         <div>
-                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', fontFamily: f, marginBottom: '2px' }}>Card Holder</div>
-                          <div style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: f, letterSpacing: '0.3px' }}>{card.cardholder_name}</div>
+                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: f, marginBottom: '4px' }}>Card Holder</div>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.95)', fontFamily: f, letterSpacing: '0.5px' }}>{card.cardholder_name}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.8px', fontFamily: f, marginBottom: '2px' }}>Exp</div>
-                          <div style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: mono }}>
+                          <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: f, marginBottom: '4px' }}>Exp</div>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.95)', fontFamily: mono, letterSpacing: '1px' }}>
                             {String(card.expiry_month).padStart(2, '0')}/{String(card.expiry_year).slice(-2)}
                           </div>
                         </div>
                       </div>
 
                       {card.status === 'FROZEN' && (
-                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(59,130,246,0.15)', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(1px)' }}>
-                          <span style={{ fontFamily: f, fontWeight: 700, fontSize: '11px', color: '#60a5fa', background: 'rgba(0,0,0,0.5)', padding: '4px 14px', borderRadius: '20px', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Frozen</span>
+                        <div style={{ position: 'absolute', inset: 0, background: 'rgba(4, 9, 24, 0.4)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(2px)' }}>
+                          <span style={{ fontFamily: f, fontWeight: 800, fontSize: '12px', color: '#fff', background: 'rgba(255, 185, 0, 0.8)', padding: '6px 16px', borderRadius: '20px', letterSpacing: '1.5px', textTransform: 'uppercase', boxShadow: '0 4px 12px rgba(0,0,0,0.3)' }}>Frozen</span>
                         </div>
                       )}
                     </div>
 
                     {cards.length > 1 && (
-                      <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: f }}>+{cards.length - 1} more card{cards.length - 1 > 1 ? 's' : ''}</span>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '16px' }}>
+                        {cards.map((_, i) => (
+                          <div key={i} style={{ width: i === 0 ? '20px' : '6px', height: '6px', borderRadius: '3px', background: i === 0 ? 'var(--teal)' : 'var(--glass-border)', transition: 'all 0.3s ease' }} />
+                        ))}
                       </div>
                     )}
                   </div>
                 );
               })()}
             </div>
-
-            {/* View All Cards button */}
-            <div style={{ padding: '12px 24px 0', borderTop: '1px solid var(--glass-border)', marginTop: '16px' }}>
-              <button onClick={() => navigate('/accounts')}
-                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, fontFamily: f, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s ease' }}
-              >View All Cards <ChevronRight size={14} /></button>
-            </div>
           </div>
 
           {/* ══════ RECENT TRANSACTIONS ══════ */}
-          <div className="glass-card" style={{ padding: '24px 0' }}>
-            <div style={{ padding: '0 24px', marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', fontFamily: f, letterSpacing: '-0.3px', margin: '0 0 14px 0' }}>Recent Transactions</h3>
-              <div style={{ display: 'flex', gap: '0', background: 'var(--glass)', borderRadius: '10px', padding: '3px', border: '1px solid var(--glass-border)' }}>
+          <div className="glass-card" style={{ padding: '24px 0', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div style={{ padding: '0 24px', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', fontFamily: f, letterSpacing: '-0.3px', margin: '0 0 16px 0' }}>Recent Transactions</h3>
+              <div style={{ display: 'flex', gap: '4px', background: 'var(--glass)', borderRadius: '10px', padding: '4px', border: '1px solid var(--glass-border)' }}>
                 {(['all', 'sent', 'received'] as const).map(fil => (
                   <button key={fil} onClick={() => setTxFilter(fil)}
-                    style={{ flex: 1, padding: '7px 0', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: txFilter === fil ? 700 : 500, fontFamily: f, background: txFilter === fil ? 'var(--teal)' : 'transparent', color: txFilter === fil ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s ease' }}
+                    style={{ flex: 1, padding: '8px 0', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: txFilter === fil ? 700 : 500, fontFamily: f, background: txFilter === fil ? 'var(--teal)' : 'transparent', color: txFilter === fil ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s ease', boxShadow: txFilter === fil ? '0 2px 8px rgba(14,203,203,0.3)' : 'none' }}
                   >{fil.charAt(0).toUpperCase() + fil.slice(1)}</button>
                 ))}
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
               {isLoadingPayments ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
                   <Loader2 size={24} style={{ color: 'var(--teal)', animation: 'spin 1s linear infinite' }} />
                 </div>
               ) : filteredTx.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '32px 24px', color: 'var(--text-secondary)', fontFamily: f, fontSize: '13px' }}>No transactions found</div>
+                <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-secondary)', fontFamily: f, fontSize: '13px' }}>No transactions found</div>
               ) : (
-                filteredTx.map((tx) => (
+                filteredTx.slice(0, 5).map((tx) => (
                   <div key={tx.id}
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px', cursor: 'pointer', transition: 'background 0.15s ease' }}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', cursor: 'pointer', transition: 'background 0.15s ease' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--row-hover)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: tx.status === 'received' ? 'rgba(0,232,143,0.12)' : 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: tx.status === 'received' ? 'rgba(0,232,143,0.12)' : 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {tx.status === 'received' ? <ArrowDownLeft size={18} style={{ color: 'var(--success)' }} /> : <ArrowUpRight size={18} style={{ color: 'var(--danger)' }} />}
                       </div>
                       <div>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: f }}>{tx.name}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: f }}>{tx.desc} · {tx.time}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: f, marginBottom: '2px' }}>{tx.name}</div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f }}>{tx.desc} · {tx.time}</div>
                       </div>
                     </div>
-                    <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: f, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.3px', color: tx.status === 'received' ? 'var(--success)' : 'var(--danger)' }}>{tx.amount}</span>
+                    <span style={{ fontSize: '15px', fontWeight: 700, fontFamily: f, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.3px', color: tx.status === 'received' ? 'var(--success)' : 'var(--text-primary)' }}>{tx.amount}</span>
                   </div>
                 ))
               )}
             </div>
 
-            <div style={{ padding: '12px 24px 0', borderTop: '1px solid var(--glass-border)', marginTop: '4px' }}>
+            <div style={{ padding: '16px 24px 0', borderTop: '1px solid var(--glass-border)', marginTop: 'auto' }}>
               <button onClick={() => navigate('/transactions')}
-                style={{ width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, fontFamily: f, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s ease' }}
-              >View All Transactions <ChevronRight size={14} /></button>
+                style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 600, fontFamily: f, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', transition: 'all 0.2s ease' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--row-hover)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--glass)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+              >View All Activity <ChevronRight size={16} /></button>
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes wave {
+          0% { transform: rotate(0deg); }
+          10% { transform: rotate(14deg); }
+          20% { transform: rotate(-8deg); }
+          30% { transform: rotate(14deg); }
+          40% { transform: rotate(-4deg); }
+          50% { transform: rotate(10deg); }
+          60% { transform: rotate(0deg); }
+          100% { transform: rotate(0deg); }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </section>
   );
 };

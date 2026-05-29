@@ -10,7 +10,9 @@ const AdminLayout: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("credify_theme") || "light";
+  });
 
   const location = useLocation();
   const [isBypassed, setIsBypassed] = useState(location.state?.bypassAuth === true);
@@ -45,7 +47,9 @@ const AdminLayout: React.FC = () => {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem("credify_theme", newTheme);
   };
 
   return (

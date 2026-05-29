@@ -13,6 +13,7 @@ const SettingsAdminPage: React.FC = () => {
   const toggleTheme = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("credify_theme", newTheme);
   };
 
   return (
