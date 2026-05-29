@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
   return (
-    <div className="relative min-h-screen -mt-[300px] pt-[400px] overflow-hidden">
+    <div className="relative min-h-screen -mt-[200px] pt-[320px] md:-mt-[300px] md:pt-[400px] overflow-hidden">
 
       {/* Background Shapes */}
       <div className="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none">
@@ -26,18 +26,18 @@ const Hero: React.FC = () => {
         </svg>
       </div>
 
-      <main className="max-w-7xl mx-auto px-12 grid lg:grid-cols-2 gap-16 items-center">
-        <div className="lg:pl-16">
-          {/* العنوان بتنسيق Black & Tight */}
-          <h1 className="text-[85px] font-[900] text-slate-900 leading-[0.9] mb-8 tracking-tighter">
+      <main className="max-w-7xl mx-auto px-6 sm:px-12 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="lg:pl-16 text-center lg:text-left flex flex-col items-center lg:items-start">
+          {/* Title */}
+          <h1 className="text-[40px] sm:text-[55px] md:text-[70px] lg:text-[85px] font-[900] text-slate-900 leading-[0.95] md:leading-[0.9] mb-6 md:mb-8 tracking-tighter">
             Banking <br />
             <span className="bg-gradient-to-r from-[#4ade80] via-[#3b82f6] to-[#6366f1] bg-clip-text text-transparent">
               Made Human.
             </span>
           </h1>
 
-          {/* الباراجراف مع انيميشن growing الخطير */}
-          <p className="text-[22px] text-slate-500 mb-12 font-medium max-w-xl leading-relaxed">
+          {/* Paragraph */}
+          <p className="text-base sm:text-lg md:text-[22px] text-slate-500 mb-8 md:mb-12 font-medium max-w-xl leading-relaxed">
             Stop fighting your bank. Start
             <span className="relative inline-block font-[900] text-slate-900 mx-2 group">
               <span className="relative z-10">growing</span>
@@ -65,44 +65,44 @@ const Hero: React.FC = () => {
             with a seamless digital experience.
           </p>
 
-          <div className="flex gap-5">
-            {/* الزرار مع تأثير الـ Shine */}
-            <Link to="/login" className="group relative overflow-hidden flex items-center gap-4 bg-slate-900 px-10 py-5 rounded-full font-bold text-white text-lg transition-all duration-300 active:scale-95 shadow-xl hover:bg-[#22c55e]">
+          <div className="flex gap-5 justify-center lg:justify-start w-full sm:w-auto">
+            {/* CTA Button */}
+            <Link to="/login" className="group relative overflow-hidden flex items-center gap-4 bg-slate-900 px-8 py-4 sm:px-10 sm:py-5 rounded-full font-bold text-white text-base sm:text-lg transition-all duration-300 active:scale-95 shadow-xl hover:bg-[#22c55e]">
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1s_ease-in-out] pointer-events-none"></span>
               <span className="relative z-10">Get Started</span>
-              <div className="relative z-10 w-10 h-10 bg-white/10 rounded-full flex justify-center items-center transition-all duration-300 group-hover:rotate-45 group-hover:bg-white/20">
-                <i className="fa-solid fa-arrow-right text-sm"></i>
+              <div className="relative z-10 w-8 h-8 sm:w-10 sm:h-10 bg-white/10 rounded-full flex justify-center items-center transition-all duration-300 group-hover:rotate-45 group-hover:bg-white/20">
+                <i className="fa-solid fa-arrow-right text-xs sm:text-sm"></i>
               </div>
             </Link>
           </div>
         </div>
 
-        {/* قسم الكروت بتأثيرات الـ Floating */}
-        <div className="relative h-[550px] flex justify-center items-center">
+        {/* Floating Cards Container */}
+        <div className="relative h-[320px] xs:h-[360px] sm:h-[450px] lg:h-[550px] w-full flex justify-center items-center">
           {/* White Card (Back) */}
-          <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-[5] animate-float-card-secondary absolute w-[380px] h-[230px] rounded-[2.5rem] p-8 flex flex-col justify-end translate-x-12 translate-y-12">
-            <p className="text-slate-400 tracking-widest font-medium text-lg">
+          <div className="bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.05)] z-[5] animate-float-card-secondary absolute w-[280px] h-[170px] xs:w-[320px] xs:h-[195px] sm:w-[380px] sm:h-[230px] rounded-[1.8rem] sm:rounded-[2.5rem] p-5 xs:p-6 sm:p-8 flex flex-col justify-end translate-x-6 translate-y-6 xs:translate-x-8 xs:translate-y-8 sm:translate-x-12 sm:translate-y-12">
+            <p className="text-slate-400 tracking-widest font-medium text-sm xs:text-base sm:text-lg">
               1234 5678 9101 0000
             </p>
-            <p className="text-slate-400 text-sm mt-1 uppercase font-semibold">CARDHOLDER NAME</p>
+            <p className="text-slate-400 text-[10px] xs:text-xs sm:text-sm mt-1 uppercase font-semibold">CARDHOLDER NAME</p>
           </div>
 
           {/* Black Card (Front) */}
-          <div className="bg-gradient-to-br from-[#2d2d2d] to-black shadow-[30px_30px_70px_rgba(0,0,0,0.35)] z-10 animate-float-card absolute w-[380px] h-[230px] rounded-[2.5rem] p-8 text-white flex flex-col justify-between overflow-hidden border border-white/10">
+          <div className="bg-gradient-to-br from-[#2d2d2d] to-black shadow-[30px_30px_70px_rgba(0,0,0,0.35)] z-10 animate-float-card absolute w-[280px] h-[170px] xs:w-[320px] xs:h-[195px] sm:w-[380px] sm:h-[230px] rounded-[1.8rem] sm:rounded-[2.5rem] p-5 xs:p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden border border-white/10">
             <div className="flex justify-between items-start">
-              <span className="text-2xl font-extrabold tracking-tighter italic">
+              <span className="text-lg xs:text-xl sm:text-2xl font-extrabold tracking-tighter italic">
                 Credify
               </span>
-              <div className="w-14 h-10 bg-yellow-500/20 rounded-xl border border-yellow-500/30 backdrop-blur-sm flex items-center justify-center">
-                <div className="w-8 h-6 bg-yellow-600/40 rounded-md"></div>
+              <div className="w-10 h-7 xs:w-12 xs:h-8 sm:w-14 sm:h-10 bg-yellow-500/20 rounded-lg xs:rounded-xl border border-yellow-500/30 backdrop-blur-sm flex items-center justify-center">
+                <div className="w-6 h-4 xs:w-8 xs:h-6 bg-yellow-600/40 rounded-sm xs:rounded-md"></div>
               </div>
             </div>
             <div>
-              <p className="tracking-widest text-xl font-medium mb-3">
+              <p className="tracking-widest text-sm xs:text-base sm:text-xl font-medium mb-2 xs:mb-3">
                 1234 5678 9101 0000
               </p>
               <div className="flex justify-between items-end">
-                <p className="text-sm opacity-60 uppercase tracking-widest font-light">
+                <p className="text-[10px] xs:text-xs sm:text-sm opacity-60 uppercase tracking-widest font-light">
                   CARDHOLDER NAME
                 </p>
               </div>

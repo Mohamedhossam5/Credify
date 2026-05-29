@@ -567,6 +567,17 @@ const Login: React.FC = () => {
           Sign In Securely
         </Button>
 
+        <div className="mt-5 md:hidden text-[0.85rem] text-auth-text-mid text-center">
+          Don't have an account?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/register')}
+            className="text-auth-teal font-bold hover:underline cursor-pointer transition-colors"
+          >
+            Create one here
+          </button>
+        </div>
+
         {securityBadge}
       </form>
     </div>

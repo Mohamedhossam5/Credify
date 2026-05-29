@@ -3,6 +3,9 @@
 $RepoRoot = $PSScriptRoot
 Write-Host "Starting Credify Services..." -ForegroundColor Cyan
 Write-Host "Repo root: $RepoRoot" -ForegroundColor Gray
+Write-Host ""
+Write-Host "NOTE: Run .\setup-and-start.ps1 on first run to install deps + set up databases." -ForegroundColor Yellow
+Write-Host ""
 
 Write-Host "1/5 Starting API Gateway (Port 3000)..." -ForegroundColor Green
 Start-Process powershell -WorkingDirectory $RepoRoot -ArgumentList "-NoExit -Command `"cd Server\api-gateway; npm run dev`""
@@ -21,5 +24,3 @@ Start-Process powershell -WorkingDirectory $RepoRoot -ArgumentList "-NoExit -Com
 
 Write-Host "Success! All services have been started in separate terminal windows." -ForegroundColor Cyan
 Write-Host "You can close this window now." -ForegroundColor Gray
-
-

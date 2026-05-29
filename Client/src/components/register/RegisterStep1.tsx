@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Mail, Phone, IdCard, ArrowRight } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
@@ -6,6 +7,7 @@ import { useRegisterStep1 } from '../../hooks/useRegisterStep1';
 import { useAuthStore } from '../../store/authStore';
 
 export const RegisterStep1: React.FC = () => {
+  const navigate = useNavigate();
   const { currentStep, register, handleSubmit, errors, focusedError, onSubmit, onError } = useRegisterStep1();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -136,6 +138,17 @@ export const RegisterStep1: React.FC = () => {
             Continue
           </Button>
         )}
+
+        <div className="mt-5 md:hidden text-[0.85rem] text-auth-text-mid text-center">
+          Already have an account?{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/login')}
+            className="text-auth-teal font-bold hover:underline cursor-pointer transition-colors"
+          >
+            Sign in here
+          </button>
+        </div>
       </form>
     </div>
   );

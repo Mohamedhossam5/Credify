@@ -14,13 +14,13 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-[1250px] mx-auto px-5 py-10 animate-[fadeIn_1s_ease-out]">
-      <div className="text-left mb-[50px]">
+    <div className="w-full max-w-[1250px] mx-auto px-6 sm:px-12 py-16 md:py-24 animate-[fadeIn_1s_ease-out]">
+      <div className="text-left mb-[40px] md:mb-[50px]">
         <h1 className="text-[clamp(32px,5vw,48px)] text-dark font-extrabold tracking-tight">Let's Connect</h1>
         <p className="text-slate-500 text-lg mt-2.5">Have a question or just want to say hi? We're here for you.</p>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.4fr] gap-10">
-        <div className="bg-white p-11 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black/5 relative">
+        <div className="bg-white p-6 sm:p-11 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black/5 relative">
           <div className="text-[22px] text-dark mb-[30px] font-bold flex items-center gap-2.5">
             <span className="w-[30px] h-1 bg-accent rounded-sm"></span> Send a Message
           </div>
@@ -75,16 +75,16 @@ const Contact: React.FC = () => {
             </a>
           </div>
         </div>
-        <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-[650px]">
-          <div className="absolute top-[30px] left-[30px] right-[30px] bg-white/85 backdrop-blur-[12px] p-[25px] rounded-2xl z-10 border border-white/50 flex justify-between items-center">
+        <div className="relative rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.05)] h-[350px] sm:h-[450px] lg:h-[650px]">
+          <div className="absolute top-[20px] left-[20px] right-[20px] sm:top-[30px] sm:left-[30px] sm:right-[30px] bg-white/85 backdrop-blur-[12px] p-[15px] sm:p-[25px] rounded-2xl z-10 border border-white/50 flex justify-between items-center">
             <div>
-              <h4 className="text-[18px] text-dark mb-1 font-bold">Helwan University</h4>
-              <p className="text-[14px] text-slate-500">
+              <h4 className="text-[16px] sm:text-[18px] text-dark mb-1 font-bold">Helwan University</h4>
+              <p className="text-[12px] sm:text-[14px] text-slate-500">
                 <i className="fa-solid fa-location-dot text-accent mr-1"></i>
                 Faculty of BIS, Cairo
               </p>
             </div>
-            <a href="#" className="w-[50px] h-[50px] bg-accent text-white rounded-full flex justify-center items-center no-underline text-[20px] transition-all duration-400 hover:rotate-45 hover:scale-110" title="Get Directions">
+            <a href="#" className="w-[40px] h-[40px] sm:w-[50px] sm:h-[50px] bg-accent text-white rounded-full flex justify-center items-center no-underline text-[16px] sm:text-[20px] transition-all duration-400 hover:rotate-45 hover:scale-110" title="Get Directions">
               <i className="fa-solid fa-arrow-up-right-from-square"></i>
             </a>
           </div>
