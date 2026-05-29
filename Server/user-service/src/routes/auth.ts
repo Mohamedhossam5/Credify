@@ -352,7 +352,8 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
         return;
       } else {
         await User.incrementFailedLogins(user.id);
-        res.status(401).json({ error: "Invalid email or password." });
+        const remaining = 2 - user.failed_login_attempts;
+        res.status(401).json({ error: `Invalid email or password. ${remaining} attempt(s) remaining before account lock.` });
         return;
       }
     }
