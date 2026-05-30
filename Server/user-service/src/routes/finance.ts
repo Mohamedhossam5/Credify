@@ -13,7 +13,7 @@ import { sendSms } from "../services/sms";
 const router = Router();
 
 // ─── Fee configuration ──────────────────────────────────────
-const TRANSFER_FEE_RATE = 0.01; // 1% fee on every transfer
+const TRANSFER_FEE_RATE = 0.001; // 0.1% fee on every transfer
 
 // ─── Pending-transfer store (in-memory, expires with OTP) ───
 
@@ -92,14 +92,18 @@ router.post("/transfer/initiate", authenticate, transferValidation, async (req: 
       return;
     }
 
-    // Calculate 1% fee
+    // Calculate 0.1% fee with min 0.5 and max 20 EGP
     const parsedAmount = parseFloat(amount);
-    const fee = Math.round(parsedAmount * TRANSFER_FEE_RATE * 100) / 100;
+    let fee = Math.round(parsedAmount * TRANSFER_FEE_RATE * 100) / 100;
+    if (parsedAmount > 0) {
+      if (fee < 0.5) fee = 0.5;
+      if (fee > 20) fee = 20;
+    }
     const totalDebit = parsedAmount + fee;
 
     // Quick balance check (will re-check at confirm time under lock)
     if (parseFloat(String(senderAccount.balance)) < totalDebit) {
-      res.status(400).json({ error: `Insufficient balance. Transfer amount: ${parsedAmount}, fee (1%): ${fee}, total required: ${totalDebit}.` });
+      res.status(400).json({ error: `Insufficient balance. Transfer amount: ${parsedAmount}, fee: ${fee}, total required: ${totalDebit}.` });
       return;
     }
 

@@ -4,7 +4,7 @@ import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
 
 const fmt = (n: number) => new Intl.NumberFormat("en-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
-const FEE_RATE = 0.01; // 1% — matches backend TRANSFER_FEE_RATE
+const FEE_RATE = 0.001; // 0.1% — matches backend TRANSFER_FEE_RATE
 
 type TransferType = 'SAME_BANK' | 'DOMESTIC' | 'INTERNATIONAL';
 
@@ -46,7 +46,11 @@ const TransfersPage: React.FC = () => {
   const [confirming, setConfirming] = useState(false);
 
   // Computed
-  const fee = Math.round(amount * FEE_RATE * 100) / 100;
+  let fee = Math.round(amount * FEE_RATE * 100) / 100;
+  if (amount > 0) {
+    if (fee < 0.5) fee = 0.5;
+    if (fee > 20) fee = 20;
+  }
   const totalDebit = amount + fee;
 
   const f = '"Inter",sans-serif';
@@ -351,7 +355,7 @@ const TransfersPage: React.FC = () => {
                 <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>{fmt(amount)} EGP</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Fee (1%)</span>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Transfer Fee (0.1%)</span>
                 <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--danger)', fontFamily: f }}>{fmt(fee)} EGP</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--glass-border)' }}>
