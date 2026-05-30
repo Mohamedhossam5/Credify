@@ -42,6 +42,7 @@ export const useNotifications = () => {
     queryKey: ['transactions'],
     queryFn: () => financeService.getTransactions(),
     enabled: !!currentAccountId,
+    refetchInterval: 30000, // Real-time updates every 30 seconds
   });
 
   // Fetch cards
@@ -51,6 +52,7 @@ export const useNotifications = () => {
       const { data } = await api.get<{ cards: any[] }>('/cards');
       return data.cards || [];
     },
+    refetchInterval: 30000, // Real-time updates every 30 seconds
   });
 
   // Build notifications from real data

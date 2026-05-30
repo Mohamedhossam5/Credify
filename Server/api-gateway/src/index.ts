@@ -24,8 +24,8 @@ app.use(cors());
 app.use(morgan("dev"));
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5000, // Increased limit to allow background polling
   message: { error: "Too many requests, please try again later." },
 });
 app.use(limiter);
