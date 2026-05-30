@@ -50,4 +50,28 @@ export const financeService = {
     const { data } = await api.get<{ transactions: TransactionRecord[] }>('/transactions', { params });
     return data.transactions;
   },
+
+  /** Initiate a Bill Payment (generates OTP) */
+  initiateBillPayment: async (
+    amount: number,
+    providerName: string,
+    accountNumber: string
+  ): Promise<{ message: string; transferId?: string; otpRequired: boolean }> => {
+    const { data } = await api.post('/transfer/initiate', {
+      type: 'BILL_PAYMENT',
+      amount,
+      recipientName: providerName,
+      recipientAccount: accountNumber,
+    });
+    return data;
+  },
+
+  /** Confirm a Bill Payment (verifies OTP) */
+  confirmBillPayment: async (transferId: string, otp: string): Promise<any> => {
+    const { data } = await api.post('/transfer/confirm', {
+      transferId,
+      otp,
+    });
+    return data;
+  },
 };

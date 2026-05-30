@@ -16,4 +16,7 @@ export const routesMeta: Record<string, RouteMeta> = {
   '/register': {
     title: createTitle('Create Account'),
   },
+  '/bill-payment': {
+    title: createTitle('Bill Payment'),
+  },
 };

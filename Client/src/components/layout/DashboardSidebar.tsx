@@ -7,6 +7,7 @@ const preloadMap: Record<string, () => void> = {
   '/dashboard': () => import('../../pages/dashboard/Dashboard'),
   '/transactions': () => import('../../pages/dashboard/Transactions'),
   '/transfers': () => import('../../pages/dashboard/TransfersPage'),
+  '/bill-payment': () => import('../../pages/dashboard/BillPaymentPage'),
   '/accounts': () => import('../../pages/dashboard/AccountsPage'),
   '/exchange': () => import('../../pages/dashboard/ExchangePage'),
   '/settings': () => import('../../pages/dashboard/SettingsPage'),
@@ -115,6 +116,44 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
               <path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
             </svg>
             Transfers
+          </div>
+
+          <div
+            className={`nav-item ${location.pathname === '/bill-payment' ? 'active' : ''}`}
+            onClick={() => handleNavigate('/bill-payment')}
+            onMouseEnter={() => handlePreload('/bill-payment')}
+            onTouchStart={() => handlePreload('/bill-payment')}
+          >
+            <svg
+              className="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+              <rect x="9" y="3" width="6" height="4" rx="1" />
+              <path d="M9 14l2 2 4-4" />
+            </svg>
+            Bill Payment
+          </div>
+
+          <div
+            className={`nav-item ${location.pathname === '/donations' ? 'active' : ''}`}
+            onClick={() => handleNavigate('/donations')}
+            onMouseEnter={() => handlePreload('/donations')}
+            onTouchStart={() => handlePreload('/donations')}
+          >
+            <svg
+              className="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            Donations
           </div>
 
           <div

@@ -78,6 +78,8 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
     dashboard: "Dashboard",
     transactions: "Transactions",
     transfers: "Transfers",
+    'bill-payment': "Bill Payment",
+    donations: "Donations",
     accounts: "My Accounts",
     exchange: "Exchange Rates",
     settings: "Settings",

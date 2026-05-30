@@ -18,6 +18,8 @@ const PaymentsPage = React.lazy(() => import('./pages/landing/PaymentsPage'));
 const Dashboard = React.lazy(() => import('./pages/dashboard/Dashboard'));
 const Transactions = React.lazy(() => import('./pages/dashboard/Transactions'));
 const TransfersPage = React.lazy(() => import('./pages/dashboard/TransfersPage'));
+const BillPaymentPage = React.lazy(() => import('./pages/dashboard/BillPaymentPage'));
+const DonationsPage = React.lazy(() => import('./pages/dashboard/DonationsPage'));
 const AccountsPage = React.lazy(() => import('./pages/dashboard/AccountsPage'));
 const ExchangePage = React.lazy(() => import('./pages/dashboard/ExchangePage'));
 const SettingsPage = React.lazy(() => import('./pages/dashboard/SettingsPage'));
@@ -57,6 +59,8 @@ const AppContent: React.FC = () => {
         <Route path="/dashboard" element={<Suspense fallback={<PageLoader />}><Dashboard /></Suspense>} />
         <Route path="/transactions" element={<Suspense fallback={<PageLoader />}><Transactions /></Suspense>} />
         <Route path="/transfers" element={<Suspense fallback={<PageLoader />}><TransfersPage /></Suspense>} />
+        <Route path="/bill-payment" element={<Suspense fallback={<PageLoader />}><BillPaymentPage /></Suspense>} />
+        <Route path="/donations" element={<Suspense fallback={<PageLoader />}><DonationsPage /></Suspense>} />
         <Route path="/accounts" element={<Suspense fallback={<PageLoader />}><AccountsPage /></Suspense>} />
         <Route path="/exchange" element={<Suspense fallback={<PageLoader />}><ExchangePage /></Suspense>} />
         <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />

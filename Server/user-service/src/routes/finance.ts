@@ -48,7 +48,7 @@ setInterval(() => {
 // ─── Shared validation ──────────────────────────────────────
 
 const transferValidation = [
-  body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
+  body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL", "BILL_PAYMENT"]).withMessage("Invalid transfer type"),
   body("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
   body("recipientName").notEmpty().withMessage("Recipient name is required"),
   body("recipientAccount").notEmpty().withMessage("Recipient account is required"),
@@ -61,6 +61,7 @@ router.post("/transfer/initiate", authenticate, transferValidation, async (req: 
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation failed for /transfer/initiate', req.body, errors.array());
       res.status(400).json({ errors: errors.array() });
       return;
     }
@@ -114,32 +115,7 @@ router.post("/transfer/initiate", authenticate, transferValidation, async (req: 
       return;
     }
 
-    // ─── Admin bypass: execute transfer immediately without OTP ───
-    if (user.role === "ADMIN") {
-      const receiverInternalId = type === "SAME_BANK" ? recipientAccount : undefined;
-      const transferRes = await Account.transferFunds(userId, parsedAmount, receiverInternalId, fee);
-      if (!transferRes.success) {
-        res.status(400).json({ error: transferRes.error });
-        return;
-      }
 
-      const transaction = await Transaction.create({
-        senderId: userId,
-        senderAccountId: senderAccount.account_id,
-        type,
-        amount: parsedAmount,
-        fee,
-        recipientName,
-        recipientAccount,
-        recipientBank,
-        swiftCode,
-        recipientAddress,
-        reference,
-      });
-
-      res.json({ message: "Transfer successful.", otpRequired: false, transaction });
-      return;
-    }
 
     // ─── Regular user: store pending transfer and send OTP ────
     const transferId = uuidv4();
