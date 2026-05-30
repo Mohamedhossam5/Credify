@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { financeService, type TransactionRecord } from '../services/finance.service';
 import { useAuthStore } from '../store/authStore';
@@ -36,6 +36,13 @@ function saveReadIds(ids: Set<string>) {
 export const useNotifications = () => {
   const user = useAuthStore((s) => s.user);
   const currentAccountId = user?.account?.accountId;
+  const [readUpdateTick, setReadUpdateTick] = useState(0);
+
+  useEffect(() => {
+    const handleUpdate = () => setReadUpdateTick((t) => t + 1);
+    window.addEventListener('notifications_read_updated', handleUpdate);
+    return () => window.removeEventListener('notifications_read_updated', handleUpdate);
+  }, []);
 
   // Fetch recent transactions
   const { data: rawTransactions = [] } = useQuery({
@@ -159,7 +166,7 @@ export const useNotifications = () => {
     // Sort by newest first
     items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     return items;
-  }, [rawTransactions, cardsData, currentAccountId, user]);
+  }, [rawTransactions, cardsData, currentAccountId, user, readUpdateTick]);
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
@@ -167,12 +174,14 @@ export const useNotifications = () => {
     const ids = getReadIds();
     ids.add(id);
     saveReadIds(ids);
+    window.dispatchEvent(new Event('notifications_read_updated'));
   }, []);
 
   const markAllRead = useCallback(() => {
     const ids = getReadIds();
     notifications.forEach((n) => ids.add(n.id));
     saveReadIds(ids);
+    window.dispatchEvent(new Event('notifications_read_updated'));
   }, [notifications]);
 
   return { notifications, unreadCount, markAsRead, markAllRead };

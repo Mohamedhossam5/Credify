@@ -121,9 +121,6 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
 
   const handleMarkAllRead = () => {
     markAllRead();
-    // Force a re-render by closing and reopening
-    setIsNotifOpen(false);
-    setTimeout(() => setIsNotifOpen(true), 50);
   };
 
   return (
