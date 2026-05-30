@@ -10,11 +10,11 @@ Write-Host "Repo root: $RepoRoot" -ForegroundColor Gray
 Write-Host "`n[1/6] Stopping existing services on ports 3000, 3001, 3002..." -ForegroundColor Yellow
 $ports = @(3000, 3001, 3002)
 foreach ($port in $ports) {
-    $pid = (netstat -ano | Select-String ":$port\s" | Where-Object { $_ -match 'LISTENING' } | ForEach-Object { ($_ -split '\s+')[-1] } | Select-Object -First 1)
-    if ($pid -and $pid -ne "0") {
+    $procId = (netstat -ano | Select-String ":$port\s" | Where-Object { $_ -match 'LISTENING' } | ForEach-Object { ($_ -split '\s+')[-1] } | Select-Object -First 1)
+    if ($procId -and $procId -ne "0") {
         try {
-            Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
-            Write-Host "  Stopped process on port $port (PID $pid)" -ForegroundColor Gray
+            Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
+            Write-Host "  Stopped process on port $port (PID $procId)" -ForegroundColor Gray
         } catch {}
     }
 }

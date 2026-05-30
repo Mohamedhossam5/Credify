@@ -71,7 +71,7 @@ router.post("/register", registerValidation, async (req, res) => {
             res.status(409).json({ error: "A user with this email already exists." });
             return;
         }
-        const salt = await bcryptjs_1.default.genSalt(12);
+        const salt = await bcryptjs_1.default.genSalt(10);
         const passwordHash = await bcryptjs_1.default.hash(password, salt);
         const user = await User_1.default.create({
             firstName, middleName: middleName || null, lastName, email, passwordHash,
@@ -293,13 +293,70 @@ router.post("/login", loginValidation, async (req, res) => {
             res.status(401).json({ error: "Invalid email or password." });
             return;
         }
+        if (user.is_locked) {
+            res.status(403).json({ error: "Account locked. Please contact admin." });
+            return;
+        }
         const isMatch = await bcryptjs_1.default.compare(password, user.password_hash);
         if (!isMatch) {
-            res.status(401).json({ error: "Invalid email or password." });
-            return;
+            if (user.failed_login_attempts >= 2) {
+                await User_1.default.lockAccount(user.id);
+                res.status(403).json({ error: "Account locked due to 3 failed attempts. Please contact admin." });
+                return;
+            }
+            else {
+                await User_1.default.incrementFailedLogins(user.id);
+                const remaining = 2 - user.failed_login_attempts;
+                res.status(401).json({ error: `Invalid email or password. ${remaining} attempt(s) remaining before account lock.` });
+                return;
+            }
+        }
+        if (user.failed_login_attempts > 0) {
+            await User_1.default.resetFailedLogins(user.id);
+        }
+        // ─── Re-hash with lower cost if needed (background, after response) ──
+        const TARGET_ROUNDS = 10;
+        const currentRounds = bcryptjs_1.default.getRounds(user.password_hash);
+        if (currentRounds > TARGET_ROUNDS) {
+            setImmediate(async () => {
+                try {
+                    const salt = await bcryptjs_1.default.genSalt(TARGET_ROUNDS);
+                    const newHash = await bcryptjs_1.default.hash(password, salt);
+                    await User_1.default.updatePassword(user.id, newHash);
+                }
+                catch (_) { /* best-effort migration */ }
+            });
         }
         // ─── Admin bypass: skip OTP entirely ─────────────────────
         if (user.role === "ADMIN") {
+            const token = (0, auth_1.generateToken)(user);
+            const account = await Account_1.default.findByUserId(user.id);
+            res.json({
+                message: "Login successful.",
+                otpRequired: false,
+                user: {
+                    id: user.id,
+                    firstName: user.first_name,
+                    middleName: user.middle_name,
+                    lastName: user.last_name,
+                    email: user.email,
+                    phoneNumber: user.phone_number,
+                    gender: user.gender,
+                    phoneVerified: user.phone_verified,
+                    emailVerified: user.email_verified,
+                    kycStatus: user.kyc_status,
+                    role: user.role,
+                    account: account ? {
+                        accountId: account.account_id,
+                        balance: account.balance
+                    } : null
+                },
+                token,
+            });
+            return;
+        }
+        // ─── Dev bypass: skip OTP when SKIP_OTP=true ─────────────
+        if (process.env.SKIP_OTP === "true") {
             const token = (0, auth_1.generateToken)(user);
             const account = await Account_1.default.findByUserId(user.id);
             res.json({
@@ -565,7 +622,7 @@ router.post("/reset-password", [
             return;
         }
         // Hash new password and save
-        const salt = await bcryptjs_1.default.genSalt(12);
+        const salt = await bcryptjs_1.default.genSalt(10);
         const passwordHash = await bcryptjs_1.default.hash(newPassword, salt);
         await User_1.default.updatePassword(user.id, passwordHash);
         // Consume the token (one-time use)

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import Account from "../models/Account";
 import Transaction from "../models/Transaction";
 import User from "../models/User";
+import Beneficiary from "../models/Beneficiary";
 import { authenticate, AuthenticatedRequest } from "../middleware/auth";
 import { generateOtp, verifyOtp } from "../services/otp";
 import { sendEmail, buildOtpEmailHtml } from "../services/brevo";
@@ -266,6 +267,79 @@ router.post("/transfer/confirm", authenticate, [
     res.json({ message: "Transfer successful.", transaction });
   } catch (err) {
     console.error("[Transfer Confirm Error]", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// ─── Beneficiaries ──────────────────────────────────────────
+
+router.get("/transfer/beneficiaries", authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const beneficiaries = await Beneficiary.findByUserId(userId);
+    res.json({ beneficiaries });
+  } catch (err) {
+    console.error("[Get Beneficiaries Error]", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.post("/transfer/beneficiaries", authenticate, [
+  body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
+  body("name").notEmpty().withMessage("Beneficiary name is required"),
+  body("accountNumber").notEmpty().withMessage("Account number is required"),
+], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const { type, name, accountNumber, bankName, swiftCode, address } = req.body;
+    const userId = req.user!.id;
+
+    if (type === "DOMESTIC" && !bankName) {
+      res.status(400).json({ error: "Bank name is required for domestic beneficiaries." });
+      return;
+    }
+    if (type === "INTERNATIONAL") {
+      if (!bankName) { res.status(400).json({ error: "Bank name is required for international beneficiaries." }); return; }
+      if (!swiftCode) { res.status(400).json({ error: "SWIFT code is required for international beneficiaries." }); return; }
+      if (!address) { res.status(400).json({ error: "Address is required for international beneficiaries." }); return; }
+    }
+
+    const beneficiary = await Beneficiary.create({
+      userId,
+      type,
+      name,
+      accountNumber,
+      bankName,
+      swiftCode,
+      address,
+    });
+
+    res.status(201).json({ message: "Beneficiary saved successfully.", beneficiary });
+  } catch (err: any) {
+    console.error("[Add Beneficiary Error]", err);
+    require('fs').appendFileSync('beneficiary_error.log', new Date().toISOString() + ' ' + (err.stack || err.message) + '\\n');
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+router.delete("/transfer/beneficiaries/:id", authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user!.id;
+    const beneficiaryId = parseInt(req.params.id, 10);
+    const success = await Beneficiary.delete(beneficiaryId, userId);
+    
+    if (success) {
+      res.json({ message: "Beneficiary deleted successfully." });
+    } else {
+      res.status(404).json({ error: "Beneficiary not found." });
+    }
+  } catch (err) {
+    console.error("[Delete Beneficiary Error]", err);
     res.status(500).json({ error: "Internal server error." });
   }
 });

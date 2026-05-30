@@ -16,6 +16,8 @@ export interface UserRecord {
     role: string;
     created_at: string;
     updated_at: string;
+    failed_login_attempts: number;
+    is_locked: boolean;
 }
 interface CreateUserInput {
     firstName: string;
@@ -39,5 +41,9 @@ declare class User {
     static updateEmailVerified(userId: number): Promise<UserRecord | null>;
     static findByPhoneNumber(phone: string): Promise<UserRecord | null>;
     static updatePassword(userId: number, passwordHash: string): Promise<void>;
+    static incrementFailedLogins(userId: number): Promise<void>;
+    static resetFailedLogins(userId: number): Promise<void>;
+    static lockAccount(userId: number): Promise<void>;
+    static unlockAccount(userId: number): Promise<void>;
 }
 export default User;

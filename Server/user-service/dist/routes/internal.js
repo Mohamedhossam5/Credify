@@ -84,4 +84,20 @@ router.get("/users/:id/verification-status", async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 });
+// PUT /api/internal/users/:id/unlock
+router.put("/users/:id/unlock", async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id, 10);
+        if (isNaN(userId)) {
+            res.status(400).json({ error: "Invalid user ID." });
+            return;
+        }
+        await User_1.default.unlockAccount(userId);
+        res.json({ message: "User account unlocked successfully." });
+    }
+    catch (err) {
+        console.error("[Internal] Error unlocking account:", err.message);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
 exports.default = router;

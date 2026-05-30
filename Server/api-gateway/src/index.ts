@@ -120,6 +120,9 @@ app.post("/api/auth/reset-password", (req, res) => forwardJSON(USER_SERVICE_URL,
 app.get("/api/fx-rates", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/fx-rates", req, res));
 app.post("/api/transfer/initiate", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/initiate", req, res));
 app.post("/api/transfer/confirm", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/confirm", req, res));
+app.get("/api/transfer/beneficiaries", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/beneficiaries", req, res));
+app.post("/api/transfer/beneficiaries", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/beneficiaries", req, res));
+app.delete("/api/transfer/beneficiaries/:id", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/transfer/beneficiaries/${req.params.id}`, req, res));
 app.get("/api/transactions", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
 
 // ─── Card Routes -> User Service ─────────────────────────────

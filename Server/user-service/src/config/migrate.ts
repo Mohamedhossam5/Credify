@@ -89,6 +89,19 @@ const migration = `
 
   CREATE INDEX IF NOT EXISTS idx_card_deliveries_card_id ON card_deliveries(card_id);
   CREATE INDEX IF NOT EXISTS idx_card_deliveries_user_id ON card_deliveries(user_id);
+
+  CREATE TABLE IF NOT EXISTS beneficiaries (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    type VARCHAR(20) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    account_number VARCHAR(100) NOT NULL,
+    bank_name VARCHAR(100),
+    swift_code VARCHAR(50),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(user_id, account_number)
+  );
 `;
 
 async function runMigration(): Promise<void> {

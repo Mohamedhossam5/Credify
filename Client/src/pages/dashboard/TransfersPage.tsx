@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, CheckCircle2, ArrowRight, CreditCard, User, Hash, FileText, DollarSign, Building2, Globe, AlertCircle, Loader2 } from 'lucide-react';
+import { Send, CheckCircle2, ArrowRight, CreditCard, User, Hash, FileText, DollarSign, Building2, Globe, AlertCircle, Loader2, Star, Trash2, ChevronDown } from 'lucide-react';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
 
@@ -8,11 +8,24 @@ const FEE_RATE = 0.01; // 1% — matches backend TRANSFER_FEE_RATE
 
 type TransferType = 'SAME_BANK' | 'DOMESTIC' | 'INTERNATIONAL';
 
+interface Beneficiary {
+  id: number;
+  type: TransferType;
+  name: string;
+  account_number: string;
+  bank_name?: string;
+  swift_code?: string;
+  address?: string;
+}
+
 const TransfersPage: React.FC = () => {
   // Account state from backend
   const [accountId, setAccountId] = useState('');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
+  const [isBeneficiariesOpen, setIsBeneficiariesOpen] = useState(false);
+  const [saveBeneficiary, setSaveBeneficiary] = useState(false);
 
   // Form
   const [transferType, setTransferType] = useState<TransferType>('SAME_BANK');
@@ -43,11 +56,16 @@ const TransfersPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { data } = await api.get('/auth/me');
+        const [meRes, benRes] = await Promise.all([
+          api.get('/auth/me'),
+          api.get('/transfer/beneficiaries')
+        ]);
+        const data = meRes.data;
         if (data.user?.account) {
           setAccountId(data.user.account.accountId);
           setBalance(parseFloat(data.user.account.balance));
         }
+        setBeneficiaries(benRes.data.beneficiaries || []);
       } catch {
         toast.error('Failed to load account data');
       } finally {
@@ -108,8 +126,9 @@ const TransfersPage: React.FC = () => {
         // Admin bypass — transfer executed immediately
         setStep(4);
         toast.success('Transfer successful!');
-        await refreshBalance();
-        setTimeout(() => resetForm(), 4000);
+      if (saveBeneficiary) await handleSaveBeneficiary();
+      await refreshBalance();
+      setTimeout(() => resetForm(), 4000);
       } else {
         setTransferId(data.transferId);
         setStep(3); // Go to OTP step
@@ -130,6 +149,7 @@ const TransfersPage: React.FC = () => {
       await api.post('/transfer/confirm', { transferId, otp });
       setStep(4);
       toast.success('Transfer successful!');
+      if (saveBeneficiary) await handleSaveBeneficiary();
       await refreshBalance();
       setTimeout(() => resetForm(), 4000);
     } catch (err: any) {
@@ -143,7 +163,54 @@ const TransfersPage: React.FC = () => {
     setRecipientName(''); setRecipientAccount(''); setRecipientBank('');
     setSwiftCode(''); setRecipientAddress(''); setReference('');
     setAmtStr(''); setAmount(0); setOtp(''); setTransferId('');
+    setSaveBeneficiary(false);
     setStep(1);
+  };
+
+  
+  const handleSaveBeneficiary = async () => {
+    try {
+      const payload: any = { type: transferType, name: recipientName, accountNumber: recipientAccount.replace(/\s/g, '') };
+      if (transferType !== 'SAME_BANK') payload.bankName = recipientBank;
+      if (transferType === 'INTERNATIONAL') {
+        payload.swiftCode = swiftCode;
+        payload.address = recipientAddress;
+      }
+      const { data } = await api.post('/transfer/beneficiaries', payload);
+      setBeneficiaries(prev => {
+        const exists = prev.find(b => b.account_number === data.beneficiary.account_number);
+        if (exists) return prev.map(b => b.account_number === data.beneficiary.account_number ? data.beneficiary : b);
+        return [data.beneficiary, ...prev];
+      });
+      toast.success('Beneficiary saved!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to save beneficiary: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const deleteBeneficiary = async (id: number) => {
+    try {
+      await api.delete(`/transfer/beneficiaries/${id}`);
+      setBeneficiaries(prev => prev.filter(b => b.id !== id));
+      toast.success('Beneficiary deleted');
+    } catch {
+      toast.error('Failed to delete beneficiary');
+    }
+  };
+
+  const selectBeneficiary = (b: Beneficiary) => {
+    setTransferType(b.type);
+    setRecipientName(b.name);
+    
+    // Format account if it's alphanumeric/numeric
+    const v = b.account_number;
+    setRecipientAccount((v.match(/.{1,4}/g)?.join(' ') || v).substring(0, 40));
+    
+    setRecipientBank(b.bank_name || '');
+    setSwiftCode(b.swift_code || '');
+    setRecipientAddress(b.address || '');
+    toast.success('Beneficiary selected');
   };
 
   const labelStyle: React.CSSProperties = { fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontFamily: f };
@@ -167,9 +234,59 @@ const TransfersPage: React.FC = () => {
   }
 
   return (
-    <section id="transfers" className="page active" style={{ display: 'flex' }}>
-      {/* Main Panel */}
-      <div id="transfer-panel" className="glass-card" style={{ padding: '36px 32px', position: 'relative', overflow: 'hidden' }}>
+        <section id="transfers" className="page active" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: '1400px' }}>
+        
+        {/* Left Spacer */}
+        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: '24px' }}>
+          {/* Left Column: Beneficiaries Dropdown */}
+          <div style={{ position: 'relative', width: '240px', flexShrink: 0, zIndex: 50 }}>
+          <label style={{ ...labelStyle, marginBottom: '12px' }}><Star size={13} /> Saved Beneficiaries</label>
+          {beneficiaries.length > 0 ? (
+            <>
+              <button onClick={() => setIsBeneficiariesOpen(!isBeneficiariesOpen)} style={{
+                width: '100%', padding: '14px 16px', background: 'var(--glass)', borderRadius: '14px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-primary)', fontFamily: f, fontSize: '13px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+              }}>
+                Select Recipient <ChevronDown size={14} style={{ transform: isBeneficiariesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.6 }} />
+              </button>
+              
+              {isBeneficiariesOpen && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '8px', background: 'var(--glass)', borderRadius: '14px', border: '1px solid var(--glass-border)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '300px', overflowY: 'auto', backdropFilter: 'blur(20px)', boxShadow: '0 12px 32px rgba(0,0,0,0.3)'
+                }}>
+                  {beneficiaries.map(b => (
+                    <div key={b.id} className="dropdown-item" onClick={() => { selectBeneficiary(b); setIsBeneficiariesOpen(false); }} style={{
+                      padding: '12px', borderRadius: '10px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.2s'
+                    }}>
+                      <div style={{ flex: 1, overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '0 0 4px' }}>
+                          <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', margin: 0 }}>{b.name}</p>
+                          <span style={{ fontSize: '9px', fontWeight: 600, padding: '2px 6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontFamily: f }}>
+                            {b.type === 'SAME_BANK' ? 'Within Bank' : b.type === 'DOMESTIC' ? 'Domestic' : 'International'}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '10px', color: 'var(--text-secondary)', fontFamily: mono, margin: 0 }}>{b.account_number}</p>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); deleteBeneficiary(b.id); }} style={{
+                        background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px dashed rgba(255,255,255,0.1)', textAlign: 'center' }}>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, margin: 0 }}>No saved beneficiaries yet</p>
+            </div>
+          )}
+          </div>
+        </div>
+
+        {/* Main Panel */}
+        <div id="transfer-panel" className="glass-card" style={{ width: '100%', maxWidth: '680px', padding: '36px 32px', position: 'relative', overflow: 'hidden' }}>
         {/* Decorative glow */}
         <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '250px', height: '250px', background: 'radial-gradient(circle,rgba(14,203,203,0.06),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '200px', height: '200px', background: 'radial-gradient(circle,rgba(26,111,255,0.05),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
@@ -377,6 +494,21 @@ const TransfersPage: React.FC = () => {
                 <input type="text" value={recipientAddress} onChange={e => setRecipientAddress(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. 10 Champollion St, Cairo, Egypt" />
               </div>
             )}
+            {/* Save Beneficiary Checkbox */}
+            {valid && !beneficiaries.find(b => b.account_number === recipientAccount.replace(/\s/g, '')) && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', padding: '12px', background: 'rgba(14,203,203,0.05)', borderRadius: '12px', border: '1px solid rgba(14,203,203,0.2)' }}>
+                <input
+                  type="checkbox"
+                  id="save-ben"
+                  checked={saveBeneficiary}
+                  onChange={(e) => setSaveBeneficiary(e.target.checked)}
+                  style={{ width: '16px', height: '16px', accentColor: 'var(--teal)', cursor: 'pointer' }}
+                />
+                <label htmlFor="save-ben" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', fontFamily: f, margin: 0 }}>
+                  Save this recipient as a beneficiary for future transfers
+                </label>
+              </div>
+            )}
 
             {/* Submit */}
             <button onClick={initiateTransfer} disabled={!valid || submitting} style={{
@@ -386,6 +518,11 @@ const TransfersPage: React.FC = () => {
             </button>
           </>
         )}
+      </div>
+      
+      {/* Right Spacer */}
+      <div style={{ flex: 1 }}></div>
+
       </div>
     </section>
   );
