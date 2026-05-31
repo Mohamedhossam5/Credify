@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { financeService } from '../../../services/finance.service';
+import { realtime, RealtimeEvent } from '../../../lib/realtime';
 
 // ─── Helpers ─────────────────────────────────────────────────
 const f = '"Inter",sans-serif';
@@ -62,20 +63,33 @@ const LoansAdminPage: React.FC = () => {
   // Mutations
   const approveMutation = useMutation({
     mutationFn: (id: number) => financeService.approveLoan(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       toast.success('Loan approved and funds disbursed!');
       queryClient.invalidateQueries({ queryKey: ['admin-loans'] });
+      realtime.publish(RealtimeEvent.ADMIN_LOANS_UPDATED);
+      realtime.publish(RealtimeEvent.LOANS_UPDATED);
+      realtime.publish(RealtimeEvent.BALANCE_UPDATED);
+      realtime.pushNotification({
+        title: 'Loan Approved',
+        message: `Loan application #${id} has been approved and funds disbursed.`
+      });
     },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Failed to approve'),
   });
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: number; reason: string }) => financeService.rejectLoan(id, reason),
-    onSuccess: () => {
+    onSuccess: (_, { id, reason }) => {
       toast.success('Loan rejected.');
       queryClient.invalidateQueries({ queryKey: ['admin-loans'] });
+      realtime.publish(RealtimeEvent.ADMIN_LOANS_UPDATED);
+      realtime.publish(RealtimeEvent.LOANS_UPDATED);
       setRejectModal(null);
       setRejectReason('');
+      realtime.pushNotification({
+        title: 'Loan Rejected',
+        message: `Loan application #${id} was rejected: ${reason}`
+      });
     },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Failed to reject'),
   });

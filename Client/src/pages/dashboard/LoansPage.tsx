@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { financeService } from '../../services/finance.service';
+import { realtime, RealtimeEvent } from '../../lib/realtime';
 
 // ─── Helpers ─────────────────────────────────────────────────
 const f = '"Inter",sans-serif';
@@ -66,6 +67,7 @@ const LoansPage: React.FC = () => {
     onSuccess: () => {
       toast.success('Loan application submitted successfully!');
       queryClient.invalidateQueries({ queryKey: ['my-loans'] });
+      realtime.publish(RealtimeEvent.LOANS_UPDATED);
       setShowApplyForm(false);
       setPurpose('');
     },

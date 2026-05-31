@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, Plus, Snowflake, XCircle, Loader2, DollarSign, ChevronDown } from 'lucide-react';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
+import { realtime, RealtimeEvent } from '../../lib/realtime';
 
 const fmt = (n: number) => new Intl.NumberFormat('en-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const f = '"Inter",sans-serif';
@@ -50,6 +51,8 @@ const AccountsPage: React.FC = () => {
       toast.success(`${newType === 'DEBIT' ? 'Debit' : 'Prepaid'} card created!`);
       setShowCreate(false);
       await fetchCards();
+      realtime.publish(RealtimeEvent.CARDS_UPDATED);
+      realtime.publish(RealtimeEvent.BALANCE_UPDATED);
     } catch (err: any) { toast.error(err?.message || 'Failed to create card'); }
     finally { setCreating(false); }
   };
@@ -59,6 +62,7 @@ const AccountsPage: React.FC = () => {
     try {
       const { data } = await api.post(`/cards/${cardId}/freeze`);
       toast.success(data.message); await fetchCards();
+      realtime.publish(RealtimeEvent.CARDS_UPDATED);
     } catch (err: any) { toast.error(err?.message || 'Failed'); }
     finally { setActionLoading(''); }
   };
@@ -69,6 +73,7 @@ const AccountsPage: React.FC = () => {
     try {
       const { data } = await api.post(`/cards/${cardId}/cancel`);
       toast.success(data.message); setExpandedId(null); await fetchCards();
+      realtime.publish(RealtimeEvent.CARDS_UPDATED);
     } catch (err: any) { toast.error(err?.message || 'Failed'); }
     finally { setActionLoading(''); }
   };
@@ -79,6 +84,8 @@ const AccountsPage: React.FC = () => {
     try {
       const { data } = await api.post(fundModal.mode === 'load' ? '/cards/load' : '/cards/unload', { cardId: fundModal.cardId, amount: parseFloat(fundAmount) });
       toast.success(data.message); setFundModal(null); setFundAmount(''); await fetchCards();
+      realtime.publish(RealtimeEvent.CARDS_UPDATED);
+      realtime.publish(RealtimeEvent.BALANCE_UPDATED);
     } catch (err: any) { toast.error(err?.message || 'Failed'); }
     finally { setFunding(false); }
   };

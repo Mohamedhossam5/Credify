@@ -4,6 +4,7 @@ import { api } from '../../lib/api';
 import { financeService } from '../../services/finance.service';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { realtime, RealtimeEvent } from '../../lib/realtime';
 
 const f = '"Inter",sans-serif';
 const mono = '"DM Mono",monospace';
@@ -353,6 +354,7 @@ const BillPaymentPage: React.FC = () => {
           if (data.user?.account) setBalance(parseFloat(data.user.account.balance));
           queryClient.invalidateQueries({ queryKey: ['balance'] });
           queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          realtime.publish(RealtimeEvent.BILL_PAID);
         } catch { /* silent */ }
       }
     } catch (err: any) {
@@ -376,6 +378,7 @@ const BillPaymentPage: React.FC = () => {
         if (data.user?.account) setBalance(parseFloat(data.user.account.balance));
         queryClient.invalidateQueries({ queryKey: ['balance'] });
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        realtime.publish(RealtimeEvent.BILL_PAID);
       } catch { /* silent */ }
     } catch (err: any) {
       toast.dismiss('server-error');

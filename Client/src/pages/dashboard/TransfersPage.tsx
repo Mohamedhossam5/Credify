@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, CheckCircle2, ArrowRight, CreditCard, User, Hash, FileText, DollarSign, Building2, Globe, AlertCircle, Loader2, Star, Trash2, ChevronDown } from 'lucide-react';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
+import { realtime, RealtimeEvent } from '../../lib/realtime';
+import { queryClient } from '../../lib/queryClient';
 
 const fmt = (n: number) => new Intl.NumberFormat("en-EG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const FEE_RATE = 0.001; // 0.1% — matches backend TRANSFER_FEE_RATE
@@ -33,7 +35,21 @@ const TransfersPage: React.FC = () => {
   const [amount, setAmount] = useState(0);
   const [amtStr, setAmtStr] = useState('');
   const [recipientName, setRecipientName] = useState('');
-  const [recipientAccount, setRecipientAccount] = useState('');
+  const [acctSameBank, setAcctSameBank] = useState('');
+  const [acctDomestic, setAcctDomestic] = useState('');
+  const [acctInternational, setAcctInternational] = useState('');
+
+  const recipientAccount = 
+    transferType === 'SAME_BANK' ? acctSameBank :
+    transferType === 'DOMESTIC' ? acctDomestic :
+    acctInternational;
+
+  const setRecipientAccount = (val: string) => {
+    if (transferType === 'SAME_BANK') setAcctSameBank(val);
+    else if (transferType === 'DOMESTIC') setAcctDomestic(val);
+    else setAcctInternational(val);
+  };
+
   const [recipientBank, setRecipientBank] = useState('');
   const [swiftCode, setSwiftCode] = useState('');
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -88,6 +104,8 @@ const TransfersPage: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+
+
   // Refresh balance
   const refreshBalance = async () => {
     try {
@@ -100,8 +118,14 @@ const TransfersPage: React.FC = () => {
 
   // ─── Input handlers ───
   const onAcct = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-    setRecipientAccount((v.match(/.{1,4}/g)?.join(' ') || v).substring(0, 40));
+    let v = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (transferType === 'SAME_BANK') {
+      v = v.substring(0, 12);
+      setRecipientAccount(v);
+    } else {
+      v = v.replace(/[^0-9]/g, '').substring(0, 16);
+      setRecipientAccount(v.match(/.{1,4}/g)?.join(' ') || v);
+    }
   };
 
   const onAmt = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +135,12 @@ const TransfersPage: React.FC = () => {
   };
 
   // ─── Validation ───
-  const isBaseValid = recipientName.length > 2 && recipientAccount.replace(/\s/g, '').length >= 6 && amount > 0 && totalDebit <= balance;
+  const rawAcctLen = recipientAccount.replace(/\s/g, '').length;
+  const isAcctLengthValid = (transferType === 'SAME_BANK')
+    ? rawAcctLen === 12
+    : rawAcctLen === 16;
+
+  const isBaseValid = recipientName.length > 2 && isAcctLengthValid && amount > 0 && totalDebit <= balance;
   const isDomesticValid = transferType !== 'DOMESTIC' || recipientBank.length > 1;
   const isInternationalValid = transferType !== 'INTERNATIONAL' || (recipientBank.length > 1 && swiftCode.length >= 8 && recipientAddress.length > 3);
   const valid = isBaseValid && isDomesticValid && isInternationalValid;
@@ -140,9 +169,12 @@ const TransfersPage: React.FC = () => {
         // Admin bypass — transfer executed immediately
         setStep(4);
         toast.success('Transfer successful!');
-      if (saveBeneficiary) await handleSaveBeneficiary();
-      await refreshBalance();
-      setTimeout(() => resetForm(), 4000);
+        if (saveBeneficiary) await handleSaveBeneficiary();
+        await refreshBalance();
+        queryClient.invalidateQueries({ queryKey: ['balance'] });
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        realtime.publish(RealtimeEvent.TRANSACTIONS_UPDATED);
+        setTimeout(() => resetForm(), 4000);
       } else {
         setTransferId(data.transferId);
         setStep(3); // Go to OTP step
@@ -165,6 +197,9 @@ const TransfersPage: React.FC = () => {
       toast.success('Transfer successful!');
       if (saveBeneficiary) await handleSaveBeneficiary();
       await refreshBalance();
+      queryClient.invalidateQueries({ queryKey: ['balance'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      realtime.publish(RealtimeEvent.TRANSACTIONS_UPDATED);
       setTimeout(() => resetForm(), 4000);
     } catch (err: any) {
       toast.error(err?.message || err?.error || 'Verification failed');
@@ -174,8 +209,14 @@ const TransfersPage: React.FC = () => {
   };
 
   const resetForm = () => {
-    setRecipientName(''); setRecipientAccount(''); setRecipientBank('');
-    setSwiftCode(''); setRecipientAddress(''); setReference('');
+    setRecipientName('');
+    setAcctSameBank('');
+    setAcctDomestic('');
+    setAcctInternational('');
+    setRecipientBank('');
+    setSwiftCode('');
+    setRecipientAddress('');
+    setReference('');
     setAmtStr(''); setAmount(0); setOtp(''); setTransferId('');
     setSaveBeneficiary(false);
     setStep(1);
@@ -218,8 +259,12 @@ const TransfersPage: React.FC = () => {
     setRecipientName(b.name);
     
     // Format account if it's alphanumeric/numeric
-    const v = b.account_number;
-    setRecipientAccount((v.match(/.{1,4}/g)?.join(' ') || v).substring(0, 40));
+    const cleanAcct = b.account_number.replace(/\s/g, '').toUpperCase();
+    if (b.type === 'SAME_BANK') {
+      setRecipientAccount(cleanAcct.substring(0, 12));
+    } else {
+      setRecipientAccount((cleanAcct.match(/.{1,4}/g)?.join(' ') || cleanAcct).substring(0, 19));
+    }
     
     setRecipientBank(b.bank_name || '');
     setSwiftCode(b.swift_code || '');
@@ -409,6 +454,18 @@ const TransfersPage: React.FC = () => {
                       prev?.focus();
                     }
                   }}
+                  onPaste={e => {
+                    e.preventDefault();
+                    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
+                    if (pasted) {
+                      setOtp(pasted);
+                      const targetIdx = Math.min(pasted.length - 1, 5);
+                      const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                      if (inputs && inputs[targetIdx]) {
+                        (inputs[targetIdx] as HTMLInputElement).focus();
+                      }
+                    }
+                  }}
                 />
               ))}
             </div>
@@ -475,7 +532,7 @@ const TransfersPage: React.FC = () => {
               </div>
               <div>
                 <label style={labelStyle}><Hash size={13} /> {transferType === 'SAME_BANK' ? 'Credify Account ID' : 'Account / IBAN'}</label>
-                <input type="text" value={recipientAccount} onChange={onAcct} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontVariantNumeric: 'tabular-nums' }} placeholder={transferType === 'SAME_BANK' ? 'CRD123456789' : '1111 1111 1111 1111'} />
+                <input type="text" value={recipientAccount} onChange={onAcct} maxLength={transferType === 'SAME_BANK' ? 12 : 19} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontVariantNumeric: 'tabular-nums' }} placeholder={transferType === 'SAME_BANK' ? 'CRD123456789' : '1111 1111 1111 1111'} />
               </div>
             </div>
 

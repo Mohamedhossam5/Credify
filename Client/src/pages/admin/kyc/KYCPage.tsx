@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, CheckCircle2, XCircle, AlertTriangle, Eye, ShieldCheck, ShieldAlert, RefreshCw } from 'lucide-react';
 import { api } from '../../../lib/api';
 import toast from 'react-hot-toast';
+import { realtime, RealtimeEvent } from '../../../lib/realtime';
 
 // ── Types ──
 interface KycUser {
@@ -54,6 +55,13 @@ const KYCPage: React.FC = () => {
       await api.post(`/admin/kyc/${userId}/approve`);
       toast.success(`✓ KYC approved: ${name}`);
       await fetchData();
+      realtime.publish(RealtimeEvent.ADMIN_USERS_UPDATED);
+      realtime.publish(RealtimeEvent.ADMIN_KYC_UPDATED);
+      realtime.publish(RealtimeEvent.KYC_STATUS_UPDATED);
+      realtime.pushNotification({
+        title: 'KYC Approved',
+        message: `KYC verification for ${name} has been approved.`
+      });
     } catch (err: any) {
       toast.error(err?.message || 'Failed to approve');
     } finally {
@@ -73,6 +81,13 @@ const KYCPage: React.FC = () => {
       setOpenRejectId(null);
       setRejectReason('');
       await fetchData();
+      realtime.publish(RealtimeEvent.ADMIN_USERS_UPDATED);
+      realtime.publish(RealtimeEvent.ADMIN_KYC_UPDATED);
+      realtime.publish(RealtimeEvent.KYC_STATUS_UPDATED);
+      realtime.pushNotification({
+        title: 'KYC Rejected',
+        message: `KYC verification for ${name} was rejected: ${rejectReason}`
+      });
     } catch (err: any) {
       toast.error(err?.message || 'Failed to reject');
     } finally {

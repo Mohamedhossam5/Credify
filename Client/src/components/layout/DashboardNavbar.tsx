@@ -154,6 +154,39 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // ── Keyboard shortcut G -> N to toggle notifications ──
+  useEffect(() => {
+    let lastKey = '';
+    let lastKeyTime = 0;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.getAttribute('contenteditable') === 'true'
+      )) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      const now = Date.now();
+
+      if (lastKey === 'g' && key === 'n' && (now - lastKeyTime < 1000)) {
+        setIsNotifOpen((prev) => !prev);
+        lastKey = '';
+      } else if (key === 'g') {
+        lastKey = 'g';
+        lastKeyTime = now;
+      } else {
+        lastKey = '';
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleNotifToggle = () => {
     setIsNotifOpen(!isNotifOpen);
   };

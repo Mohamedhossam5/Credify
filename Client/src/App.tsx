@@ -36,6 +36,8 @@ const KYCPage = React.lazy(() => import('./pages/admin/kyc/KYCPage'));
 const SettingsAdminPage = React.lazy(() => import('./pages/admin/settings/SettingsAdminPage'));
 const LoansAdminPage = React.lazy(() => import('./pages/admin/loans/LoansAdminPage'));
 
+import { realtime } from './lib/realtime';
+
 // Lightweight Fallback Spinner
 const PageLoader = () => (
   <div className="w-full h-[50vh] flex items-center justify-center bg-transparent">
@@ -44,6 +46,10 @@ const PageLoader = () => (
 );
 const AppContent: React.FC = () => {
   useDynamicTitle();
+
+  React.useEffect(() => {
+    realtime.init();
+  }, []);
 
   return (
     <Routes>
