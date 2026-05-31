@@ -78,11 +78,41 @@ interface BillProvider {
   prefixes: string;
 }
 
+const ProviderLogo: React.FC<{ src: string; alt: string; padding?: string; scale?: number; translateY?: number }> = ({ src, alt, padding = '6px', scale = 1.0, translateY = 0 }) => {
+  return (
+    <div style={{
+      width: '100%',
+      height: '100%',
+      borderRadius: '18px',
+      backgroundColor: '#fff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      position: 'relative'
+    }}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          padding: padding,
+          transform: `scale(${scale}) translateY(${translateY}px)`,
+          transition: 'transform 0.2s ease',
+        }}
+      />
+    </div>
+  );
+};
+
 const telecomProviders: BillProvider[] = [
   {
     id: 'etisalat',
     name: 'Etisalat',
-    logo: <img src="/logos/etisalat.png" alt="Etisalat" fetchPriority="high" loading="eager" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '6px' }} />,
+    logo: <ProviderLogo src="/logos/etisalat.png" alt="Etisalat" padding="6px" scale={1.1} />,
     brandColor: '#00a651',
     brandBg: 'rgba(0,166,81,0.12)',
     brandGradient: 'linear-gradient(135deg, #00a651, #00c853)',
@@ -91,7 +121,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'orange',
     name: 'Orange',
-    logo: <img src="/logos/orange.png" alt="Orange" fetchPriority="high" loading="eager" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff' }} />,
+    logo: <ProviderLogo src="/logos/orange.png" alt="Orange" padding="0px" scale={1.0} translateY={-5} />,
     brandColor: '#ff6600',
     brandBg: 'rgba(255,102,0,0.12)',
     brandGradient: 'linear-gradient(135deg, #ff6600, #ff8c00)',
@@ -100,7 +130,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'vodafone',
     name: 'Vodafone',
-    logo: <img src="/logos/vodafone.png" alt="Vodafone" fetchPriority="high" loading="eager" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '4px' }} />,
+    logo: <ProviderLogo src="/logos/vodafone.png" alt="Vodafone" padding="4px" scale={1.1} />,
     brandColor: '#e60000',
     brandBg: 'rgba(230,0,0,0.12)',
     brandGradient: 'linear-gradient(135deg, #e60000, #ff1744)',
@@ -109,7 +139,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'we',
     name: 'WE',
-    logo: <img src="/logos/we.png" alt="WE" fetchPriority="high" loading="eager" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '4px' }} />,
+    logo: <ProviderLogo src="/logos/we.png" alt="WE" padding="4px" scale={1.15} />,
     brandColor: '#7b2d8e',
     brandBg: 'rgba(123,45,142,0.12)',
     brandGradient: 'linear-gradient(135deg, #7b2d8e, #9c27b0)',
@@ -121,7 +151,7 @@ const electricityProviders: BillProvider[] = [
   {
     id: 'south-cairo-elec',
     name: 'South Cairo Electricity',
-    logo: '⚡',
+    logo: <ProviderLogo src="/logos/eehc.png" alt="EEHC" padding="3px" scale={1.3} />,
     brandColor: '#f59e0b',
     brandBg: 'rgba(245,158,11,0.12)',
     brandGradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
@@ -130,7 +160,7 @@ const electricityProviders: BillProvider[] = [
   {
     id: 'north-cairo-elec',
     name: 'North Cairo Electricity',
-    logo: '⚡',
+    logo: <ProviderLogo src="/logos/eehc.png" alt="EEHC" padding="3px" scale={1.3} />,
     brandColor: '#f59e0b',
     brandBg: 'rgba(245,158,11,0.12)',
     brandGradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
@@ -139,7 +169,7 @@ const electricityProviders: BillProvider[] = [
   {
     id: 'canal-elec',
     name: 'Canal Electricity',
-    logo: '⚡',
+    logo: <ProviderLogo src="/logos/eehc.png" alt="EEHC" padding="3px" scale={1.3} />,
     brandColor: '#f59e0b',
     brandBg: 'rgba(245,158,11,0.12)',
     brandGradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
@@ -148,7 +178,7 @@ const electricityProviders: BillProvider[] = [
   {
     id: 'alex-elec',
     name: 'Alexandria Electricity',
-    logo: '⚡',
+    logo: <ProviderLogo src="/logos/eehc.png" alt="EEHC" padding="3px" scale={1.3} />,
     brandColor: '#f59e0b',
     brandBg: 'rgba(245,158,11,0.12)',
     brandGradient: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
@@ -158,36 +188,28 @@ const electricityProviders: BillProvider[] = [
 
 const waterProviders: BillProvider[] = [
   {
-    id: 'cairo-water',
-    name: 'Greater Cairo Water',
-    logo: '💧',
+    id: 'cairo-water', name: 'Greater Cairo Water', logo: <ProviderLogo src="/logos/hcww.png" alt="HCWW" padding="3px" scale={1.4} />,
     brandColor: '#0ea5e9',
     brandBg: 'rgba(14,165,233,0.12)',
     brandGradient: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
     prefixes: '',
   },
   {
-    id: 'alex-water',
-    name: 'Alexandria Water',
-    logo: '💧',
+    id: 'alex-water', name: 'Alexandria Water', logo: <ProviderLogo src="/logos/hcww.png" alt="Alexandria Water" padding="3px" scale={1.4} />,
     brandColor: '#0ea5e9',
     brandBg: 'rgba(14,165,233,0.12)',
     brandGradient: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
     prefixes: '',
   },
   {
-    id: 'giza-water',
-    name: 'Giza Water',
-    logo: '💧',
+    id: 'giza-water', name: 'Giza Water', logo: <ProviderLogo src="/logos/hcww.png" alt="HCWW" padding="3px" scale={1.4} />,
     brandColor: '#0ea5e9',
     brandBg: 'rgba(14,165,233,0.12)',
     brandGradient: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
     prefixes: '',
   },
   {
-    id: 'canal-water',
-    name: 'Canal Cities Water',
-    logo: '💧',
+    id: 'canal-water', name: 'Canal Cities Water', logo: <ProviderLogo src="/logos/hcww.png" alt="HCWW" padding="3px" scale={1.4} />,
     brandColor: '#0ea5e9',
     brandBg: 'rgba(14,165,233,0.12)',
     brandGradient: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
@@ -197,43 +219,36 @@ const waterProviders: BillProvider[] = [
 
 const gasProviders: BillProvider[] = [
   {
-    id: 'petrotrade',
-    name: 'Petrotrade',
-    logo: '🔥',
+    id: 'petrotrade', name: 'Petrotrade', logo: <ProviderLogo src="/logos/petrotrade.png" alt="Petrotrade" padding="3px" scale={1.2} />,
     brandColor: '#ef4444',
     brandBg: 'rgba(239,68,68,0.12)',
     brandGradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
     prefixes: '',
   },
   {
-    id: 'town-gas',
-    name: 'Town Gas',
-    logo: '🔥',
+    id: 'town-gas', name: 'Town Gas', logo: <ProviderLogo src="/logos/town-gas.png" alt="Town Gas" padding="1px" scale={1.2} />,
     brandColor: '#ef4444',
     brandBg: 'rgba(239,68,68,0.12)',
     brandGradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
     prefixes: '',
   },
   {
-    id: 'natgas',
-    name: 'Natgas',
-    logo: '🔥',
+    id: 'natgas', name: 'Natgas', logo: <ProviderLogo src="/logos/natgas.png" alt="Natgas" padding="0px" scale={1.1} />,
     brandColor: '#ef4444',
     brandBg: 'rgba(239,68,68,0.12)',
     brandGradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
     prefixes: '',
   },
   {
-    id: 'taqa-gas',
-    name: 'Taqa Gas',
-    logo: '🔥',
+    id: 'taqa-gas', name: 'Taqa Gas', logo: <ProviderLogo src="/logos/taqa-gas.png" alt="Taqa Gas" padding="3px" scale={1.25} />,
     brandColor: '#ef4444',
     brandBg: 'rgba(239,68,68,0.12)',
     brandGradient: 'linear-gradient(135deg, #ef4444, #dc2626)',
     prefixes: '',
   },
 ];
-// ─── Recharge Presets ────────────────────────────────────────
+
+// ─── Recharge Presets ────────────────────────────────────────
 const RECHARGE_PRESETS = [10, 25, 50, 75, 100, 150, 200, 250];
 const RECHARGE_RATIO = 0.70; // Recharge balance = 70% of amount paid
 
@@ -275,10 +290,10 @@ const BillPaymentPage: React.FC = () => {
   );
 
   const selectedCat = categories.find((c) => c.id === selectedCategory);
-  const provider = telecomProviders.find((p) => p.id === selectedProvider) 
-                || electricityProviders.find((p) => p.id === selectedProvider)
-                || waterProviders.find((p) => p.id === selectedProvider)
-                || gasProviders.find((p) => p.id === selectedProvider);
+  const provider = telecomProviders.find((p) => p.id === selectedProvider)
+    || electricityProviders.find((p) => p.id === selectedProvider)
+    || waterProviders.find((p) => p.id === selectedProvider)
+    || gasProviders.find((p) => p.id === selectedProvider);
 
   const resetPaymentForm = () => {
     setPhoneNumber('');
@@ -320,12 +335,12 @@ const BillPaymentPage: React.FC = () => {
   const handlePayBill = async (overrideAmount?: number) => {
     const amountToUse = overrideAmount ?? parsedAmount;
     if (amountToUse <= 0 || amountToUse > balance) return;
-    
+
     try {
       setPaymentStep('processing');
       const accountIdentifier = ePaymentCode || billingAccount || phoneNumber || 'Recharge';
       const res = await financeService.initiateBillPayment(amountToUse, provider?.name || 'Recharge', accountIdentifier);
-      
+
       if (res.otpRequired && res.transferId) {
         setTransferId(res.transferId);
         setPaymentStep('otp');
@@ -559,7 +574,7 @@ const BillPaymentPage: React.FC = () => {
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button onClick={() => handlePayBill()} disabled={parsedAmount > balance} style={{
                     flex: 1, padding: '15px', borderRadius: '14px', border: 'none', cursor: parsedAmount > balance ? 'not-allowed' : 'pointer',
-                    background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient, 
+                    background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient,
                     color: parsedAmount > balance ? 'var(--text-secondary)' : '#fff',
                     fontFamily: f, fontWeight: 700, fontSize: '14px',
                     boxShadow: parsedAmount > balance ? 'none' : `0 6px 20px ${provider.brandBg}`,
