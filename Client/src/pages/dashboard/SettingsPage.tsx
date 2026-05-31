@@ -198,7 +198,7 @@ const SettingsPage: React.FC = () => {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gap: '20px', maxWidth: '700px' }}>
+      <div style={{ display: 'grid', gap: '20px', maxWidth: '700px', margin: '0 auto' }}>
 
         {/* Profile Picture */}
         <div className="glass-card" style={{ padding: '28px', display: 'flex', alignItems: 'center', gap: '24px' }}>
