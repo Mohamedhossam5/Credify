@@ -107,7 +107,8 @@ const LoansAdminPage: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      {/* Stats Cards */}
+      <div className="loans-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
           { label: 'Pending Review', value: stats.pending, icon: <Clock size={20} />, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
           { label: 'Approved / Active', value: stats.approved, icon: <CheckCircle2 size={20} />, color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
@@ -128,8 +129,8 @@ const LoansAdminPage: React.FC = () => {
 
       {/* Filter Tabs + Search */}
       <div className="glass-card" style={{ padding: '20px 24px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div style={{ display: 'flex', gap: '4px', background: 'var(--glass)', borderRadius: '10px', padding: '4px', border: '1px solid var(--glass-border)' }}>
+        <div className="loans-filter-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div className="loans-tabs-container" style={{ display: 'flex', gap: '4px', background: 'var(--glass)', borderRadius: '10px', padding: '4px', border: '1px solid var(--glass-border)' }}>
             {FILTER_TABS.map((tab) => (
               <button
                 key={tab}
@@ -168,7 +169,7 @@ const LoansAdminPage: React.FC = () => {
       {/* Loans Table */}
       <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
         {/* Table Header */}
-        <div style={{
+        <div className="loans-table-header" style={{
           display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px',
           padding: '14px 24px', borderBottom: '1px solid var(--glass-border)',
           background: 'var(--glass)',
@@ -189,125 +190,261 @@ const LoansAdminPage: React.FC = () => {
             <p style={{ fontSize: '14px', fontWeight: 500 }}>No loan applications found</p>
           </div>
         ) : (
-          filteredLoans.map((loan: any) => {
-            const status = STATUS_CONFIG[loan.status] || STATUS_CONFIG.PENDING;
-            const isExpanded = expandedLoanId === loan.id;
-            return (
-              <div key={loan.id}>
-                <div
-                  onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
-                  style={{
-                    display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px',
-                    padding: '16px 24px', alignItems: 'center', cursor: 'pointer',
-                    borderBottom: '1px solid var(--glass-border)', transition: 'background 0.15s',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--row-hover)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <span style={{ fontSize: '12px', fontWeight: 600, fontFamily: mono, color: 'var(--text-secondary)' }}>#{loan.id}</span>
+          <>
+            {/* Desktop Table View */}
+            <div className="loans-desktop-table">
+              {filteredLoans.map((loan: any) => {
+                const status = STATUS_CONFIG[loan.status] || STATUS_CONFIG.PENDING;
+                const isExpanded = expandedLoanId === loan.id;
+                return (
+                  <div key={loan.id}>
+                    <div
+                      onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
+                      style={{
+                        display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px',
+                        padding: '16px 24px', alignItems: 'center', cursor: 'pointer',
+                        borderBottom: '1px solid var(--glass-border)', transition: 'background 0.15s',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--row-hover)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <span style={{ fontSize: '12px', fontWeight: 600, fontFamily: mono, color: 'var(--text-secondary)' }}>#{loan.id}</span>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'var(--glass)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      <User size={15} style={{ color: 'var(--text-secondary)' }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'var(--glass)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <User size={15} style={{ color: 'var(--text-secondary)' }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{loan.first_name} {loan.last_name}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{loan.email}</div>
+                        </div>
+                      </div>
+
+                      <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: f, color: 'var(--text-primary)' }}>
+                        EGP {formatEGP(parseFloat(loan.amount))}
+                      </span>
+
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>{loan.tenure_months}mo</span>
+
+                      <span style={{ fontSize: '13px', fontWeight: 600, fontFamily: mono, color: 'var(--text-primary)' }}>{loan.interest_rate}%</span>
+
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '4px', width: 'fit-content',
+                        padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 600,
+                        color: status.color, background: status.bg,
+                      }}>
+                        {status.icon} {status.label}
+                      </span>
+
+                      <div style={{ display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
+                        {loan.status === 'PENDING' && (
+                          <>
+                            <button
+                              onClick={() => approveMutation.mutate(loan.id)}
+                              disabled={approveMutation.isPending}
+                              style={{
+                                padding: '6px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                                fontSize: '11px', fontWeight: 600, fontFamily: f,
+                                background: 'rgba(16,185,129,0.15)', color: '#10b981',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#10b981'; e.currentTarget.style.color = '#fff'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(16,185,129,0.15)'; e.currentTarget.style.color = '#10b981'; }}
+                            >
+                              <CheckCircle2 size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '3px' }} />
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => setRejectModal({ loanId: loan.id, userName: `${loan.first_name} ${loan.last_name}` })}
+                              style={{
+                                padding: '6px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                                fontSize: '11px', fontWeight: 600, fontFamily: f,
+                                background: 'rgba(239,68,68,0.12)', color: '#ef4444',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
+                              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.12)'; e.currentTarget.style.color = '#ef4444'; }}
+                            >
+                              <XCircle size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '3px' }} />
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {loan.status !== 'PENDING' && (
+                          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{loan.first_name} {loan.last_name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{loan.email}</div>
-                    </div>
+
+                    {/* Expanded Row Details */}
+                    {isExpanded && (
+                      <div style={{ padding: '16px 24px', background: 'var(--glass)', borderBottom: '1px solid var(--glass-border)' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
+                          {[
+                            { l: 'Monthly Payment', v: `EGP ${formatEGP(parseFloat(loan.monthly_payment))}` },
+                            { l: 'Total Repayment', v: `EGP ${formatEGP(parseFloat(loan.total_repayment))}` },
+                            { l: 'Total Interest', v: `EGP ${formatEGP(parseFloat(loan.total_interest))}` },
+                            { l: 'Admin Fee', v: `EGP ${formatEGP(parseFloat(loan.admin_fee))}` },
+                            { l: 'Applied On', v: new Date(loan.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                          ].map((r) => (
+                            <div key={r.l}>
+                              <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 500 }}>{r.l}</div>
+                              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.v}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {loan.purpose && (
+                          <div style={{ marginTop: '14px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(14,203,203,0.05)', border: '1px solid rgba(14,203,203,0.1)' }}>
+                            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600 }}>Purpose: </span>
+                            <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{loan.purpose}</span>
+                          </div>
+                        )}
+                        {loan.rejection_reason && (
+                          <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                            <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>Rejection Reason: </span>
+                            <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{loan.rejection_reason}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
+                );
+              })}
+            </div>
 
-                  <span style={{ fontSize: '14px', fontWeight: 700, fontFamily: f, color: 'var(--text-primary)' }}>
-                    EGP {formatEGP(parseFloat(loan.amount))}
-                  </span>
+            {/* Mobile/Tablet Card View */}
+            <div className="loans-mobile-list">
+              {filteredLoans.map((loan: any) => {
+                const status = STATUS_CONFIG[loan.status] || STATUS_CONFIG.PENDING;
+                const isExpanded = expandedLoanId === loan.id;
+                return (
+                  <div key={loan.id} className="loans-mobile-card" style={{
+                    padding: '16px',
+                    borderBottom: '1px solid var(--glass-border)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px',
+                    background: 'transparent',
+                    cursor: 'pointer'
+                  }} onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}>
+                    {/* Top row: ID, Status, and Expand Icon */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, fontFamily: mono, color: 'var(--text-secondary)' }}>#{loan.id}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '4px',
+                          padding: '4px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 600,
+                          color: status.color, background: status.bg,
+                        }}>
+                          {status.icon} {status.label}
+                        </span>
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </span>
+                      </div>
+                    </div>
 
-                  <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)' }}>{loan.tenure_months}mo</span>
+                    {/* Middle row: Applicant Details & Amount */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--glass)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <User size={14} style={{ color: 'var(--text-secondary)' }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{loan.first_name} {loan.last_name}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{loan.email}</div>
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>EGP {formatEGP(parseFloat(loan.amount))}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{loan.tenure_months}mo · {loan.interest_rate}% rate</div>
+                      </div>
+                    </div>
 
-                  <span style={{ fontSize: '13px', fontWeight: 600, fontFamily: mono, color: 'var(--text-primary)' }}>{loan.interest_rate}%</span>
-
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '4px', width: 'fit-content',
-                    padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 600,
-                    color: status.color, background: status.bg,
-                  }}>
-                    {status.icon} {status.label}
-                  </span>
-
-                  <div style={{ display: 'flex', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
+                    {/* Action buttons (only shown for pending loans, stop propagation to prevent expand toggle) */}
                     {loan.status === 'PENDING' && (
-                      <>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }} onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => approveMutation.mutate(loan.id)}
                           disabled={approveMutation.isPending}
                           style={{
-                            padding: '6px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                            flex: 1, padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                             fontSize: '11px', fontWeight: 600, fontFamily: f,
                             background: 'rgba(16,185,129,0.15)', color: '#10b981',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             transition: 'all 0.2s',
                           }}
                           onMouseEnter={e => { e.currentTarget.style.background = '#10b981'; e.currentTarget.style.color = '#fff'; }}
                           onMouseLeave={e => { e.currentTarget.style.background = 'rgba(16,185,129,0.15)'; e.currentTarget.style.color = '#10b981'; }}
                         >
-                          <CheckCircle2 size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '3px' }} />
+                          <CheckCircle2 size={12} />
                           Approve
                         </button>
                         <button
                           onClick={() => setRejectModal({ loanId: loan.id, userName: `${loan.first_name} ${loan.last_name}` })}
                           style={{
-                            padding: '6px 12px', borderRadius: '8px', border: 'none', cursor: 'pointer',
+                            flex: 1, padding: '8px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                             fontSize: '11px', fontWeight: 600, fontFamily: f,
                             background: 'rgba(239,68,68,0.12)', color: '#ef4444',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
                             transition: 'all 0.2s',
                           }}
                           onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
                           onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.12)'; e.currentTarget.style.color = '#ef4444'; }}
                         >
-                          <XCircle size={12} style={{ display: 'inline', verticalAlign: '-2px', marginRight: '3px' }} />
+                          <XCircle size={12} />
                           Reject
                         </button>
-                      </>
+                      </div>
                     )}
-                    {loan.status !== 'PENDING' && (
-                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                        {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                      </span>
-                    )}
-                  </div>
-                </div>
 
-                {/* Expanded Row Details */}
-                {isExpanded && (
-                  <div style={{ padding: '16px 24px', background: 'var(--glass)', borderBottom: '1px solid var(--glass-border)' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
-                      {[
-                        { l: 'Monthly Payment', v: `EGP ${formatEGP(parseFloat(loan.monthly_payment))}` },
-                        { l: 'Total Repayment', v: `EGP ${formatEGP(parseFloat(loan.total_repayment))}` },
-                        { l: 'Total Interest', v: `EGP ${formatEGP(parseFloat(loan.total_interest))}` },
-                        { l: 'Admin Fee', v: `EGP ${formatEGP(parseFloat(loan.admin_fee))}` },
-                        { l: 'Applied On', v: new Date(loan.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
-                      ].map((r) => (
-                        <div key={r.l}>
-                          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '4px', fontWeight: 500 }}>{r.l}</div>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.v}</div>
+                    {/* Expanded Details */}
+                    {isExpanded && (
+                      <div style={{
+                        padding: '12px',
+                        background: 'rgba(255, 255, 255, 0.02)',
+                        borderRadius: '8px',
+                        border: '1px solid var(--glass-border)',
+                        marginTop: '4px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px'
+                      }} onClick={(e) => e.stopPropagation()}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                          {[
+                            { l: 'Monthly Payment', v: `EGP ${formatEGP(parseFloat(loan.monthly_payment))}` },
+                            { l: 'Total Repayment', v: `EGP ${formatEGP(parseFloat(loan.total_repayment))}` },
+                            { l: 'Total Interest', v: `EGP ${formatEGP(parseFloat(loan.total_interest))}` },
+                            { l: 'Admin Fee', v: `EGP ${formatEGP(parseFloat(loan.admin_fee))}` },
+                            { l: 'Applied On', v: new Date(loan.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
+                          ].map((r) => (
+                            <div key={r.l}>
+                              <div style={{ fontSize: '10px', color: 'var(--text-secondary)', marginBottom: '2px', fontWeight: 500 }}>{r.l}</div>
+                              <div style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-primary)' }}>{r.v}</div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    {loan.purpose && (
-                      <div style={{ marginTop: '14px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(14,203,203,0.05)', border: '1px solid rgba(14,203,203,0.1)' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600 }}>Purpose: </span>
-                        <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{loan.purpose}</span>
-                      </div>
-                    )}
-                    {loan.rejection_reason && (
-                      <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
-                        <span style={{ fontSize: '11px', color: '#ef4444', fontWeight: 600 }}>Rejection Reason: </span>
-                        <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{loan.rejection_reason}</span>
+                        {loan.purpose && (
+                          <div style={{ padding: '8px 10px', borderRadius: '6px', background: 'rgba(14,203,203,0.05)', border: '1px solid rgba(14,203,203,0.1)' }}>
+                            <div style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '2px' }}>Purpose</div>
+                            <div style={{ fontSize: '11.5px', color: 'var(--text-primary)' }}>{loan.purpose}</div>
+                          </div>
+                        )}
+                        {loan.rejection_reason && (
+                          <div style={{ padding: '8px 10px', borderRadius: '6px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                            <div style={{ fontSize: '10px', color: '#ef4444', fontWeight: 600, marginBottom: '2px' }}>Rejection Reason</div>
+                            <div style={{ fontSize: '11.5px', color: 'var(--text-primary)' }}>{loan.rejection_reason}</div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
-            );
-          })
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
 

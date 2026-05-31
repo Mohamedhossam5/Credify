@@ -39,10 +39,10 @@ const TransfersPage: React.FC = () => {
   const [acctDomestic, setAcctDomestic] = useState('');
   const [acctInternational, setAcctInternational] = useState('');
 
-  const recipientAccount = 
+  const recipientAccount =
     transferType === 'SAME_BANK' ? acctSameBank :
-    transferType === 'DOMESTIC' ? acctDomestic :
-    acctInternational;
+      transferType === 'DOMESTIC' ? acctDomestic :
+        acctInternational;
 
   const setRecipientAccount = (val: string) => {
     if (transferType === 'SAME_BANK') setAcctSameBank(val);
@@ -222,7 +222,7 @@ const TransfersPage: React.FC = () => {
     setStep(1);
   };
 
-  
+
   const handleSaveBeneficiary = async () => {
     try {
       const payload: any = { type: transferType, name: recipientName, accountNumber: recipientAccount.replace(/\s/g, '') };
@@ -257,7 +257,7 @@ const TransfersPage: React.FC = () => {
   const selectBeneficiary = (b: Beneficiary) => {
     setTransferType(b.type);
     setRecipientName(b.name);
-    
+
     // Format account if it's alphanumeric/numeric
     const cleanAcct = b.account_number.replace(/\s/g, '').toUpperCase();
     if (b.type === 'SAME_BANK') {
@@ -265,7 +265,7 @@ const TransfersPage: React.FC = () => {
     } else {
       setRecipientAccount((cleanAcct.match(/.{1,4}/g)?.join(' ') || cleanAcct).substring(0, 19));
     }
-    
+
     setRecipientBank(b.bank_name || '');
     setSwiftCode(b.swift_code || '');
     setRecipientAddress(b.address || '');
@@ -295,7 +295,7 @@ const TransfersPage: React.FC = () => {
   return (
     <section id="transfers" className="page active" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: '1400px' }}>
-        
+
         {/* Left Spacer */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: '24px' }}>
           {/* Left Column: Beneficiaries Dropdown */}
@@ -307,11 +307,11 @@ const TransfersPage: React.FC = () => {
                   width: '100%', padding: '14px 16px', background: 'var(--glass)', borderRadius: '16px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-primary)', fontFamily: f, fontSize: '13px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', transition: 'all 0.2s ease', outline: 'none'
                 }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--teal)'}
-                  onMouseLeave={e => { if(!isBeneficiariesOpen) e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
+                  onMouseLeave={e => { if (!isBeneficiariesOpen) e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
                 >
                   Select Recipient <ChevronDown size={14} style={{ transform: isBeneficiariesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.6 }} />
                 </button>
-                
+
                 {isBeneficiariesOpen && (
                   <div style={{
                     position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '6px', background: 'var(--floating-menu-bg, #ffffff)', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.06)', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px', overflowY: 'auto', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 20px 48px -10px rgba(0, 0, 0, 0.15)', animation: 'floatingMenuIn 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -355,253 +355,253 @@ const TransfersPage: React.FC = () => {
 
         {/* Main Panel */}
         <div id="transfer-panel" className="glass-card" style={{ width: '100%', maxWidth: '680px', padding: '36px 32px', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative glow */}
-        <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '250px', height: '250px', background: 'radial-gradient(circle,rgba(14,203,203,0.06),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '200px', height: '200px', background: 'radial-gradient(circle,rgba(26,111,255,0.05),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+          {/* Decorative glow */}
+          <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '250px', height: '250px', background: 'radial-gradient(circle,rgba(14,203,203,0.06),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '200px', height: '200px', background: 'radial-gradient(circle,rgba(26,111,255,0.05),transparent)', borderRadius: '50%', pointerEvents: 'none' }} />
 
-        {/* Step Indicator */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
-          {steps.map((s, i) => {
-            const done = (s.id === 1 && step >= 3) || (s.id === 2 && step >= 4) || (s.id === 3 && step >= 4);
-            const active = (s.id === 1 && step === 1) || (s.id === 2 && step === 3) || (s.id === 3 && step === 4);
-            const iconBg = done ? 'var(--success)' : active ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)';
-            return (
-              <React.Fragment key={s.id}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: done || active ? '#fff' : 'var(--text-secondary)', fontFamily: f, border: !done && !active ? '1.5px solid var(--glass-border)' : 'none', boxShadow: done ? '0 4px 12px rgba(0,232,143,0.3)' : active ? '0 4px 12px rgba(14,203,203,0.3)' : 'none', transition: 'all 0.3s ease' }}>
-                    {done ? <CheckCircle2 size={14} /> : s.id}
+          {/* Step Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
+            {steps.map((s, i) => {
+              const done = (s.id === 1 && step >= 3) || (s.id === 2 && step >= 4) || (s.id === 3 && step >= 4);
+              const active = (s.id === 1 && step === 1) || (s.id === 2 && step === 3) || (s.id === 3 && step === 4);
+              const iconBg = done ? 'var(--success)' : active ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)';
+              return (
+                <React.Fragment key={s.id}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, color: done || active ? '#fff' : 'var(--text-secondary)', fontFamily: f, border: !done && !active ? '1.5px solid var(--glass-border)' : 'none', boxShadow: done ? '0 4px 12px rgba(0,232,143,0.3)' : active ? '0 4px 12px rgba(14,203,203,0.3)' : 'none', transition: 'all 0.3s ease' }}>
+                      {done ? <CheckCircle2 size={14} /> : s.id}
+                    </div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: done ? 'var(--success)' : active ? 'var(--teal)' : 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px', fontFamily: f }}>{s.label}</span>
                   </div>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: done ? 'var(--success)' : active ? 'var(--teal)' : 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px', fontFamily: f }}>{s.label}</span>
-                </div>
-                {i < steps.length - 1 && <div style={{ width: '48px', height: '2px', margin: '0 8px', borderRadius: '2px', background: done ? 'var(--teal)' : 'var(--glass-border)', transition: 'background 0.4s ease' }} />}
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* ═══ STEP 4: Success ═══ */}
-        {step === 4 && (
-          <div style={{ textAlign: 'center', padding: '40px 0' }}>
-            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(0,232,143,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
-              <CheckCircle2 size={32} style={{ color: 'var(--success)' }} />
-            </div>
-            <h3 style={{ fontFamily: f, fontWeight: 800, fontSize: '22px', color: 'var(--text-primary)', margin: '0 0 8px' }}>Transfer Successful!</h3>
-            <p style={{ fontFamily: f, fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 4px' }}>
-              {fmt(amount)} EGP sent to {recipientName}
-            </p>
-            <p style={{ fontFamily: f, fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 20px' }}>
-              Fee: {fmt(fee)} EGP • Total debited: {fmt(totalDebit)} EGP
-            </p>
-            <p style={{ fontFamily: f, fontSize: '16px', fontWeight: 700, color: 'var(--teal)' }}>
-              New Balance: {fmt(balance)} EGP
-            </p>
+                  {i < steps.length - 1 && <div style={{ width: '48px', height: '2px', margin: '0 8px', borderRadius: '2px', background: done ? 'var(--teal)' : 'var(--glass-border)', transition: 'background 0.4s ease' }} />}
+                </React.Fragment>
+              );
+            })}
           </div>
-        )}
 
-        {/* ═══ STEP 3: OTP Verification ═══ */}
-        {step === 3 && (
-          <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ fontFamily: f, fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)', margin: '0 0 8px' }}>Verify Transfer</h3>
-              <p style={{ fontFamily: f, fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
-                Enter the 6-digit code sent to your email to confirm this transfer.
+          {/* ═══ STEP 4: Success ═══ */}
+          {step === 4 && (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(0,232,143,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+                <CheckCircle2 size={32} style={{ color: 'var(--success)' }} />
+              </div>
+              <h3 style={{ fontFamily: f, fontWeight: 800, fontSize: '22px', color: 'var(--text-primary)', margin: '0 0 8px' }}>Transfer Successful!</h3>
+              <p style={{ fontFamily: f, fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 4px' }}>
+                {fmt(amount)} EGP sent to {recipientName}
+              </p>
+              <p style={{ fontFamily: f, fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 20px' }}>
+                Fee: {fmt(fee)} EGP • Total debited: {fmt(totalDebit)} EGP
+              </p>
+              <p style={{ fontFamily: f, fontSize: '16px', fontWeight: 700, color: 'var(--teal)' }}>
+                New Balance: {fmt(balance)} EGP
               </p>
             </div>
+          )}
 
-            {/* Transfer summary */}
-            <div style={{ background: 'var(--input-bg)', borderRadius: '16px', padding: '16px 20px', border: '1px solid var(--glass-border)', marginBottom: '24px', textAlign: 'left' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>To</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>{recipientName}</span>
+          {/* ═══ STEP 3: OTP Verification ═══ */}
+          {step === 3 && (
+            <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontFamily: f, fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)', margin: '0 0 8px' }}>Verify Transfer</h3>
+                <p style={{ fontFamily: f, fontSize: '13px', color: 'var(--text-secondary)', margin: 0 }}>
+                  Enter the 6-digit code sent to your email to confirm this transfer.
+                </p>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Amount</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>{fmt(amount)} EGP</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Transfer Fee (0.1%)</span>
-                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--danger)', fontFamily: f }}>{fmt(fee)} EGP</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--glass-border)' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--teal)', fontFamily: f }}>TOTAL DEBIT</span>
-                <span style={{ fontSize: '15px', fontWeight: 900, color: 'var(--teal)', fontFamily: f }}>{fmt(totalDebit)} EGP</span>
-              </div>
-            </div>
 
-            {/* OTP Input */}
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}>
-              {[0, 1, 2, 3, 4, 5].map(i => (
-                <input
-                  key={i}
-                  type="text"
-                  maxLength={1}
-                  value={otp[i] || ''}
-                  className="premium-input"
-                  style={{ width: '48px', height: '56px', textAlign: 'center', fontSize: '22px', fontWeight: 800, borderRadius: '14px', fontFamily: mono, padding: 0 }}
-                  onChange={e => {
-                    const v = e.target.value.replace(/\D/, '');
-                    const newOtp = otp.split('');
-                    newOtp[i] = v;
-                    setOtp(newOtp.join(''));
-                    if (v && i < 5) {
-                      const next = e.target.nextElementSibling as HTMLInputElement;
-                      next?.focus();
-                    }
-                  }}
-                  onKeyDown={e => {
-                    if (e.key === 'Backspace' && !otp[i] && i > 0) {
-                      const prev = (e.target as HTMLElement).previousElementSibling as HTMLInputElement;
-                      prev?.focus();
-                    }
-                  }}
-                  onPaste={e => {
-                    e.preventDefault();
-                    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
-                    if (pasted) {
-                      setOtp(pasted);
-                      const targetIdx = Math.min(pasted.length - 1, 5);
-                      const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
-                      if (inputs && inputs[targetIdx]) {
-                        (inputs[targetIdx] as HTMLInputElement).focus();
+              {/* Transfer summary */}
+              <div style={{ background: 'var(--input-bg)', borderRadius: '16px', padding: '16px 20px', border: '1px solid var(--glass-border)', marginBottom: '24px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>To</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>{recipientName}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Amount</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>{fmt(amount)} EGP</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f }}>Transfer Fee (0.1%)</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--danger)', fontFamily: f }}>{fmt(fee)} EGP</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: '1px solid var(--glass-border)' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--teal)', fontFamily: f }}>TOTAL DEBIT</span>
+                  <span style={{ fontSize: '15px', fontWeight: 900, color: 'var(--teal)', fontFamily: f }}>{fmt(totalDebit)} EGP</span>
+                </div>
+              </div>
+
+              {/* OTP Input */}
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '24px' }}>
+                {[0, 1, 2, 3, 4, 5].map(i => (
+                  <input
+                    key={i}
+                    type="text"
+                    maxLength={1}
+                    value={otp[i] || ''}
+                    className="premium-input"
+                    style={{ width: '48px', height: '56px', textAlign: 'center', fontSize: '22px', fontWeight: 800, borderRadius: '14px', fontFamily: mono, padding: 0 }}
+                    onChange={e => {
+                      const v = e.target.value.replace(/\D/, '');
+                      const newOtp = otp.split('');
+                      newOtp[i] = v;
+                      setOtp(newOtp.join(''));
+                      if (v && i < 5) {
+                        const next = e.target.nextElementSibling as HTMLInputElement;
+                        next?.focus();
                       }
-                    }
-                  }}
-                />
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={confirmTransfer} disabled={otp.length !== 6 || confirming} style={{
-                flex: 1, padding: '15px', background: otp.length === 6 ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)', border: otp.length === 6 ? 'none' : '1.5px solid var(--glass-border)', borderRadius: '14px', color: otp.length === 6 ? '#fff' : 'var(--text-secondary)', fontFamily: f, fontWeight: 700, fontSize: '14px', cursor: otp.length === 6 ? 'pointer' : 'not-allowed', boxShadow: otp.length === 6 ? '0 4px 20px rgba(14,203,203,0.3)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-              }}>
-                {confirming ? <><Loader2 size={16} style={{ animation: 'ring-spin 1s linear infinite' }} /> Confirming...</> : <><CheckCircle2 size={16} /> Confirm Transfer</>}
-              </button>
-              <button onClick={() => { setStep(1); setOtp(''); setTransferId(''); }} style={{ padding: '15px 20px', border: '1.5px solid var(--glass-border)', borderRadius: '14px', background: 'transparent', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: f }}>Cancel</button>
-            </div>
-          </div>
-        )}
-
-        {/* ═══ STEP 1: Transfer Form ═══ */}
-        {step === 1 && (
-          <>
-            {/* Balance Display */}
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '4px', fontFamily: f }}>Available Balance</p>
-              <div style={{ fontFamily: f, fontSize: '32px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-1.5px', fontVariantNumeric: 'tabular-nums' }}>
-                {fmt(balance)} <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--teal)' }}>EGP</span>
-              </div>
-              <p style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: mono, marginTop: '4px' }}>{accountId}</p>
-            </div>
-
-            {/* Transfer Type Selector */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ ...labelStyle, justifyContent: 'center', marginBottom: '12px' }}><Globe size={14} /> Transfer Type</label>
-              <div style={{ display: 'flex', gap: '0', background: 'var(--glass)', borderRadius: '12px', padding: '3px', border: '1px solid var(--glass-border)' }}>
-                {([['SAME_BANK', 'Within Bank'], ['DOMESTIC', 'Domestic'], ['INTERNATIONAL', 'International']] as const).map(([val, label]) => (
-                  <button key={val} onClick={() => setTransferType(val)} style={{
-                    flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: transferType === val ? 700 : 500, fontFamily: f,
-                    background: transferType === val ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'transparent',
-                    color: transferType === val ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s ease',
-                  }}>{label}</button>
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Backspace' && !otp[i] && i > 0) {
+                        const prev = (e.target as HTMLElement).previousElementSibling as HTMLInputElement;
+                        prev?.focus();
+                      }
+                    }}
+                    onPaste={e => {
+                      e.preventDefault();
+                      const pasted = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
+                      if (pasted) {
+                        setOtp(pasted);
+                        const targetIdx = Math.min(pasted.length - 1, 5);
+                        const inputs = e.currentTarget.parentElement?.querySelectorAll('input');
+                        if (inputs && inputs[targetIdx]) {
+                          (inputs[targetIdx] as HTMLInputElement).focus();
+                        }
+                      }
+                    }}
+                  />
                 ))}
               </div>
-            </div>
 
-            {/* Amount Display */}
-            <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '8px', fontFamily: f }}>Amount to Send</p>
-              <div style={{ display: 'inline-flex', alignItems: 'flex-start' }}>
-                <span style={{ fontFamily: f, fontSize: '48px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-2px', fontVariantNumeric: 'tabular-nums' }}>
-                  {amount > 0 ? new Intl.NumberFormat('en-EG').format(amount) : '0'}
-                </span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--teal)', marginLeft: '8px', marginTop: '8px', fontFamily: f }}>EGP</span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button onClick={confirmTransfer} disabled={otp.length !== 6 || confirming} style={{
+                  flex: 1, padding: '15px', background: otp.length === 6 ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)', border: otp.length === 6 ? 'none' : '1.5px solid var(--glass-border)', borderRadius: '14px', color: otp.length === 6 ? '#fff' : 'var(--text-secondary)', fontFamily: f, fontWeight: 700, fontSize: '14px', cursor: otp.length === 6 ? 'pointer' : 'not-allowed', boxShadow: otp.length === 6 ? '0 4px 20px rgba(14,203,203,0.3)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                }}>
+                  {confirming ? <><Loader2 size={16} style={{ animation: 'ring-spin 1s linear infinite' }} /> Confirming...</> : <><CheckCircle2 size={16} /> Confirm Transfer</>}
+                </button>
+                <button onClick={() => { setStep(1); setOtp(''); setTransferId(''); }} style={{ padding: '15px 20px', border: '1.5px solid var(--glass-border)', borderRadius: '14px', background: 'transparent', color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: f }}>Cancel</button>
               </div>
-              {amount > 0 && (
-                <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '12px', fontFamily: f }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Fee (1%): <strong style={{ color: 'var(--danger)' }}>{fmt(fee)}</strong></span>
-                  <span style={{ color: 'var(--text-secondary)' }}>Total: <strong style={{ color: 'var(--teal)' }}>{fmt(totalDebit)}</strong></span>
+            </div>
+          )}
+
+          {/* ═══ STEP 1: Transfer Form ═══ */}
+          {step === 1 && (
+            <>
+              {/* Balance Display */}
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '4px', fontFamily: f }}>Available Balance</p>
+                <div style={{ fontFamily: f, fontSize: '32px', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-1.5px', fontVariantNumeric: 'tabular-nums' }}>
+                  {fmt(balance)} <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--teal)' }}>EGP</span>
                 </div>
-              )}
-            </div>
+                <p style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: mono, marginTop: '4px' }}>{accountId}</p>
+              </div>
 
-            {/* Form Fields */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-              <div>
-                <label style={labelStyle}><User size={13} /> Recipient Name</label>
-                <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. Ahmed Nady" />
-              </div>
-              <div>
-                <label style={labelStyle}><Hash size={13} /> {transferType === 'SAME_BANK' ? 'Credify Account ID' : 'Account / IBAN'}</label>
-                <input type="text" value={recipientAccount} onChange={onAcct} maxLength={transferType === 'SAME_BANK' ? 12 : 19} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontVariantNumeric: 'tabular-nums' }} placeholder={transferType === 'SAME_BANK' ? 'CRD123456789' : '1111 1111 1111 1111'} />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-              <div style={{ position: 'relative' }}>
-                <label style={labelStyle}><DollarSign size={13} /> Amount (EGP)</label>
-                <input type="text" value={amtStr} onChange={onAmt} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} placeholder="0.00" />
-                {amount > 0 && totalDebit > balance && (
-                  <p style={{ position: 'absolute', bottom: '-20px', left: '4px', fontSize: '11px', color: 'var(--danger)', fontWeight: 600, fontFamily: f, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <AlertCircle size={12} /> Insufficient balance
-                  </p>
-                )}
-              </div>
-              <div>
-                <label style={labelStyle}><FileText size={13} /> Reference <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, fontSize: '11px' }}>(Optional)</span></label>
-                <input type="text" value={reference} onChange={e => setReference(e.target.value)} id="tr-note" className="premium-input" style={{ ...inputStyle, fontWeight: 500 }} placeholder="e.g. Rent payment" />
-              </div>
-            </div>
-
-            {/* Conditional fields for DOMESTIC / INTERNATIONAL */}
-            {transferType !== 'SAME_BANK' && (
-              <div style={{ display: 'grid', gridTemplateColumns: transferType === 'INTERNATIONAL' ? '1fr 1fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
-                <div>
-                  <label style={labelStyle}><Building2 size={13} /> Recipient Bank</label>
-                  <input type="text" value={recipientBank} onChange={e => setRecipientBank(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. National Bank of Egypt" />
+              {/* Transfer Type Selector */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ ...labelStyle, justifyContent: 'center', marginBottom: '12px' }}><Globe size={14} /> Transfer Type</label>
+                <div style={{ display: 'flex', gap: '0', background: 'var(--glass)', borderRadius: '12px', padding: '3px', border: '1px solid var(--glass-border)' }}>
+                  {([['SAME_BANK', 'Within Bank'], ['DOMESTIC', 'Domestic'], ['INTERNATIONAL', 'International']] as const).map(([val, label]) => (
+                    <button key={val} onClick={() => setTransferType(val)} style={{
+                      flex: 1, padding: '10px 0', borderRadius: '10px', border: 'none', cursor: 'pointer', fontSize: '12px', fontWeight: transferType === val ? 700 : 500, fontFamily: f,
+                      background: transferType === val ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'transparent',
+                      color: transferType === val ? '#fff' : 'var(--text-secondary)', transition: 'all 0.2s ease',
+                    }}>{label}</button>
+                  ))}
                 </div>
-                {transferType === 'INTERNATIONAL' && (
-                  <div>
-                    <label style={labelStyle}><Globe size={13} /> SWIFT / BIC Code</label>
-                    <input type="text" value={swiftCode} onChange={e => setSwiftCode(e.target.value.toUpperCase())} className="premium-input" style={{ ...inputStyle, fontFamily: mono, textTransform: 'uppercase' }} placeholder="e.g. NBEGEGCX" />
+              </div>
+
+              {/* Amount Display */}
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '8px', fontFamily: f }}>Amount to Send</p>
+                <div style={{ display: 'inline-flex', alignItems: 'flex-start' }}>
+                  <span style={{ fontFamily: f, fontSize: '48px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-2px', fontVariantNumeric: 'tabular-nums' }}>
+                    {amount > 0 ? new Intl.NumberFormat('en-EG').format(amount) : '0'}
+                  </span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--teal)', marginLeft: '8px', marginTop: '8px', fontFamily: f }}>EGP</span>
+                </div>
+                {amount > 0 && (
+                  <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '12px', fontFamily: f }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Fee (1%): <strong style={{ color: 'var(--danger)' }}>{fmt(fee)}</strong></span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Total: <strong style={{ color: 'var(--teal)' }}>{fmt(totalDebit)}</strong></span>
                   </div>
                 )}
               </div>
-            )}
 
-            {transferType === 'INTERNATIONAL' && (
-              <div style={{ marginBottom: '24px' }}>
-                <label style={labelStyle}><Building2 size={13} /> Bank Address</label>
-                <input type="text" value={recipientAddress} onChange={e => setRecipientAddress(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. 10 Champollion St, Cairo, Egypt" />
+              {/* Form Fields */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <label style={labelStyle}><User size={13} /> Recipient Name</label>
+                  <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. Ahmed Nady" />
+                </div>
+                <div>
+                  <label style={labelStyle}><Hash size={13} /> {transferType === 'SAME_BANK' ? 'Credify Account ID' : 'Account / IBAN'}</label>
+                  <input type="text" value={recipientAccount} onChange={onAcct} maxLength={transferType === 'SAME_BANK' ? 12 : 19} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontVariantNumeric: 'tabular-nums' }} placeholder={transferType === 'SAME_BANK' ? 'CRD123456789' : '1111 1111 1111 1111'} />
+                </div>
               </div>
-            )}
-            {/* Save Beneficiary Checkbox */}
-            {valid && !beneficiaries.find(b => b.account_number === recipientAccount.replace(/\s/g, '')) && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', padding: '12px', background: 'rgba(14,203,203,0.05)', borderRadius: '12px', border: '1px solid rgba(14,203,203,0.2)' }}>
-                <input
-                  type="checkbox"
-                  id="save-ben"
-                  checked={saveBeneficiary}
-                  onChange={(e) => setSaveBeneficiary(e.target.checked)}
-                  style={{ width: '16px', height: '16px', accentColor: 'var(--teal)', cursor: 'pointer' }}
-                />
-                <label htmlFor="save-ben" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', fontFamily: f, margin: 0 }}>
-                  Save this recipient as a beneficiary for future transfers
-                </label>
-              </div>
-            )}
 
-            {/* Submit */}
-            <button onClick={initiateTransfer} disabled={!valid || submitting} style={{
-              width: '100%', padding: '16px', background: valid ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)', border: valid ? 'none' : '1.5px solid var(--glass-border)', borderRadius: '16px', color: valid ? '#fff' : 'var(--text-secondary)', fontFamily: f, fontWeight: 700, fontSize: '15px', transition: 'all 0.3s ease', boxShadow: valid ? '0 6px 24px rgba(14,203,203,0.3)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', cursor: valid ? 'pointer' : 'not-allowed', marginTop: '8px',
-            }}>
-              {submitting ? <><Loader2 size={16} style={{ animation: 'ring-spin 1s linear infinite' }} /> Sending Verification...</> : <><Send size={16} /> Review & Send <ArrowRight size={16} /></>}
-            </button>
-          </>
-        )}
-      </div>
-      
-      {/* Right Spacer */}
-      <div style={{ flex: 1 }}></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div style={{ position: 'relative' }}>
+                  <label style={labelStyle}><DollarSign size={13} /> Amount (EGP)</label>
+                  <input type="text" value={amtStr} onChange={onAmt} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} placeholder="0.00" />
+                  {amount > 0 && totalDebit > balance && (
+                    <p style={{ position: 'absolute', bottom: '-20px', left: '4px', fontSize: '11px', color: 'var(--danger)', fontWeight: 600, fontFamily: f, margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <AlertCircle size={12} /> Insufficient balance
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label style={labelStyle}><FileText size={13} /> Reference <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, fontSize: '11px' }}>(Optional)</span></label>
+                  <input type="text" value={reference} onChange={e => setReference(e.target.value)} id="tr-note" className="premium-input" style={{ ...inputStyle, fontWeight: 500 }} placeholder="e.g. Rent payment" />
+                </div>
+              </div>
+
+              {/* Conditional fields for DOMESTIC / INTERNATIONAL */}
+              {transferType !== 'SAME_BANK' && (
+                <div style={{ display: 'grid', gridTemplateColumns: transferType === 'INTERNATIONAL' ? '1fr 1fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
+                  <div>
+                    <label style={labelStyle}><Building2 size={13} /> Recipient Bank</label>
+                    <input type="text" value={recipientBank} onChange={e => setRecipientBank(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. National Bank of Egypt" />
+                  </div>
+                  {transferType === 'INTERNATIONAL' && (
+                    <div>
+                      <label style={labelStyle}><Globe size={13} /> SWIFT / BIC Code</label>
+                      <input type="text" value={swiftCode} onChange={e => setSwiftCode(e.target.value.toUpperCase())} className="premium-input" style={{ ...inputStyle, fontFamily: mono, textTransform: 'uppercase' }} placeholder="e.g. NBEGEGCX" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {transferType === 'INTERNATIONAL' && (
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={labelStyle}><Building2 size={13} /> Bank Address</label>
+                  <input type="text" value={recipientAddress} onChange={e => setRecipientAddress(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. 10 Champollion St, Cairo, Egypt" />
+                </div>
+              )}
+              {/* Save Beneficiary Checkbox */}
+              {valid && !beneficiaries.find(b => b.account_number === recipientAccount.replace(/\s/g, '')) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px', padding: '12px', background: 'rgba(14,203,203,0.05)', borderRadius: '12px', border: '1px solid rgba(14,203,203,0.2)' }}>
+                  <input
+                    type="checkbox"
+                    id="save-ben"
+                    checked={saveBeneficiary}
+                    onChange={(e) => setSaveBeneficiary(e.target.checked)}
+                    style={{ width: '16px', height: '16px', accentColor: 'var(--teal)', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="save-ben" style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', fontFamily: f, margin: 0 }}>
+                    Save this recipient as a beneficiary for future transfers
+                  </label>
+                </div>
+              )}
+
+              {/* Submit */}
+              <button onClick={initiateTransfer} disabled={!valid || submitting} style={{
+                width: '100%', padding: '16px', background: valid ? 'linear-gradient(135deg,var(--teal),var(--blue))' : 'var(--glass)', border: valid ? 'none' : '1.5px solid var(--glass-border)', borderRadius: '16px', color: valid ? '#fff' : 'var(--text-secondary)', fontFamily: f, fontWeight: 700, fontSize: '15px', transition: 'all 0.3s ease', boxShadow: valid ? '0 6px 24px rgba(14,203,203,0.3)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', cursor: valid ? 'pointer' : 'not-allowed', marginTop: '8px',
+              }}>
+                {submitting ? <><Loader2 size={16} style={{ animation: 'ring-spin 1s linear infinite' }} /> Sending Verification...</> : <><Send size={16} /> Review & Send <ArrowRight size={16} /></>}
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Right Spacer */}
+        <div style={{ flex: 1 }}></div>
 
       </div>
     </section>

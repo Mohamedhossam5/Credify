@@ -129,7 +129,7 @@ const AdminDashboardPage: React.FC = () => {
             <div className="section-title" style={{ margin: 0 }}>All Users</div>
             <button onClick={() => navigate('/admin/accounts')} style={{ fontSize: '11px', color: 'var(--teal, #0ecbcb)', fontWeight: 600, fontFamily: f, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>View All <ChevronRight size={12} /></button>
           </div>
-          <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
+          <div style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '12px' }}>
             {users.filter(u => u.role !== 'ADMIN').slice(0, 3).map(u => {
               const statusColor = u.kyc_status === 'APPROVED' ? 'var(--success, #00e88f)' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? '#f59e0b' : u.kyc_status === 'REJECTED' ? 'var(--danger, #ff4d6a)' : 'var(--text-muted, var(--text-secondary))';
               const statusLabel = u.kyc_status === 'APPROVED' ? 'APPROVED' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? 'PENDING REVIEW' : u.kyc_status === 'REJECTED' ? 'REJECTED' : u.kyc_app_status?.replace(/_/g, ' ') || 'PENDING';
@@ -157,7 +157,7 @@ const AdminDashboardPage: React.FC = () => {
             <div className="section-title" style={{ margin: 0 }}>Recent Transactions</div>
             <button onClick={() => navigate('/admin/transactions')} style={{ fontSize: '11px', color: 'var(--teal, #0ecbcb)', fontWeight: 600, fontFamily: f, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>View All <ChevronRight size={12} /></button>
           </div>
-          <div style={{ maxHeight: '420px', overflowY: 'auto' }}>
+          <div style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '12px' }}>
             {transactions.slice(0, 15).map(tx => {
               const isSent = true; // All transactions in the global list are outgoing from sender
               return (

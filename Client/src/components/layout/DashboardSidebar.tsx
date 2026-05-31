@@ -30,8 +30,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
 
   const handleNavigate = (path: string) => {
     navigate(path);
-    if (window.innerWidth <= 768) {
-      onClose(); // Close sidebar on mobile after navigation
+    if (window.innerWidth <= 1024) {
+      onClose(); // Close sidebar on mobile and tablet after navigation
     }
   };
 

@@ -270,7 +270,7 @@ const Dashboard: React.FC = () => {
                 return (
                   <div>
                     <div onClick={() => navigate('/accounts')} style={{
-                      width: '100%', height: '190px', borderRadius: '20px',
+                      width: '100%', maxWidth: '340px', margin: '0 auto', height: '190px', borderRadius: '20px',
                       background: cardGrad, padding: '24px', position: 'relative', overflow: 'hidden',
                       cursor: 'pointer', transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease',
                       boxShadow: '0 12px 40px rgba(0,0,0,0.25)',

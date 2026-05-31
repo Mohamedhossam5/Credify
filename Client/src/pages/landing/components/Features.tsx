@@ -125,9 +125,21 @@ const Features: React.FC = () => {
             <div className="flex justify-start pl-16 md:pl-20">
               <div className="bg-transparent rounded-xl py-4 sm:py-8 w-full max-w-md flex justify-start md:justify-center items-center relative h-[240px] xs:h-[280px] sm:h-[300px]">
                 {/* Pure CSS Card matching the Hero section */}
-                <div className="bg-gradient-to-br from-[#2d2d2d] to-black shadow-[30px_30px_70px_rgba(0,0,0,0.35)] hover:scale-105 transition-transform duration-500 w-[280px] h-[170px] xs:w-[300px] xs:h-[185px] sm:w-[340px] sm:h-[210px] md:w-[300px] md:h-[185px] lg:w-[380px] lg:h-[230px] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[2.5rem] p-5 xs:p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden border border-white/10 relative">
+                <div className="bg-gradient-to-br from-[#2d2d2d] to-black shadow-[30px_30px_70px_rgba(0,0,0,0.35)] hover:scale-105 transition-transform duration-500 w-[280px] h-[170px] xs:w-[300px] xs:h-[185px] sm:w-[340px] sm:h-[210px] md:w-[300px] md:h-[185px] lg:w-[380px] lg:h-[230px] rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[2.5rem] p-5 xs:p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden border border-white/10 relative group">
                   {/* Card Gloss/Reflection */}
                   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/5 to-transparent pointer-events-none rounded-[1.5rem] sm:rounded-[2rem] lg:rounded-[2.5rem]"></div>
+
+                  {/* Premium Glassmorphic Emerald Lock Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                    <div className="bg-emerald-950/40 backdrop-blur-[6px] border border-emerald-500/30 rounded-2xl p-4 flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.3)] w-[70px] h-[75px] xs:w-[80px] xs:h-[85px] sm:w-[90px] sm:h-[95px] relative transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 group-hover:border-emerald-400/50 group-hover:shadow-[0_0_50px_rgba(16,185,129,0.45)]">
+                      <svg className="w-8 h-8 xs:w-9 xs:h-9 sm:w-11 sm:h-11 text-emerald-400 drop-shadow-[0_2px_8px_rgba(52,211,153,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="3" ry="3" fill="currentColor" fillOpacity="0.15" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        <circle cx="12" cy="16" r="1.5" fill="currentColor" />
+                        <path d="M12 17.5V20" />
+                      </svg>
+                    </div>
+                  </div>
 
                   <div className="flex justify-between items-start relative z-10">
                     <span className="text-lg xs:text-xl sm:text-2xl font-extrabold tracking-tighter italic">
@@ -137,8 +149,8 @@ const Features: React.FC = () => {
                       <div className="w-6 h-4 xs:w-8 xs:h-6 bg-yellow-600/40 rounded-sm xs:rounded-md"></div>
                     </div>
                   </div>
-                  <div className="relative z-10">
-                    <p className="tracking-widest text-sm xs:text-base sm:text-xl font-medium mb-2 xs:mb-3 shadow-sm">
+                  <div className="relative z-10 mt-auto pt-6">
+                    <p className="tracking-widest text-sm xs:text-base sm:text-xl font-medium mb-1 xs:mb-2 shadow-sm blur-[5px] select-none">
                       1234 5678 9101 0000
                     </p>
                     <div className="flex justify-between items-end">

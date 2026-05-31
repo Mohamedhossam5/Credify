@@ -565,6 +565,93 @@
   }
 }
 
+@media (max-width: 500px) {
+  .save-bar-pill {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 12px;
+  }
+
+  .save-bar-left {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .dirty-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .save-bar-title {
+    font-size: 12px;
+  }
+
+  .save-bar-subtitle {
+    display: none;
+  }
+
+  .save-bar-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .save-bar-revert,
+  .save-bar-save {
+    justify-content: center;
+    padding: 7px !important;
+    font-size: 11px !important;
+    border-radius: 7px !important;
+    gap: 4px !important;
+  }
+
+  .save-bar-revert svg,
+  .save-bar-save svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .bill-cat-list {
+    gap: 16px !important;
+  }
+
+  .bill-cat-card {
+    padding: 12px 16px !important;
+    gap: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .bill-cat-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .bill-cat-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .bill-cat-card h3 {
+    font-size: 13.5px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .bill-cat-card p {
+    font-size: 11px !important;
+    line-height: 1.4 !important;
+  }
+
+  .bill-cat-card > svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
 /* ─── MODERN NON-CONFLICTING TOGGLE SWITCH ─── */
 .modern-toggle-label {
   position: relative;
@@ -644,4 +731,94 @@
 .modern-toggle-label input:checked+.modern-toggle-slider::before {
   transform: translateX(20px);
   background: #fff;
+}
+
+/* ─── ADMIN LOANS MOBILE/TABLET RESPONSIVENESS ─── */
+@media (max-width: 900px) {
+  .loans-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .loans-filter-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+
+  .loans-filter-row > div:last-child {
+    width: 100% !important;
+  }
+
+  .loans-filter-row input {
+    width: 100% !important;
+  }
+
+  .loans-tabs-container {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    display: flex !important;
+    width: 100% !important;
+    padding: 3px !important;
+    border-radius: 10px !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px !important;
+  }
+
+  .loans-tabs-container::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .loans-tabs-container button {
+    flex-shrink: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
+  }
+
+  .loans-table-header {
+    display: none !important;
+  }
+
+  .loans-desktop-table {
+    display: none !important;
+  }
+
+  .loans-mobile-list {
+    display: block !important;
+  }
+
+  .loans-mobile-card {
+    border-bottom: 1px solid var(--glass-border) !important;
+    transition: background-color 0.2s ease !important;
+  }
+
+  .loans-mobile-card:last-child {
+    border-bottom: none !important;
+  }
+
+  .loans-mobile-card:hover {
+    background-color: var(--row-hover) !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .loans-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+}
+
+@media (min-width: 901px) {
+  .loans-table-header {
+    display: grid !important;
+  }
+
+  .loans-desktop-table {
+    display: block !important;
+  }
+
+  .loans-mobile-list {
+    display: none !important;
+  }
 }

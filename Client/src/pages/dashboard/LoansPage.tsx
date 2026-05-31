@@ -94,7 +94,7 @@ const LoansPage: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '24px', alignItems: 'start' }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
 
         {/* ─── LEFT COLUMN ──────────────────────── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -141,7 +141,7 @@ const LoansPage: React.FC = () => {
             {/* Tenure Selector */}
             <div style={{ marginBottom: '24px' }}>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: f, display: 'block', marginBottom: '10px' }}>Loan Tenure</span>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '8px' }}>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                 {TENURE_OPTIONS.map((t) => (
                   <button
                     key={t}
@@ -163,8 +163,7 @@ const LoansPage: React.FC = () => {
 
             {/* Results Grid */}
             {calcResult && (
-              <div style={{ 
-                display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '20px',
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-5" style={{ 
                 opacity: isCalculating ? 0.5 : 1, transition: 'opacity 0.2s'
               }}>
                 {[
@@ -341,7 +340,7 @@ const LoansPage: React.FC = () => {
                       {isExpanded && (
                         <div style={{ padding: '0 24px 16px', animation: 'fadein 0.2s ease' }}>
                           <div style={{ padding: '16px', borderRadius: '12px', background: 'var(--glass)', border: '1px solid var(--glass-border)' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: loan.rejection_reason ? '12px' : '0' }}>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" style={{ marginBottom: loan.rejection_reason ? '12px' : '0' }}>
                               {[
                                 { l: 'Total Repayment', v: `EGP ${formatEGP(parseFloat(loan.total_repayment))}` },
                                 { l: 'Total Interest', v: `EGP ${formatEGP(parseFloat(loan.total_interest))}` },

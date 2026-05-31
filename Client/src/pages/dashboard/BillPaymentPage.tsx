@@ -2412,11 +2412,11 @@ const BillPaymentPage: React.FC = () => {
         </div>
 
         {/* Category Cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="bill-cat-list" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {filteredCategories.map((cat, index) => (
             <div
               key={cat.id}
-              className="glass-card"
+              className="glass-card bill-cat-card"
               onClick={() => setSelectedCategory(cat.id)}
               style={{
                 padding: '24px 28px', cursor: 'pointer', display: 'flex', alignItems: 'center',
@@ -2441,7 +2441,7 @@ const BillPaymentPage: React.FC = () => {
               }} />
 
               {/* Icon */}
-              <div style={{
+              <div className="bill-cat-icon" style={{
                 width: '52px', height: '52px', borderRadius: '14px', background: cat.iconBg,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 color: cat.accentColor, transition: 'transform 0.3s ease',
