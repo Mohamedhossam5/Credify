@@ -67,7 +67,9 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
   const pageId = location.pathname.split('/').pop() || 'dashboard';
   const user = useAuthStore((s) => s.user);
   const { notifications, unreadCount, markAsRead, markAllRead } = useNotifications();
+  
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isBellHovered, setIsBellHovered] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
   // User initials from real data
@@ -118,6 +120,39 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isNotifOpen]);
+
+  // ── Keyboard shortcut G -> N to toggle notifications ──
+  useEffect(() => {
+    let lastKey = '';
+    let lastKeyTime = 0;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (activeEl && (
+        activeEl.tagName === 'INPUT' || 
+        activeEl.tagName === 'TEXTAREA' || 
+        activeEl.getAttribute('contenteditable') === 'true'
+      )) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      const now = Date.now();
+
+      if (lastKey === 'g' && key === 'n' && (now - lastKeyTime < 1000)) {
+        setIsNotifOpen((prev) => !prev);
+        lastKey = '';
+      } else if (key === 'g') {
+        lastKey = 'g';
+        lastKeyTime = now;
+      } else {
+        lastKey = '';
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleNotifToggle = () => {
     setIsNotifOpen(!isNotifOpen);
@@ -184,8 +219,14 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
         <div ref={notifRef} style={{ position: 'relative' }}>
           <div
             className="icon-btn"
-            style={{ position: 'relative', color: 'var(--text-primary)', cursor: 'pointer' }}
+            style={{ position: 'relative', color: 'var(--text-primary)', cursor: 'pointer', outline: 'none' }}
             onClick={handleNotifToggle}
+            onMouseEnter={() => setIsBellHovered(true)}
+            onMouseLeave={() => setIsBellHovered(false)}
+            onFocus={() => setIsBellHovered(true)}
+            onBlur={() => setIsBellHovered(false)}
+            tabIndex={0}
+            aria-label="Notifications"
           >
             <svg
               width="20"
@@ -204,6 +245,62 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
               <div className="notif-badge">{unreadCount > 9 ? '9+' : unreadCount}</div>
             )}
           </div>
+
+          {/* ── Premium Hotkey Shortcut Tooltip ── */}
+          {isBellHovered && !isNotifOpen && (
+            <div style={{
+              position: 'absolute',
+              top: 'calc(100% + 12px)',
+              right: '0',
+              background: 'var(--bg-sidebar)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid var(--glass-border)',
+              boxShadow: 'var(--shadow-card)',
+              borderRadius: '12px',
+              padding: '10px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              whiteSpace: 'nowrap',
+              zIndex: 1000,
+              animation: 'tooltipSlideIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) both',
+              pointerEvents: 'none',
+            }}>
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'var(--font-primary)' }}>
+                {unreadCount > 0 ? `You have ${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'You have no unread notifications'}
+              </span>
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                <kbd style={{
+                  background: 'var(--navy-light)',
+                  border: '1px solid var(--glass-border)',
+                  padding: '2px 6px',
+                  borderRadius: '5px',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-mono)',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                }}>G</kbd>
+                <kbd style={{
+                  background: 'var(--navy-light)',
+                  border: '1px solid var(--glass-border)',
+                  padding: '2px 6px',
+                  borderRadius: '5px',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-mono)',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                }}>N</kbd>
+              </div>
+              <style>{`
+                @keyframes tooltipSlideIn {
+                  from { opacity: 0; transform: translateY(8px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+              `}</style>
+            </div>
+          )}
 
           {/* ── Notification Dropdown Panel ── */}
           {isNotifOpen && (
