@@ -250,7 +250,7 @@ const SettingsPage: React.FC = () => {
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Last Name</label>
               <input type="text" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.lastName} readOnly />
             </div>
-            <div>
+            <div style={{ gridColumn: 'span 2' }}>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Email</label>
               <input type="email" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.email} readOnly />
             </div>
