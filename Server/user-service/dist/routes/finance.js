@@ -9,12 +9,13 @@ const uuid_1 = require("uuid");
 const Account_1 = __importDefault(require("../models/Account"));
 const Transaction_1 = __importDefault(require("../models/Transaction"));
 const User_1 = __importDefault(require("../models/User"));
+const Beneficiary_1 = __importDefault(require("../models/Beneficiary"));
 const auth_1 = require("../middleware/auth");
 const otp_1 = require("../services/otp");
 const sms_1 = require("../services/sms");
 const router = (0, express_1.Router)();
 // ─── Fee configuration ──────────────────────────────────────
-const TRANSFER_FEE_RATE = 0.01; // 1% fee on every transfer
+const TRANSFER_FEE_RATE = 0.001; // 0.1% fee on every transfer
 const PENDING_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const pendingTransfers = new Map();
 // Cleanup expired entries every 60 seconds
@@ -28,7 +29,7 @@ setInterval(() => {
 }, 60000);
 // ─── Shared validation ──────────────────────────────────────
 const transferValidation = [
-    (0, express_validator_1.body)("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
+    (0, express_validator_1.body)("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL", "BILL_PAYMENT", "DONATION"]).withMessage("Invalid transfer type"),
     (0, express_validator_1.body)("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
     (0, express_validator_1.body)("recipientName").notEmpty().withMessage("Recipient name is required"),
     (0, express_validator_1.body)("recipientAccount").notEmpty().withMessage("Recipient account is required"),
@@ -39,6 +40,7 @@ router.post("/transfer/initiate", auth_1.authenticate, transferValidation, async
     try {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
+            console.log('Validation failed for /transfer/initiate', req.body, errors.array());
             res.status(400).json({ errors: errors.array() });
             return;
         }
@@ -74,43 +76,25 @@ router.post("/transfer/initiate", auth_1.authenticate, transferValidation, async
             res.status(400).json({ error: "You cannot transfer to your own account." });
             return;
         }
-        // Calculate 1% fee
+        // Calculate 0.1% fee with min 0.5 and max 20 EGP
         const parsedAmount = parseFloat(amount);
-        const fee = Math.round(parsedAmount * TRANSFER_FEE_RATE * 100) / 100;
+        let fee = Math.round(parsedAmount * TRANSFER_FEE_RATE * 100) / 100;
+        if (parsedAmount > 0) {
+            if (fee < 0.5)
+                fee = 0.5;
+            if (fee > 20)
+                fee = 20;
+        }
         const totalDebit = parsedAmount + fee;
         // Quick balance check (will re-check at confirm time under lock)
         if (parseFloat(String(senderAccount.balance)) < totalDebit) {
-            res.status(400).json({ error: `Insufficient balance. Transfer amount: ${parsedAmount}, fee (1%): ${fee}, total required: ${totalDebit}.` });
+            res.status(400).json({ error: `Insufficient balance. Transfer amount: ${parsedAmount}, fee: ${fee}, total required: ${totalDebit}.` });
             return;
         }
         // Fetch user for OTP email
         const user = await User_1.default.findById(userId);
         if (!user) {
             res.status(404).json({ error: "User not found." });
-            return;
-        }
-        // ─── Admin bypass: execute transfer immediately without OTP ───
-        if (user.role === "ADMIN") {
-            const receiverInternalId = type === "SAME_BANK" ? recipientAccount : undefined;
-            const transferRes = await Account_1.default.transferFunds(userId, parsedAmount, receiverInternalId, fee);
-            if (!transferRes.success) {
-                res.status(400).json({ error: transferRes.error });
-                return;
-            }
-            const transaction = await Transaction_1.default.create({
-                senderId: userId,
-                senderAccountId: senderAccount.account_id,
-                type,
-                amount: parsedAmount,
-                fee,
-                recipientName,
-                recipientAccount,
-                recipientBank,
-                swiftCode,
-                recipientAddress,
-                reference,
-            });
-            res.json({ message: "Transfer successful.", otpRequired: false, transaction });
             return;
         }
         // ─── Regular user: store pending transfer and send OTP ────
@@ -228,6 +212,83 @@ router.post("/transfer/confirm", auth_1.authenticate, [
     }
     catch (err) {
         console.error("[Transfer Confirm Error]", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+// ─── Beneficiaries ──────────────────────────────────────────
+router.get("/transfer/beneficiaries", auth_1.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const beneficiaries = await Beneficiary_1.default.findByUserId(userId);
+        res.json({ beneficiaries });
+    }
+    catch (err) {
+        console.error("[Get Beneficiaries Error]", err);
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+router.post("/transfer/beneficiaries", auth_1.authenticate, [
+    (0, express_validator_1.body)("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
+    (0, express_validator_1.body)("name").notEmpty().withMessage("Beneficiary name is required"),
+    (0, express_validator_1.body)("accountNumber").notEmpty().withMessage("Account number is required"),
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errors: errors.array() });
+            return;
+        }
+        const { type, name, accountNumber, bankName, swiftCode, address } = req.body;
+        const userId = req.user.id;
+        if (type === "DOMESTIC" && !bankName) {
+            res.status(400).json({ error: "Bank name is required for domestic beneficiaries." });
+            return;
+        }
+        if (type === "INTERNATIONAL") {
+            if (!bankName) {
+                res.status(400).json({ error: "Bank name is required for international beneficiaries." });
+                return;
+            }
+            if (!swiftCode) {
+                res.status(400).json({ error: "SWIFT code is required for international beneficiaries." });
+                return;
+            }
+            if (!address) {
+                res.status(400).json({ error: "Address is required for international beneficiaries." });
+                return;
+            }
+        }
+        const beneficiary = await Beneficiary_1.default.create({
+            userId,
+            type,
+            name,
+            accountNumber,
+            bankName,
+            swiftCode,
+            address,
+        });
+        res.status(201).json({ message: "Beneficiary saved successfully.", beneficiary });
+    }
+    catch (err) {
+        console.error("[Add Beneficiary Error]", err);
+        require('fs').appendFileSync('beneficiary_error.log', new Date().toISOString() + ' ' + (err.stack || err.message) + '\\n');
+        res.status(500).json({ error: "Internal server error." });
+    }
+});
+router.delete("/transfer/beneficiaries/:id", auth_1.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const beneficiaryId = parseInt(req.params.id, 10);
+        const success = await Beneficiary_1.default.delete(beneficiaryId, userId);
+        if (success) {
+            res.json({ message: "Beneficiary deleted successfully." });
+        }
+        else {
+            res.status(404).json({ error: "Beneficiary not found." });
+        }
+    }
+    catch (err) {
+        console.error("[Delete Beneficiary Error]", err);
         res.status(500).json({ error: "Internal server error." });
     }
 });

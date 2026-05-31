@@ -66,6 +66,17 @@ export const financeService = {
     return data;
   },
 
+  /** Initiate a new Donation */
+  initiateDonation: async (amount: number, charityName: string, donorName: string): Promise<any> => {
+    const { data } = await api.post('/transfer/initiate', {
+      type: 'DONATION',
+      amount,
+      recipientName: charityName,
+      recipientAccount: donorName, // Use recipientAccount for donor name / reference
+    });
+    return data;
+  },
+
   /** Confirm a Bill Payment (verifies OTP) */
   confirmBillPayment: async (transferId: string, otp: string): Promise<any> => {
     const { data } = await api.post('/transfer/confirm', {

@@ -48,7 +48,7 @@ setInterval(() => {
 // ─── Shared validation ──────────────────────────────────────
 
 const transferValidation = [
-  body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL", "BILL_PAYMENT"]).withMessage("Invalid transfer type"),
+  body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL", "BILL_PAYMENT", "DONATION"]).withMessage("Invalid transfer type"),
   body("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
   body("recipientName").notEmpty().withMessage("Recipient name is required"),
   body("recipientAccount").notEmpty().withMessage("Recipient account is required"),

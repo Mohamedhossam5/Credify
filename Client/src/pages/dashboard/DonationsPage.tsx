@@ -57,7 +57,7 @@ const DonationsPage: React.FC = () => {
     if (parsedAmount <= 0 || parsedAmount > balance) return;
     try {
       setPaymentStep('processing');
-      const res = await financeService.initiateBillPayment(parsedAmount, provider?.name || 'Donation', donorName || 'Anonymous');
+      const res = await financeService.initiateDonation(parsedAmount, provider?.name || 'Donation', donorName || 'Anonymous');
       if (res.otpRequired && res.transferId) {
         setTransferId(res.transferId);
         setPaymentStep('otp');
