@@ -71,7 +71,7 @@ const categories: BillCategory[] = [
 interface BillProvider {
   id: string;
   name: string;
-  logo: string;
+  logo: React.ReactNode;
   brandColor: string;
   brandBg: string;
   brandGradient: string;
@@ -82,7 +82,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'etisalat',
     name: 'Etisalat',
-    logo: '𝐞&',
+    logo: <img src="/logos/etisalat.png" alt="Etisalat" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '6px' }} />,
     brandColor: '#00a651',
     brandBg: 'rgba(0,166,81,0.12)',
     brandGradient: 'linear-gradient(135deg, #00a651, #00c853)',
@@ -91,7 +91,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'orange',
     name: 'Orange',
-    logo: '🟠',
+    logo: <img src="/logos/orange.png" alt="Orange" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff' }} />,
     brandColor: '#ff6600',
     brandBg: 'rgba(255,102,0,0.12)',
     brandGradient: 'linear-gradient(135deg, #ff6600, #ff8c00)',
@@ -100,7 +100,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'vodafone',
     name: 'Vodafone',
-    logo: '📱',
+    logo: <img src="/logos/vodafone.png" alt="Vodafone" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '4px' }} />,
     brandColor: '#e60000',
     brandBg: 'rgba(230,0,0,0.12)',
     brandGradient: 'linear-gradient(135deg, #e60000, #ff1744)',
@@ -109,7 +109,7 @@ const telecomProviders: BillProvider[] = [
   {
     id: 'we',
     name: 'WE',
-    logo: '🌐',
+    logo: <img src="/logos/we.png" alt="WE" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '18px', backgroundColor: '#fff', padding: '4px' }} />,
     brandColor: '#7b2d8e',
     brandBg: 'rgba(123,45,142,0.12)',
     brandGradient: 'linear-gradient(135deg, #7b2d8e, #9c27b0)',
