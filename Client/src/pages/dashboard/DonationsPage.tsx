@@ -9,11 +9,11 @@ const f = '"Inter",sans-serif';
 const mono = '"JetBrains Mono", monospace';
 
 const charities = [
-  { id: 'resala', name: 'Resala Charity', logo: '❤️', brandGradient: 'linear-gradient(135deg, #e11d48, #be123c)', brandBg: 'rgba(225, 29, 72, 0.12)' },
-  { id: 'misr-el-kheir', name: 'Misr El Kheir', logo: '🤝', brandGradient: 'linear-gradient(135deg, #10b981, #059669)', brandBg: 'rgba(16, 185, 129, 0.12)' },
-  { id: 'baheya', name: 'Baheya Foundation', logo: '🎀', brandGradient: 'linear-gradient(135deg, #f472b6, #db2777)', brandBg: 'rgba(244, 114, 182, 0.12)' },
-  { id: 'hospital-57357', name: '57357 Hospital', logo: '🏥', brandGradient: 'linear-gradient(135deg, #fbbf24, #d97706)', brandBg: 'rgba(251, 191, 36, 0.12)' },
-  { id: 'magdi-yacoub', name: 'Magdi Yacoub Heart Foundation', logo: '💓', brandGradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', brandBg: 'rgba(239, 68, 68, 0.12)' },
+  { id: 'resala', name: 'Resala Charity', logo: <img src="/logos/resala.png" alt="Resala" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 'inherit', backgroundColor: '#fff', padding: '4px' }} />, brandGradient: 'linear-gradient(135deg, #e11d48, #be123c)', brandBg: 'rgba(225, 29, 72, 0.12)' },
+  { id: 'misr-el-kheir', name: 'Misr El Kheir', logo: <img src="/logos/misr-el-kheir.png" alt="Misr El Kheir" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 'inherit', backgroundColor: '#fff', padding: '4px' }} />, brandGradient: 'linear-gradient(135deg, #10b981, #059669)', brandBg: 'rgba(16, 185, 129, 0.12)' },
+  { id: 'baheya', name: 'Baheya Foundation', logo: <img src="/logos/baheya.png" alt="Baheya" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 'inherit', backgroundColor: '#fff', padding: '4px' }} />, brandGradient: 'linear-gradient(135deg, #f472b6, #db2777)', brandBg: 'rgba(244, 114, 182, 0.12)' },
+  { id: 'hospital-57357', name: '57357 Hospital', logo: <img src="/logos/hospital-57357.png" alt="57357" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 'inherit', backgroundColor: '#fff', padding: '4px' }} />, brandGradient: 'linear-gradient(135deg, #fbbf24, #d97706)', brandBg: 'rgba(251, 191, 36, 0.12)' },
+  { id: 'magdi-yacoub', name: 'Magdi Yacoub Heart Foundation', logo: <img src="/logos/magdi-yacoub.png" alt="Magdi Yacoub" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 'inherit', backgroundColor: '#fff', padding: '4px' }} />, brandGradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', brandBg: 'rgba(239, 68, 68, 0.12)' },
 ];
 
 const DonationsPage: React.FC = () => {
