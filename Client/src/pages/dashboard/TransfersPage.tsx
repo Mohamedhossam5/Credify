@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, CheckCircle2, ArrowRight, CreditCard, User, Hash, FileText, DollarSign, Building2, Globe, AlertCircle, Loader2, Star, Trash2, ChevronDown } from 'lucide-react';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
@@ -26,6 +26,7 @@ const TransfersPage: React.FC = () => {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [isBeneficiariesOpen, setIsBeneficiariesOpen] = useState(false);
   const [saveBeneficiary, setSaveBeneficiary] = useState(false);
+  const beneficiaryRef = useRef<HTMLDivElement>(null);
 
   // Form
   const [transferType, setTransferType] = useState<TransferType>('SAME_BANK');
@@ -76,6 +77,15 @@ const TransfersPage: React.FC = () => {
         setLoading(false);
       }
     })();
+
+    // Outside click handler
+    const handleClickOutside = (e: MouseEvent) => {
+      if (beneficiaryRef.current && !beneficiaryRef.current.contains(e.target as Node)) {
+        setIsBeneficiariesOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   // Refresh balance
@@ -238,54 +248,63 @@ const TransfersPage: React.FC = () => {
   }
 
   return (
-        <section id="transfers" className="page active" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+    <section id="transfers" className="page active" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: '1400px' }}>
         
         {/* Left Spacer */}
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: '24px' }}>
           {/* Left Column: Beneficiaries Dropdown */}
-          <div style={{ position: 'relative', width: '240px', flexShrink: 0, zIndex: 50 }}>
-          <label style={{ ...labelStyle, marginBottom: '12px' }}><Star size={13} /> Saved Beneficiaries</label>
-          {beneficiaries.length > 0 ? (
-            <>
-              <button onClick={() => setIsBeneficiariesOpen(!isBeneficiariesOpen)} style={{
-                width: '100%', padding: '14px 16px', background: 'var(--glass)', borderRadius: '14px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-primary)', fontFamily: f, fontSize: '13px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-              }}>
-                Select Recipient <ChevronDown size={14} style={{ transform: isBeneficiariesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.6 }} />
-              </button>
-              
-              {isBeneficiariesOpen && (
-                <div style={{
-                  position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '8px', background: 'var(--glass)', borderRadius: '14px', border: '1px solid var(--glass-border)', padding: '8px', display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '300px', overflowY: 'auto', backdropFilter: 'blur(20px)', boxShadow: '0 12px 32px rgba(0,0,0,0.3)'
-                }}>
-                  {beneficiaries.map(b => (
-                    <div key={b.id} className="dropdown-item" onClick={() => { selectBeneficiary(b); setIsBeneficiariesOpen(false); }} style={{
-                      padding: '12px', borderRadius: '10px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.2s'
-                    }}>
-                      <div style={{ flex: 1, overflow: 'hidden' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '0 0 4px' }}>
-                          <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', margin: 0 }}>{b.name}</p>
-                          <span style={{ fontSize: '9px', fontWeight: 600, padding: '2px 6px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', color: 'var(--text-secondary)', whiteSpace: 'nowrap', fontFamily: f }}>
-                            {b.type === 'SAME_BANK' ? 'Within Bank' : b.type === 'DOMESTIC' ? 'Domestic' : 'International'}
-                          </span>
+          <div ref={beneficiaryRef} style={{ position: 'relative', width: '240px', flexShrink: 0, zIndex: 50 }}>
+            <label style={{ ...labelStyle, marginBottom: '12px' }}><Star size={13} /> Saved Beneficiaries</label>
+            {beneficiaries.length > 0 ? (
+              <>
+                <button onClick={() => setIsBeneficiariesOpen(!isBeneficiariesOpen)} style={{
+                  width: '100%', padding: '14px 16px', background: 'var(--glass)', borderRadius: '16px', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', color: 'var(--text-primary)', fontFamily: f, fontSize: '13px', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', transition: 'all 0.2s ease', outline: 'none'
+                }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--teal)'}
+                  onMouseLeave={e => { if(!isBeneficiariesOpen) e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
+                >
+                  Select Recipient <ChevronDown size={14} style={{ transform: isBeneficiariesOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', opacity: 0.6 }} />
+                </button>
+                
+                {isBeneficiariesOpen && (
+                  <div style={{
+                    position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '6px', background: 'var(--floating-menu-bg, #ffffff)', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.06)', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px', overflowY: 'auto', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 20px 48px -10px rgba(0, 0, 0, 0.15)', animation: 'floatingMenuIn 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}>
+                    {beneficiaries.map(b => (
+                      <div key={b.id} className="dropdown-item" onClick={() => { selectBeneficiary(b); setIsBeneficiariesOpen(false); }} style={{
+                        padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'all 0.15s ease', background: 'transparent'
+                      }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--select-hover-bg, rgba(0,0,0,0.03))'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <div style={{ flex: 1, overflow: 'hidden', paddingRight: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '0 0 3px', flexWrap: 'wrap' }}>
+                            <p style={{ fontSize: '13px', fontWeight: 600, color: 'var(--floating-menu-text, #1e293b)', fontFamily: f, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', margin: 0 }}>{b.name}</p>
+                            <span style={{ fontSize: '9px', fontWeight: 600, padding: '1px 5px', background: b.type === 'SAME_BANK' ? 'rgba(16, 185, 129, 0.08)' : b.type === 'DOMESTIC' ? 'rgba(59, 130, 246, 0.08)' : 'rgba(245, 158, 11, 0.08)', borderRadius: '4px', color: b.type === 'SAME_BANK' ? '#10b981' : b.type === 'DOMESTIC' ? '#3b82f6' : '#f59e0b', whiteSpace: 'nowrap', fontFamily: f }}>
+                              {b.type === 'SAME_BANK' ? 'Within Bank' : b.type === 'DOMESTIC' ? 'Domestic' : 'International'}
+                            </span>
+                          </div>
+                          <p style={{ fontSize: '10px', color: 'var(--text-secondary)', fontFamily: mono, margin: 0 }}>{b.account_number}</p>
                         </div>
-                        <p style={{ fontSize: '10px', color: 'var(--text-secondary)', fontFamily: mono, margin: 0 }}>{b.account_number}</p>
+                        <button onClick={(e) => { e.stopPropagation(); deleteBeneficiary(b.id); }} style={{
+                          background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.18s ease'
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.color = '#ef4444'; }}
+                          onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#94a3b8'; }}
+                        >
+                          <Trash2 size={13} />
+                        </button>
                       </div>
-                      <button onClick={(e) => { e.stopPropagation(); deleteBeneficiary(b.id); }} style={{
-                        background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '6px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                      }}>
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px dashed rgba(255,255,255,0.1)', textAlign: 'center' }}>
-              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, margin: 0 }}>No saved beneficiaries yet</p>
-            </div>
-          )}
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '14px', border: '1px dashed rgba(255,255,255,0.1)', textAlign: 'center' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, margin: 0 }}>No saved beneficiaries yet</p>
+              </div>
+            )}
           </div>
         </div>
 

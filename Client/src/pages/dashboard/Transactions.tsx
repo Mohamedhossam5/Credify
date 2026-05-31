@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { ArrowUpRight, ArrowDownLeft, Loader2 } from 'lucide-react';
 import { useTransactions } from '../../hooks/useTransactions';
 import type { Payment } from '../../hooks/useTransactions';
+import FloatingSelect from '../../components/ui/FloatingSelect';
 
 const Transactions: React.FC = () => {
   const { 
@@ -79,38 +80,17 @@ const Transactions: React.FC = () => {
           </div>
         </div>
 
-        {/* Category Dropdown */}
-        <div style={{ position: 'relative' }}>
-          <select 
+        <div>
+          <FloatingSelect
             value={txCategory}
-            onChange={(e) => setTxCategory(e.target.value as any)}
-            style={{
-              appearance: 'none',
-              backgroundColor: 'var(--glass)',
-              border: '1px solid var(--glass-border)',
-              color: 'var(--text-primary)',
-              padding: '10px 40px 10px 16px',
-              borderRadius: '12px',
-              fontSize: '13px',
-              fontFamily: '"Inter", sans-serif',
-              fontWeight: 600,
-              cursor: 'pointer',
-              outline: 'none',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--text-secondary)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--glass-border)'; }}
-          >
-            <option value="all" style={{ backgroundColor: 'var(--fx-dropdown-bg)', color: 'var(--text-primary)' }}>All Types</option>
-            <option value="transfers" style={{ backgroundColor: 'var(--fx-dropdown-bg)', color: 'var(--text-primary)' }}>Transfers</option>
-            <option value="bills" style={{ backgroundColor: 'var(--fx-dropdown-bg)', color: 'var(--text-primary)' }}>Bills</option>
-            <option value="donations" style={{ backgroundColor: 'var(--fx-dropdown-bg)', color: 'var(--text-primary)' }}>Donations</option>
-          </select>
-          <div style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-secondary)' }}>
-            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-            </svg>
-          </div>
+            onChange={(v) => setTxCategory(v as any)}
+            options={[
+              { value: 'all', label: 'All Types' },
+              { value: 'transfers', label: 'Transfers' },
+              { value: 'bills', label: 'Bills' },
+              { value: 'donations', label: 'Donations' }
+            ]}
+          />
         </div>
       </div>
 

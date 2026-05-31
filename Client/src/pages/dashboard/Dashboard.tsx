@@ -6,6 +6,7 @@ import { financeService } from '../../services/finance.service';
 import { useTransactions } from '../../hooks/useTransactions';
 import { useAuthStore } from '../../store/authStore';
 import { api } from '../../lib/api';
+import FloatingSelect from '../../components/ui/FloatingSelect';
 
 // ─── Types ───────────────────────────────────────────────────
 interface CardData {
@@ -155,17 +156,17 @@ const Dashboard: React.FC = () => {
             <div className="glass-card" style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>Money Flow</span>
-                <select 
-                  value={moneyFlowFilter} 
-                  onChange={(e) => setMoneyFlowFilter(e.target.value as any)}
-                  style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, padding: '4px 8px', background: 'var(--select-bg)', borderRadius: '6px', border: '1px solid var(--glass-border)', outline: 'none', cursor: 'pointer' }}
-                >
-                  <option value="today">Today</option>
-                  <option value="yesterday">Yesterday</option>
-                  <option value="week">Last 7 Days</option>
-                  <option value="month">Last 30 Days</option>
-                  <option value="all">All Time</option>
-                </select>
+                <FloatingSelect
+                  value={moneyFlowFilter}
+                  onChange={(v) => setMoneyFlowFilter(v as any)}
+                  options={[
+                    { value: 'today',     label: 'Today' },
+                    { value: 'yesterday', label: 'Yesterday' },
+                    { value: 'week',      label: 'Last 7 Days' },
+                    { value: 'month',     label: 'Last 30 Days' },
+                    { value: 'all',       label: 'All Time' },
+                  ]}
+                />
               </div>
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px' }}>
@@ -348,7 +349,7 @@ const Dashboard: React.FC = () => {
               ) : filteredTx.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-secondary)', fontFamily: f, fontSize: '13px' }}>No transactions found</div>
               ) : (
-                filteredTx.slice(0, 5).map((tx) => (
+                filteredTx.slice(0, 3).map((tx) => (
                   <div key={tx.id}
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', cursor: 'pointer', transition: 'background 0.15s ease' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--row-hover)')}
