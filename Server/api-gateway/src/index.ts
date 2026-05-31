@@ -141,6 +141,15 @@ app.get("/api/cards/deliveries/all", express.json(), (req, res) => forwardJSON(U
 app.post("/api/cards/:cardId/delivery", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
 app.get("/api/cards/:cardId/delivery", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
 
+// ─── Loan Routes -> User Service ─────────────────────────────
+
+app.get("/api/loans/calculate", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/calculate?${new URL(req.url, 'http://x').searchParams}`, req, res));
+app.post("/api/loans/apply", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/loans/apply", req, res));
+app.get("/api/loans/my", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/loans/my", req, res));
+app.get("/api/loans/all", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
+app.post("/api/loans/:id/approve", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/${req.params.id}/approve`, req, res));
+app.post("/api/loans/:id/reject", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/${req.params.id}/reject`, req, res));
+
 // ─── KYC Routes -> KYC Service ───────────────────────────────
 
 app.get("/api/kyc/status", express.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/status", req, res));
