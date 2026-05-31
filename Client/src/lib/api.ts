@@ -39,7 +39,10 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Handle 401 Unauthorized errors (Token expired)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Skip auto-logout for /transfer/confirm — a 401 there means "wrong OTP", not "session expired"
+    const requestUrl = originalRequest?.url || '';
+    const isOtpEndpoint = requestUrl.includes('/transfer/confirm');
+    if (error.response?.status === 401 && !originalRequest._retry && !isOtpEndpoint) {
       originalRequest._retry = true;
 
       try {

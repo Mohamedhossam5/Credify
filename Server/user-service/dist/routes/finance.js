@@ -192,7 +192,7 @@ router.post("/transfer/confirm", auth_1.authenticate, [
         // Verify OTP
         const isValid = (0, otp_1.verifyOtp)(pending.email, otp);
         if (!isValid) {
-            res.status(401).json({ error: "Invalid or expired verification code." });
+            res.status(400).json({ error: "Invalid or expired verification code." });
             return;
         }
         // Execute the transfer

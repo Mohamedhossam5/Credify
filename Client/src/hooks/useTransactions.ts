@@ -13,9 +13,12 @@ export interface Payment {
   desc: string;
   amount: string;
   status: 'received' | 'sent';
+  type: string;
   initials: string;
   color: string;
 }
+
+export type TxCategory = 'all' | 'transfers' | 'bills' | 'donations';
 
 // ─── Helpers ─────────────────────────────────────────────────
 
@@ -67,6 +70,7 @@ function mapTransaction(tx: TransactionRecord, currentAccountId?: string): Payme
     desc,
     amount: formattedAmount,
     status,
+    type: tx.type,
     initials,
     color,
   };
@@ -76,6 +80,7 @@ function mapTransaction(tx: TransactionRecord, currentAccountId?: string): Payme
 
 export const useTransactions = () => {
   const [txFilter, setTxFilter] = useState<PaymentStatus>('all');
+  const [txCategory, setTxCategory] = useState<TxCategory>('all');
   const [txSearchQuery, setTxSearchQuery] = useState('');
   const user = useAuthStore((s) => s.user);
   const currentAccountId = user?.account?.accountId;
@@ -95,9 +100,24 @@ export const useTransactions = () => {
   // Apply filters
   const history = useMemo(() => {
     let data = allPayments;
+    
+    // Status Filter (All, Sent, Received)
     if (txFilter !== 'all') {
       data = data.filter((tx) => tx.status === txFilter);
     }
+    
+    // Category Filter (All, Transfers, Bills, Donations)
+    if (txCategory !== 'all') {
+      if (txCategory === 'transfers') {
+        data = data.filter(tx => ['SAME_BANK', 'DOMESTIC', 'INTERNATIONAL'].includes(tx.type));
+      } else if (txCategory === 'bills') {
+        data = data.filter(tx => tx.type === 'BILL_PAYMENT');
+      } else if (txCategory === 'donations') {
+        data = data.filter(tx => tx.type === 'DONATION');
+      }
+    }
+    
+    // Search Query
     if (txSearchQuery) {
       const q = txSearchQuery.toLowerCase();
       data = data.filter(
@@ -107,7 +127,7 @@ export const useTransactions = () => {
       );
     }
     return data;
-  }, [allPayments, txFilter, txSearchQuery]);
+  }, [allPayments, txFilter, txCategory, txSearchQuery]);
 
   // Recent payments (latest 5 for dashboard)
   const payments = useMemo(() => allPayments.slice(0, 5), [allPayments]);
@@ -119,6 +139,8 @@ export const useTransactions = () => {
     isLoadingHistory,
     txFilter,
     setTxFilter,
+    txCategory,
+    setTxCategory,
     txSearchQuery,
     setTxSearchQuery,
   };

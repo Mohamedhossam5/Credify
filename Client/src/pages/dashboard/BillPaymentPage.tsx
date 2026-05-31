@@ -317,13 +317,14 @@ const BillPaymentPage: React.FC = () => {
   const parsedAmount = parseFloat(billAmount) || 0;
   const isFormValid = phoneNumber.length === 11 && parsedAmount > 0 && parsedAmount <= balance;
 
-  const handlePayBill = async () => {
-    if (parsedAmount <= 0 || parsedAmount > balance) return;
+  const handlePayBill = async (overrideAmount?: number) => {
+    const amountToUse = overrideAmount ?? parsedAmount;
+    if (amountToUse <= 0 || amountToUse > balance) return;
     
     try {
       setPaymentStep('processing');
       const accountIdentifier = ePaymentCode || billingAccount || phoneNumber || 'Recharge';
-      const res = await financeService.initiateBillPayment(parsedAmount, provider?.name || 'Recharge', accountIdentifier);
+      const res = await financeService.initiateBillPayment(amountToUse, provider?.name || 'Recharge', accountIdentifier);
       
       if (res.otpRequired && res.transferId) {
         setTransferId(res.transferId);
@@ -340,10 +341,13 @@ const BillPaymentPage: React.FC = () => {
         } catch { /* silent */ }
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || (err.response?.data?.errors ? JSON.stringify(err.response.data.errors) : err.message) || 'Failed to initiate bill payment');
+      const errorMsg = err.message || 'Failed to initiate payment';
+      toast.dismiss('server-error');
+      toast.error(errorMsg, { id: 'bill-payment-error' });
       setPaymentStep('confirm');
     }
   };
+
 
   const handleVerifyOTP = async () => {
     if (otp.length !== 6) return;
@@ -359,7 +363,8 @@ const BillPaymentPage: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ['transactions'] });
       } catch { /* silent */ }
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Invalid OTP');
+      toast.dismiss('server-error');
+      toast.error(err.message || 'Invalid or expired verification code', { id: 'bill-otp-error' });
       setPaymentStep('otp');
     }
   };
@@ -552,7 +557,7 @@ const BillPaymentPage: React.FC = () => {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={handlePayBill} disabled={parsedAmount > balance} style={{
+                  <button onClick={() => handlePayBill()} disabled={parsedAmount > balance} style={{
                     flex: 1, padding: '15px', borderRadius: '14px', border: 'none', cursor: parsedAmount > balance ? 'not-allowed' : 'pointer',
                     background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient, 
                     color: parsedAmount > balance ? 'var(--text-secondary)' : '#fff',
@@ -779,14 +784,8 @@ const BillPaymentPage: React.FC = () => {
 
     const handleRecharge = async () => {
       if (!isRechargeValid) return;
-      setPaymentStep('processing');
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setPaymentStep('success');
-      toast.success('Recharge successful!');
-      try {
-        const { data } = await api.get('/auth/me');
-        if (data.user?.account) setBalance(parseFloat(data.user.account.balance));
-      } catch { /* silent */ }
+      setBillAmount(amountToPay.toString());
+      await handlePayBill(amountToPay);
     };
 
     return (
@@ -1364,7 +1363,7 @@ const BillPaymentPage: React.FC = () => {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={handlePayBill} disabled={parsedAmount > balance} style={{
+                  <button onClick={() => handlePayBill()} disabled={parsedAmount > balance} style={{
                     flex: 1, padding: '15px', borderRadius: '14px', border: 'none', cursor: parsedAmount > balance ? 'not-allowed' : 'pointer',
                     background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient,
                     color: parsedAmount > balance ? 'var(--text-secondary)' : '#fff',
@@ -1717,7 +1716,7 @@ const BillPaymentPage: React.FC = () => {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={handlePayBill} disabled={parsedAmount > balance} style={{
+                  <button onClick={() => handlePayBill()} disabled={parsedAmount > balance} style={{
                     flex: 1, padding: '15px', borderRadius: '14px', border: 'none', cursor: parsedAmount > balance ? 'not-allowed' : 'pointer',
                     background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient,
                     color: parsedAmount > balance ? 'var(--text-secondary)' : '#fff',
@@ -2070,7 +2069,7 @@ const BillPaymentPage: React.FC = () => {
                 ) : null}
 
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={handlePayBill} disabled={parsedAmount > balance} style={{
+                  <button onClick={() => handlePayBill()} disabled={parsedAmount > balance} style={{
                     flex: 1, padding: '15px', borderRadius: '14px', border: 'none', cursor: parsedAmount > balance ? 'not-allowed' : 'pointer',
                     background: parsedAmount > balance ? 'var(--glass)' : provider.brandGradient,
                     color: parsedAmount > balance ? 'var(--text-secondary)' : '#fff',

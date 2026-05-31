@@ -206,7 +206,7 @@ router.post("/transfer/confirm", authenticate, [
     // Verify OTP
     const isValid = verifyOtp(pending.email, otp);
     if (!isValid) {
-      res.status(401).json({ error: "Invalid or expired verification code." });
+      res.status(400).json({ error: "Invalid or expired verification code." });
       return;
     }
 
