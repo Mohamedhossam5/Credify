@@ -161,41 +161,62 @@ const SettingsPage: React.FC = () => {
   return (
     <section id="settings" className="page active" style={{ display: 'block', paddingBottom: '100px' }}>
 
-      {/* Sticky Save Bar */}
+      {/* Floating Action Bar */}
       <div id="sticky-save-bar" className={isDirty || isSavedAnimating ? 'visible' : ''}>
-        {isDirty && !isSavedAnimating && (
-          <div className="settings-dirty-indicator" onClick={revertSettings} title="Click to undo changes">
-            <div className="dirty-dot"></div>
-            <span className="dirty-label">Unsaved changes</span>
+        <div className="save-bar-pill">
+
+          {/* Left: status */}
+          <div className="save-bar-left">
+            {!isSavedAnimating && <div className="dirty-dot" />}
+            {isSavedAnimating ? (
+              <div className="save-bar-text">
+                <span className="save-bar-title">Changes saved</span>
+                <span className="save-bar-subtitle">All modifications have been applied</span>
+              </div>
+            ) : (
+              <div className="save-bar-text">
+                <span className="save-bar-title">Unsaved Changes</span>
+                <span className="save-bar-subtitle">You have pending modifications</span>
+              </div>
+            )}
           </div>
-        )}
-        <button
-          className="btn-primary"
-          style={{
-            padding: '12px 28px',
-            fontSize: '14px',
-            background: isSavedAnimating ? 'linear-gradient(135deg, var(--success), #00a86b)' : undefined
-          }}
-          onClick={saveSettings}
-        >
-          {isSavedAnimating ? (
-            <>
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Saved!
-            </>
-          ) : (
-            <>
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                <polyline points="17 21 17 13 7 13 7 21" />
-                <polyline points="7 3 7 8 15 8" />
-              </svg>
-              Save Changes
-            </>
-          )}
-        </button>
+
+          {/* Right: actions */}
+          <div className="save-bar-right">
+            {isDirty && !isSavedAnimating && (
+              <button className="save-bar-revert" onClick={revertSettings}>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Revert
+              </button>
+            )}
+            <button
+              className={`save-bar-save${isSavedAnimating ? ' saved' : ''}`}
+              onClick={saveSettings}
+            >
+              {isSavedAnimating ? (
+                <>
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Saved!
+                </>
+              ) : (
+                <>
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+
+        </div>
       </div>
 
       <div style={{ display: 'grid', gap: '20px', maxWidth: '700px', margin: '0 auto' }}>
