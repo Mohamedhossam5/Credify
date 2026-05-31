@@ -38,6 +38,7 @@ export interface UserData {
   emailVerified: boolean;
   kycStatus: string;
   role: string;
+  profilePicture?: string | null;
   account?: {
     accountId: string;
     balance: number;
@@ -149,6 +150,12 @@ export const authService = {
   /** Step 3 of forgot-password: consume resetToken → save new password */
   resetPassword: async (resetToken: string, newPassword: string): Promise<{ message: string }> => {
     const { data } = await api.post('/auth/reset-password', { resetToken, newPassword });
+    return data;
+  },
+
+  /** Update user profile picture */
+  updateProfilePicture: async (base64Image: string): Promise<{ message: string }> => {
+    const { data } = await api.post('/auth/profile-picture', { image: base64Image });
     return data;
   },
 };

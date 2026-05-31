@@ -99,7 +99,7 @@ function forwardMultipart(serviceUrl: string, apiPath: string, req: Request, res
 
 // ─── Auth Routes -> User Service ─────────────────────────────
 
-app.use("/api/auth", express.json());
+app.use("/api/auth", express.json({ limit: "50mb" }));
 
 app.post("/api/auth/register", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/register", req, res));
 app.post("/api/auth/login", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/login", req, res));
@@ -114,6 +114,7 @@ app.get("/api/auth/me", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/m
 app.post("/api/auth/forgot-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/forgot-password", req, res));
 app.post("/api/auth/verify-reset-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-reset-otp", req, res));
 app.post("/api/auth/reset-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/reset-password", req, res));
+app.post("/api/auth/profile-picture", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/profile-picture", req, res));
 
 // ─── Finance Routes -> User Service ──────────────────────────
 

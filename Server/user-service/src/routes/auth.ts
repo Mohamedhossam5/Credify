@@ -114,6 +114,7 @@ router.post("/register", registerValidation, async (req: Request, res: Response)
         emailVerified: false,
         kycStatus: user.kyc_status,
         role: user.role,
+        profilePicture: null,
       },
       token,
       nextStep: "verify-phone",
@@ -395,6 +396,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
           emailVerified: user.email_verified,
           kycStatus: user.kyc_status,
           role: user.role,
+          profilePicture: user.profile_picture || null,
           account: account ? {
             accountId: account.account_id,
             balance: account.balance
@@ -425,6 +427,7 @@ router.post("/login", loginValidation, async (req: Request, res: Response): Prom
           emailVerified: user.email_verified,
           kycStatus: user.kyc_status,
           role: user.role,
+          profilePicture: user.profile_picture || null,
           account: account ? {
             accountId: account.account_id,
             balance: account.balance
@@ -508,6 +511,7 @@ router.post("/verify-otp", otpValidation, async (req: Request, res: Response): P
         emailVerified: user.email_verified,
         kycStatus: user.kyc_status,
         role: user.role,
+        profilePicture: user.profile_picture || null,
         account: account ? {
           accountId: account.account_id,
           balance: account.balance
@@ -590,6 +594,7 @@ router.get("/me", authenticate, async (req: AuthenticatedRequest, res: Response)
         emailVerified: user.email_verified,
         kycStatus: user.kyc_status,
         role: user.role,
+        profilePicture: user.profile_picture || null,
         createdAt: user.created_at,
         account: account ? {
           accountId: account.account_id,
@@ -718,6 +723,33 @@ router.post("/reset-password", [
     res.json({ message: "Password reset successfully. You can now log in with your new password." });
   } catch (err) {
     console.error("[Reset Password] Error:", err);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// ─── POST /api/auth/profile-picture ─────────────────────────
+// Update user's profile picture with base64 string
+
+router.post("/profile-picture", authenticate, [
+  body("image").isString().withMessage("Image must be a base64 string"),
+], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({ errors: errors.array() });
+      return;
+    }
+
+    const user = await User.findById(req.user!.id);
+    if (!user) {
+      res.status(404).json({ error: "User not found." });
+      return;
+    }
+
+    await User.updateProfilePicture(user.id, req.body.image);
+    res.json({ message: "Profile picture updated successfully." });
+  } catch (err) {
+    console.error("[Profile Picture] Error:", err);
     res.status(500).json({ error: "Internal server error." });
   }
 });

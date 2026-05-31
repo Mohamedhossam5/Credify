@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../store/authStore';
+import { authService } from '../../services/auth.service';
 
 const defaultValues = {
   firstName: '',
@@ -33,6 +35,11 @@ const SettingsPage: React.FC = () => {
   const [isSavedAnimating, setIsSavedAnimating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { user, setUser } = useAuthStore();
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const isDirty = JSON.stringify(formValues) !== JSON.stringify(initialValues);
 
   useEffect(() => {
@@ -59,6 +66,7 @@ const SettingsPage: React.FC = () => {
           };
           setInitialValues(fetchedData);
           setFormValues(fetchedData);
+          setProfilePic(data.user.profilePicture || null);
         }
       } catch (err) {
         toast.error('Failed to load profile data');
@@ -83,6 +91,33 @@ const SettingsPage: React.FC = () => {
 
   const revertSettings = () => {
     setFormValues(initialValues);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePic(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadProfilePicture = async () => {
+    if (!profilePic || !user) return;
+    setIsUploading(true);
+    try {
+      await authService.updateProfilePicture(profilePic);
+      setUser({ ...user, profilePicture: profilePic });
+      setSelectedFile(null);
+      toast.success('Profile picture updated successfully!');
+    } catch (err) {
+      toast.error('Failed to upload profile picture.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const togglePwSection = () => {
@@ -165,6 +200,32 @@ const SettingsPage: React.FC = () => {
 
       <div style={{ display: 'grid', gap: '20px', maxWidth: '700px' }}>
 
+        {/* Profile Picture */}
+        <div className="glass-card" style={{ padding: '28px', display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{ position: 'relative', width: '100px', height: '100px' }}>
+            {profilePic ? (
+              <img src={profilePic} alt="Profile" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--glass-border)' }} />
+            ) : (
+              <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'linear-gradient(135deg, var(--teal), var(--blue))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '32px', fontWeight: 'bold' }}>
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+            )}
+            <label style={{ position: 'absolute', bottom: 0, right: 0, width: '32px', height: '32px', background: 'var(--bg-primary)', border: '1px solid var(--glass-border)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+              <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileChange} />
+              <svg width="16" height="16" fill="none" stroke="var(--text-primary)" strokeWidth="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+            </label>
+          </div>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>Profile Picture</div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: '12px' }}>Upload a photo to personalize your account.</div>
+            {selectedFile && (
+              <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '12px' }} onClick={uploadProfilePicture} disabled={isUploading}>
+                {isUploading ? 'Uploading...' : 'Save Picture'}
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Personal Info */}
         <div className="glass-card" style={{ padding: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '22px' }}>
@@ -179,27 +240,27 @@ const SettingsPage: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>First Name</label>
-              <input type="text" className="premium-input" style={inputStyle} value={formValues.firstName} onChange={e => handleChange('firstName', e.target.value)} />
+              <input type="text" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.firstName} readOnly />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Middle Name</label>
-              <input type="text" className="premium-input" style={inputStyle} placeholder="Optional" value={formValues.middleName} onChange={e => handleChange('middleName', e.target.value)} />
+              <input type="text" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} placeholder="Optional" value={formValues.middleName} readOnly />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Last Name</label>
-              <input type="text" className="premium-input" style={inputStyle} value={formValues.lastName} onChange={e => handleChange('lastName', e.target.value)} />
+              <input type="text" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.lastName} readOnly />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Email</label>
-              <input type="email" className="premium-input" style={inputStyle} value={formValues.email} onChange={e => handleChange('email', e.target.value)} readOnly />
+              <input type="email" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.email} readOnly />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Phone Number</label>
-              <input type="tel" className="premium-input" style={{...inputStyle, fontFamily: mono }} value={formValues.phone} onChange={e => handleChange('phone', e.target.value)} />
+              <input type="tel" className="premium-input" style={{ ...inputStyle, fontFamily: mono, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.phone} readOnly />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>Address</label>
-              <textarea className="premium-input" style={{...inputStyle, minHeight: '100px', resize: 'vertical' }} value={formValues.address} onChange={e => handleChange('address', e.target.value)} />
+              <textarea className="premium-input" style={{ ...inputStyle, minHeight: '100px', resize: 'vertical', opacity: 0.7, cursor: 'not-allowed' }} value={formValues.address} readOnly />
             </div>
           </div>
         </div>

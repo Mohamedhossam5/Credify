@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, type JSX } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useAuthStore } from '../../store/authStore';
 
@@ -63,7 +63,8 @@ function timeAgo(date: Date): string {
 
 const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) => {
   const location = useLocation();
-  const pageId = location.pathname.split('/')[1] || 'dashboard';
+  const navigate = useNavigate();
+  const pageId = location.pathname.split('/').pop() || 'dashboard';
   const user = useAuthStore((s) => s.user);
   const { notifications, unreadCount, markAsRead, markAllRead } = useNotifications();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -247,7 +248,13 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
           )}
         </div>
 
-        <div className="avatar">{userInitials}</div>
+        <div style={{ cursor: 'pointer' }} onClick={() => navigate('/settings')}>
+          {user?.profilePicture ? (
+            <img src={user.profilePicture} alt="Profile" className="avatar" style={{ objectFit: 'cover' }} />
+          ) : (
+            <div className="avatar">{userInitials}</div>
+          )}
+        </div>
       </div>
     </div>
   );

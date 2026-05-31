@@ -17,6 +17,7 @@ const migration = `
     address       TEXT,
     kyc_status    VARCHAR(30)   DEFAULT 'PENDING',
     role          VARCHAR(20)   DEFAULT 'USER',
+    profile_picture TEXT,
     created_at    TIMESTAMP     DEFAULT NOW(),
     updated_at    TIMESTAMP     DEFAULT NOW()
   );
@@ -102,6 +103,8 @@ const migration = `
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(user_id, account_number)
   );
+
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
 `;
 
 async function runMigration(): Promise<void> {
