@@ -24,10 +24,12 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [txFilter, setTxFilter] = useState<'all' | 'sent' | 'received'>('all');
+  const [moneyFlowFilter, setMoneyFlowFilter] = useState<'all' | 'today' | 'yesterday' | 'week' | 'month'>('today');
 
   const { data: accountData, isLoading: isLoadingBalance } = useQuery({
     queryKey: ['balance'],
     queryFn: financeService.getBalance,
+    refetchInterval: 5000,
   });
   const balance = accountData?.balance ?? 0;
 
@@ -40,7 +42,7 @@ const Dashboard: React.FC = () => {
   });
   const cards = cardsData ?? [];
 
-  const { payments, isLoadingPayments } = useTransactions();
+  const { payments, isLoadingPayments, allPayments = [] } = useTransactions();
 
   const filteredTx = useMemo(() => {
     if (txFilter === 'all') return payments;
@@ -49,13 +51,33 @@ const Dashboard: React.FC = () => {
 
   const { totalReceived, totalSent } = useMemo(() => {
     let received = 0, sent = 0;
-    payments.forEach((tx) => {
-      const n = parseFloat(tx.amount.replace(/[^0-9.-]/g, ''));
-      if (tx.status === 'received') received += Math.abs(n);
-      else sent += Math.abs(n);
+    
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const yesterdayStart = todayStart - 86400000;
+    const weekStart = todayStart - 7 * 86400000;
+    const monthStart = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
+
+    allPayments.forEach((tx) => {
+      let include = true;
+      if (moneyFlowFilter === 'today') {
+        include = tx.timestamp >= todayStart;
+      } else if (moneyFlowFilter === 'yesterday') {
+        include = tx.timestamp >= yesterdayStart && tx.timestamp < todayStart;
+      } else if (moneyFlowFilter === 'week') {
+        include = tx.timestamp >= weekStart;
+      } else if (moneyFlowFilter === 'month') {
+        include = tx.timestamp >= monthStart;
+      }
+
+      if (include) {
+        const n = parseFloat(tx.amount.replace(/[^0-9.-]/g, ''));
+        if (tx.status === 'received') received += Math.abs(n);
+        else sent += Math.abs(n);
+      }
     });
     return { totalReceived: received, totalSent: sent };
-  }, [payments]);
+  }, [allPayments, moneyFlowFilter]);
 
   const totalActivity = totalReceived + totalSent || 1; // Prevent division by zero
   const receivedPct = Math.round((totalReceived / totalActivity) * 100);
@@ -110,7 +132,7 @@ const Dashboard: React.FC = () => {
                     <Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} />
                     <span style={{ fontSize: '18px', fontWeight: 500, color: 'var(--text-secondary)' }}>Loading...</span>
                   </div>
-                ) : `£ ${formatEGP(balance)}`}
+                ) : `EGP ${formatEGP(Number(balance))}`}
               </div>
 
               {/* Sparkline purely visual */}
@@ -133,7 +155,17 @@ const Dashboard: React.FC = () => {
             <div className="glass-card" style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <span style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', fontFamily: f }}>Money Flow</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, padding: '4px 8px', background: 'var(--glass)', borderRadius: '6px' }}>All Time</span>
+                <select 
+                  value={moneyFlowFilter} 
+                  onChange={(e) => setMoneyFlowFilter(e.target.value as any)}
+                  style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: f, padding: '4px 8px', background: 'var(--select-bg)', borderRadius: '6px', border: '1px solid var(--glass-border)', outline: 'none', cursor: 'pointer' }}
+                >
+                  <option value="today">Today</option>
+                  <option value="yesterday">Yesterday</option>
+                  <option value="week">Last 7 Days</option>
+                  <option value="month">Last 30 Days</option>
+                  <option value="all">All Time</option>
+                </select>
               </div>
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '20px' }}>

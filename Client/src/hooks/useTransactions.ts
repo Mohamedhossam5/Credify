@@ -9,6 +9,7 @@ export interface Payment {
   id: string;
   date: string;
   time: string;
+  timestamp: number;
   name: string;
   desc: string;
   amount: string;
@@ -66,6 +67,7 @@ function mapTransaction(tx: TransactionRecord, currentAccountId?: string): Payme
     id: String(tx.id),
     date: dateStr,
     time: timeStr,
+    timestamp: date.getTime(),
     name: counterpartyName,
     desc,
     amount: formattedAmount,
@@ -90,6 +92,7 @@ export const useTransactions = () => {
     queryKey: ['transactions'],
     queryFn: () => financeService.getTransactions(),
     enabled: !!currentAccountId,
+    refetchInterval: 5000,
   });
 
   // Map backend records to UI-friendly Payments
@@ -143,5 +146,6 @@ export const useTransactions = () => {
     setTxCategory,
     txSearchQuery,
     setTxSearchQuery,
+    allPayments,
   };
 };
