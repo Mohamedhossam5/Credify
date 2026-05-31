@@ -2,19 +2,33 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { cn } from '../../lib/utils';
 import { PenLine, RotateCcw, Keyboard, Edit2 } from 'lucide-react';
 
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 interface SignaturePadProps {
   onSignatureChange: (dataUrl: string | null) => void;
   signatureData: string | null;
 }
 
+const SIGNATURE_FONT = '"Great Vibes", cursive';
+
 export const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureChange, signatureData }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
   const isDrawingRef = useRef(false);
+  const canvasInitialized = useRef(false);
   
   const [isEmpty, setIsEmpty] = useState(true);
   const [mode, setMode] = useState<'draw' | 'type'>('draw');
   const [typedName, setTypedName] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debouncedTypedName = useDebounce(typedName, 150);
 
   // Initialize canvas
   useEffect(() => {
@@ -27,10 +41,11 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureChange, s
     // Set canvas size to match display size
     const rect = canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    if (canvas.width === 0) {
+    if (!canvasInitialized.current) {
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       ctx.scale(dpr, dpr);
+      canvasInitialized.current = true;
     }
 
     // Set drawing style
@@ -52,24 +67,26 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureChange, s
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle Typed Signature Changes
+  // Handle Typed Signature Changes (debounced to avoid re-render storms)
   useEffect(() => {
     if (mode === 'type') {
-      if (typedName.trim()) {
+      if (debouncedTypedName.trim()) {
         const canvas = document.createElement('canvas');
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvasRef.current!.getBoundingClientRect();
+        const mainCanvas = canvasRef.current;
+        if (!mainCanvas) return;
+        const rect = mainCanvas.getBoundingClientRect();
         canvas.width = rect.width * dpr;
         canvas.height = rect.height * dpr;
         
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.scale(dpr, dpr);
-          ctx.font = 'italic 36px "Caveat", "Dancing Script", "Brush Script MT", cursive';
+          ctx.font = `36px ${SIGNATURE_FONT}`;
           ctx.fillStyle = '#1a1a2e';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillText(typedName, rect.width / 2, rect.height / 2 - 8);
+          ctx.fillText(debouncedTypedName, rect.width / 2, rect.height / 2 - 8);
           
           setIsEmpty(false);
           onSignatureChange(canvas.toDataURL('image/png'));
@@ -79,7 +96,14 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureChange, s
         onSignatureChange(null);
       }
     }
-  }, [typedName, mode, onSignatureChange]);
+  }, [debouncedTypedName, mode, onSignatureChange]);
+
+  // Keep isEmpty in sync with typedName for immediate UI feedback
+  useEffect(() => {
+    if (mode === 'type') {
+      setIsEmpty(!typedName.trim());
+    }
+  }, [typedName, mode]);
 
   const getPos = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     const canvas = canvasRef.current;
@@ -242,13 +266,22 @@ export const SignaturePad: React.FC<SignaturePadProps> = ({ onSignatureChange, s
         {mode === 'type' && (
           <div className="absolute inset-0 z-[3] flex items-center justify-center px-[20px]">
             <input
+              ref={inputRef}
               type="text"
               value={typedName}
               onChange={(e) => setTypedName(e.target.value)}
+              onBlur={() => {
+                // Re-focus the input if we're still in type mode
+                // This prevents focus loss from parent re-renders
+                if (mode === 'type') {
+                  setTimeout(() => inputRef.current?.focus(), 0);
+                }
+              }}
               placeholder="Type your full name"
-              className="w-full h-full bg-transparent border-none text-center outline-none text-[#1a1a2e] font-[cursive] text-[32px] pb-[8px]"
-              style={{ fontFamily: '"Caveat", "Dancing Script", "Brush Script MT", cursive' }}
+              className="w-full h-full bg-transparent border-none text-center outline-none text-[#1a1a2e] text-[32px] pb-[8px]"
+              style={{ fontFamily: SIGNATURE_FONT }}
               spellCheck={false}
+              autoComplete="off"
               autoFocus
             />
           </div>
