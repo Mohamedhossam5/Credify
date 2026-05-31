@@ -18,6 +18,8 @@ const migration = `
     kyc_status    VARCHAR(30)   DEFAULT 'PENDING',
     role          VARCHAR(20)   DEFAULT 'USER',
     profile_picture TEXT,
+    failed_login_attempts INTEGER DEFAULT 0,
+    is_locked     BOOLEAN       DEFAULT FALSE,
     created_at    TIMESTAMP     DEFAULT NOW(),
     updated_at    TIMESTAMP     DEFAULT NOW()
   );
@@ -105,6 +107,8 @@ const migration = `
   );
 
   ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE;
 `;
 
 async function runMigration(): Promise<void> {

@@ -39,8 +39,25 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Route not found." });
 });
 
+import pool from "./config/db";
+
+async function runStartupPatches() {
+  try {
+    console.log("[Startup] Checking and applying database patches for User Service...");
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+    `);
+    console.log("[Startup] Database patches applied successfully.");
+  } catch (err: any) {
+    console.error("[Startup] Failed to apply database patches:", err.message);
+  }
+}
+
 // ─── Start Server ────────────────────────────────────────────
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await runStartupPatches();
   console.log(`[User Service] Running on port ${PORT}`);
 });
