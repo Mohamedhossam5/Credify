@@ -10,6 +10,7 @@ const preloadMap: Record<string, () => void> = {
   '/bill-payment': () => import('../../pages/dashboard/BillPaymentPage'),
   '/accounts': () => import('../../pages/dashboard/AccountsPage'),
   '/exchange': () => import('../../pages/dashboard/ExchangePage'),
+  '/loans': () => import('../../pages/dashboard/LoansPage'),
   '/settings': () => import('../../pages/dashboard/SettingsPage'),
 };
 
@@ -157,6 +158,24 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
           </div>
 
           <div
+            className={`nav-item ${location.pathname === '/loans' ? 'active' : ''}`}
+            onClick={() => handleNavigate('/loans')}
+            onMouseEnter={() => handlePreload('/loans')}
+            onTouchStart={() => handlePreload('/loans')}
+          >
+            <svg
+              className="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              viewBox="0 0 24 24"
+            >
+              <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
+            </svg>
+            Loans
+          </div>
+
+          <div
             className={`nav-item ${location.pathname === '/accounts' ? 'active' : ''}`}
             onClick={() => handleNavigate('/accounts')}
             onMouseEnter={() => handlePreload('/accounts')}
@@ -193,6 +212,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ isOpen, onClose }) 
             </svg>
             Exchange Rates
           </div>
+
 
           <div className="nav-divider"></div>
 

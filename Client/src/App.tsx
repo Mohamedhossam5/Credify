@@ -23,6 +23,7 @@ const DonationsPage = React.lazy(() => import('./pages/dashboard/DonationsPage')
 const AccountsPage = React.lazy(() => import('./pages/dashboard/AccountsPage'));
 const ExchangePage = React.lazy(() => import('./pages/dashboard/ExchangePage'));
 const SettingsPage = React.lazy(() => import('./pages/dashboard/SettingsPage'));
+const LoansPage = React.lazy(() => import('./pages/dashboard/LoansPage'));
 const PendingApprovalPage = React.lazy(() => import('./pages/auth/PendingApprovalPage'));
 const RejectedPage = React.lazy(() => import('./pages/auth/RejectedPage'));
 
@@ -33,6 +34,7 @@ const TransactionsAdminPage = React.lazy(() => import('./pages/admin/transaction
 const AdminFraudPage = React.lazy(() => import('./pages/admin/fraud/AdminFraudPage'));
 const KYCPage = React.lazy(() => import('./pages/admin/kyc/KYCPage'));
 const SettingsAdminPage = React.lazy(() => import('./pages/admin/settings/SettingsAdminPage'));
+const LoansAdminPage = React.lazy(() => import('./pages/admin/loans/LoansAdminPage'));
 
 // Lightweight Fallback Spinner
 const PageLoader = () => (
@@ -63,6 +65,7 @@ const AppContent: React.FC = () => {
         <Route path="/donations" element={<Suspense fallback={<PageLoader />}><DonationsPage /></Suspense>} />
         <Route path="/accounts" element={<Suspense fallback={<PageLoader />}><AccountsPage /></Suspense>} />
         <Route path="/exchange" element={<Suspense fallback={<PageLoader />}><ExchangePage /></Suspense>} />
+        <Route path="/loans" element={<Suspense fallback={<PageLoader />}><LoansPage /></Suspense>} />
         <Route path="/settings" element={<Suspense fallback={<PageLoader />}><SettingsPage /></Suspense>} />
       </Route>
 
@@ -73,6 +76,7 @@ const AppContent: React.FC = () => {
         <Route path="transactions" element={<Suspense fallback={<PageLoader />}><TransactionsAdminPage /></Suspense>} />
         <Route path="fraud" element={<Suspense fallback={<PageLoader />}><AdminFraudPage /></Suspense>} />
         <Route path="kyc" element={<Suspense fallback={<PageLoader />}><KYCPage /></Suspense>} />
+        <Route path="loans" element={<Suspense fallback={<PageLoader />}><LoansAdminPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageLoader />}><SettingsAdminPage /></Suspense>} />
       </Route>
     </Routes>

@@ -76,6 +76,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
             <span className="nav-label">Transactions</span>
           </NavLink>
 
+          <NavLink to="/admin/loans" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/loans')} onTouchStart={() => handlePreload('/admin/loans')}>
+            <span className="nav-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" /></svg>
+            </span>
+            <span className="nav-label">Loans</span>
+          </NavLink>
+
           <div className="nav-section-label">Security</div>
           
           <NavLink to="/admin/fraud" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/fraud')} onTouchStart={() => handlePreload('/admin/fraud')}>

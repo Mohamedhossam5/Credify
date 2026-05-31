@@ -85,4 +85,44 @@ export const financeService = {
     });
     return data;
   },
+
+  // ─── Loan APIs ──────────────────────────────────────────────
+
+  /** Calculate loan repayment preview */
+  calculateLoan: async (amount: number, tenure: number): Promise<any> => {
+    const { data } = await api.get('/loans/calculate', { params: { amount, tenure } });
+    return data;
+  },
+
+  /** Apply for a loan */
+  applyForLoan: async (amount: number, tenure: number, purpose?: string): Promise<any> => {
+    const { data } = await api.post('/loans/apply', { amount, tenure, purpose });
+    return data;
+  },
+
+  /** Get current user's loans */
+  getMyLoans: async (): Promise<any> => {
+    const { data } = await api.get('/loans/my');
+    return data.loans;
+  },
+
+  /** Admin: Get all loans */
+  getAllLoans: async (status?: string): Promise<any> => {
+    const params = status && status !== 'ALL' ? { status } : {};
+    const { data } = await api.get('/loans/all', { params });
+    return data.loans;
+  },
+
+  /** Admin: Approve a loan */
+  approveLoan: async (id: number): Promise<any> => {
+    const { data } = await api.post(`/loans/${id}/approve`);
+    return data;
+  },
+
+  /** Admin: Reject a loan */
+  rejectLoan: async (id: number, reason: string): Promise<any> => {
+    const { data } = await api.post(`/loans/${id}/reject`, { reason });
+    return data;
+  },
 };
+

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUpRight, ArrowDownLeft, ChevronRight, BarChart3, Loader2, Plus, CreditCard, Send, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, ArrowDownLeft, ChevronRight, BarChart3, Loader2, Plus, CreditCard, Send, TrendingUp, Landmark } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { financeService } from '../../services/finance.service';
 import { useTransactions } from '../../hooks/useTransactions';
@@ -102,6 +102,9 @@ const Dashboard: React.FC = () => {
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={() => navigate('/transfers')} className="btn-primary" style={{ padding: '10px 20px', fontSize: '13px', borderRadius: '10px' }}>
             <Send size={16} /> Send Money
+          </button>
+          <button onClick={() => navigate('/loans')} className="btn-secondary" style={{ padding: '10px 20px', fontSize: '13px', borderRadius: '10px', background: 'var(--glass)', border: '1px solid var(--glass-border)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+            <Landmark size={16} style={{ color: 'var(--teal)' }} /> Loans
           </button>
         </div>
       </div>
