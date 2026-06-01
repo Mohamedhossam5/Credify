@@ -388,7 +388,7 @@
   color: var(--text-secondary);
   background: var(--bg-input);
   border: 1px solid var(--border-input);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   flex-shrink: 0;
 }
 
@@ -472,7 +472,7 @@
   background: var(--bg-input);
   border: 1px solid var(--border-input);
   position: relative;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .topbar-btn:hover {
@@ -934,7 +934,7 @@
   background: var(--bg-card);
   margin-bottom: 8px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .alert-row:hover {
@@ -1209,7 +1209,7 @@
   cursor: pointer;
   border: none;
   font-family: var(--font-ui);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -1668,7 +1668,7 @@
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   text-align: center;
   background: var(--bg-card);
   color: var(--text-secondary);
@@ -1799,7 +1799,7 @@
   cursor: pointer;
   border: none;
   font-family: var(--font-ui);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -1930,7 +1930,7 @@
   cursor: pointer;
   border: none;
   font-family: var(--font-ui);
-  transition: all var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -2023,7 +2023,7 @@
   padding: 18px 24px;
   gap: 20px;
   box-shadow: var(--shadow-card);
-  transition: all 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
   cursor: pointer;
 }
 
@@ -2117,7 +2117,7 @@
   font-size: 13px;
   color: var(--text-primary);
   outline: none;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .modern-search-wrap input:focus {
@@ -2159,7 +2159,7 @@
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .filter-chip:hover {
@@ -2381,7 +2381,7 @@
   cursor: pointer;
   padding: 4px 6px;
   border-radius: 6px;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .account-mobile-card .quick-action-btn:hover {

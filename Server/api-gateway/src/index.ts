@@ -159,6 +159,16 @@ app.post("/api/kyc/upload/face-selfie", (req, res) => forwardMultipart(KYC_SERVI
 app.post("/api/kyc/upload/proof-of-address", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/proof-of-address", req, res));
 app.post("/api/kyc/upload/digital-signature", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/digital-signature", req, res));
 
+// ─── Change Request Routes -> User Service ───────────────────
+
+app.post("/api/change-requests", express.json({ limit: "50mb" }), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests", req, res));
+app.get("/api/change-requests", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests", req, res));
+app.post("/api/change-requests/send-otp", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests/send-otp", req, res));
+app.post("/api/change-requests/verify-otp", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests/verify-otp", req, res));
+app.get("/api/change-requests/:id", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}`, req, res));
+app.post("/api/change-requests/:id/documents", express.json({ limit: "50mb" }), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}/documents`, req, res));
+app.post("/api/change-requests/:id/messages", express.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}/messages`, req, res));
+
 // ─── Admin Routes ──────────────────────────────────────────────
 
 app.use("/api/admin", adminRoutes);

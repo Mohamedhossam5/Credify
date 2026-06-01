@@ -11,3 +11,4 @@ export declare function generateToken(user: {
     id: number;
     email: string;
 }): string;
+export declare function requireActiveUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void>;

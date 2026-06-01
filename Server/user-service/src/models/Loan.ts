@@ -107,7 +107,7 @@ class Loan {
   static generateSchedule(principal: number, annualRate: number, months: number) {
     const r = annualRate / 100 / 12;
     const monthlyPayment = this.calculateMonthlyPayment(principal, annualRate, months);
-    const schedule = [];
+    const schedule: any[] = [];
     let balance = principal;
 
     for (let i = 1; i <= months; i++) {

@@ -18,6 +18,8 @@ export interface UserRecord {
     updated_at: string;
     failed_login_attempts: number;
     is_locked: boolean;
+    is_frozen: boolean;
+    profile_picture?: string | null;
 }
 interface CreateUserInput {
     firstName: string;
@@ -45,5 +47,8 @@ declare class User {
     static resetFailedLogins(userId: number): Promise<void>;
     static lockAccount(userId: number): Promise<void>;
     static unlockAccount(userId: number): Promise<void>;
+    static freezeAccount(userId: number): Promise<void>;
+    static unfreezeAccount(userId: number): Promise<void>;
+    static updateProfilePicture(userId: number, base64Image: string): Promise<UserRecord | null>;
 }
 export default User;

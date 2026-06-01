@@ -36,7 +36,7 @@ const transferValidation = [
 ];
 // ─── POST /transfer/initiate ─────────────────────────────────
 // Validate transfer, send OTP, return transferId
-router.post("/transfer/initiate", auth_1.authenticate, transferValidation, async (req, res) => {
+router.post("/transfer/initiate", auth_1.authenticate, auth_1.requireActiveUser, transferValidation, async (req, res) => {
     try {
         const errors = (0, express_validator_1.validationResult)(req);
         if (!errors.isEmpty()) {
@@ -227,7 +227,7 @@ router.get("/transfer/beneficiaries", auth_1.authenticate, async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 });
-router.post("/transfer/beneficiaries", auth_1.authenticate, [
+router.post("/transfer/beneficiaries", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.body)("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
     (0, express_validator_1.body)("name").notEmpty().withMessage("Beneficiary name is required"),
     (0, express_validator_1.body)("accountNumber").notEmpty().withMessage("Account number is required"),
@@ -275,7 +275,7 @@ router.post("/transfer/beneficiaries", auth_1.authenticate, [
         res.status(500).json({ error: "Internal server error." });
     }
 });
-router.delete("/transfer/beneficiaries/:id", auth_1.authenticate, async (req, res) => {
+router.delete("/transfer/beneficiaries/:id", auth_1.authenticate, auth_1.requireActiveUser, async (req, res) => {
     try {
         const userId = req.user.id;
         const beneficiaryId = parseInt(req.params.id, 10);

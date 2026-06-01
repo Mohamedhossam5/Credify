@@ -117,4 +117,125 @@ router.put("/users/:userId/unlock", async (req: Request, res: Response): Promise
   }
 });
 
+// ─── PUT /api/admin/users/:userId/freeze ─────────────────────
+router.put("/users/:userId/freeze", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/freeze`,
+      { method: "PUT" }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Freeze user error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── PUT /api/admin/users/:userId/unfreeze ───────────────────
+router.put("/users/:userId/unfreeze", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/unfreeze`,
+      { method: "PUT" }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Unfreeze user error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── GET /api/admin/users/:userId/transactions ───────────────
+router.get("/users/:userId/transactions", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/transactions`);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Get user transactions error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── Change Request Admin Routes ─────────────────────────────
+
+// GET /api/admin/change-requests — list all change requests
+router.get("/change-requests", async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/all`);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Change requests list error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// GET /api/admin/change-requests/:id — get a single change request
+router.get("/change-requests/:id", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}`);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Change request get error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// POST /api/admin/change-requests/:id/approve
+router.post("/change-requests/:id/approve", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/approve`,
+      { method: "POST" }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Change request approve error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// POST /api/admin/change-requests/:id/reject
+router.post("/change-requests/:id/reject", express.json(), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/reject`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: req.body?.reason }),
+      }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Change request reject error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// POST /api/admin/change-requests/:id/request-info
+router.post("/change-requests/:id/request-info", express.json(), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/request-info`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: req.body?.message }),
+      }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Change request request-info error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
 export default router;

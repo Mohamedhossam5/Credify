@@ -3,7 +3,7 @@ import { body, validationResult } from "express-validator";
 import Loan from "../models/Loan";
 import Account from "../models/Account";
 import User from "../models/User";
-import { authenticate, AuthenticatedRequest } from "../middleware/auth";
+import { authenticate, requireActiveUser, AuthenticatedRequest } from "../middleware/auth";
 
 const router = Router();
 
@@ -37,7 +37,7 @@ router.get("/calculate", authenticate, async (req: AuthenticatedRequest, res: Re
 // ─── POST /loans/apply ───────────────────────────────────────
 // User submits a loan application
 
-router.post("/apply", authenticate, [
+router.post("/apply", authenticate, requireActiveUser, [
   body("amount").isFloat({ min: 5000, max: 1000000 }).withMessage("Amount must be between 5,000 and 1,000,000 EGP"),
   body("tenure").isInt().isIn([6, 12, 24, 36, 48, 60]).withMessage("Tenure must be 6, 12, 24, 36, 48, or 60 months"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {

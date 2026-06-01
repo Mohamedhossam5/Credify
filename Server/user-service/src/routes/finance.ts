@@ -5,7 +5,7 @@ import Account from "../models/Account";
 import Transaction from "../models/Transaction";
 import User from "../models/User";
 import Beneficiary from "../models/Beneficiary";
-import { authenticate, AuthenticatedRequest } from "../middleware/auth";
+import { authenticate, requireActiveUser, AuthenticatedRequest } from "../middleware/auth";
 import { generateOtp, verifyOtp } from "../services/otp";
 import { sendEmail, buildOtpEmailHtml } from "../services/brevo";
 import { sendSms } from "../services/sms";
@@ -57,7 +57,7 @@ const transferValidation = [
 // ─── POST /transfer/initiate ─────────────────────────────────
 // Validate transfer, send OTP, return transferId
 
-router.post("/transfer/initiate", authenticate, transferValidation, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.post("/transfer/initiate", authenticate, requireActiveUser, transferValidation, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -264,7 +264,7 @@ router.get("/transfer/beneficiaries", authenticate, async (req: AuthenticatedReq
   }
 });
 
-router.post("/transfer/beneficiaries", authenticate, [
+router.post("/transfer/beneficiaries", authenticate, requireActiveUser, [
   body("type").isIn(["SAME_BANK", "DOMESTIC", "INTERNATIONAL"]).withMessage("Invalid transfer type"),
   body("name").notEmpty().withMessage("Beneficiary name is required"),
   body("accountNumber").notEmpty().withMessage("Account number is required"),
@@ -307,7 +307,7 @@ router.post("/transfer/beneficiaries", authenticate, [
   }
 });
 
-router.delete("/transfer/beneficiaries/:id", authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+router.delete("/transfer/beneficiaries/:id", authenticate, requireActiveUser, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user!.id;
     const beneficiaryId = parseInt(req.params.id, 10);

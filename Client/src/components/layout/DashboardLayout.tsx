@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
+import { authService } from '../../services/auth.service';
 import DashboardNavbar from './DashboardNavbar';
 import DashboardSidebar from './DashboardSidebar';
 import { ErrorBoundary } from '../shared/ErrorBoundary';
+import SupportChatbot from '../SupportChatbot';
 import '../../styles/dashboard.css';
 import '../../styles/phase2.css';
 import '../../styles/phase3.css';
+import '../../styles/change-request.css';
 
 const DashboardLayout: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -17,6 +20,14 @@ const DashboardLayout: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
+    } else {
+      authService.getMe()
+        .then(({ user }) => {
+          if (user) useAuthStore.getState().setUser(user);
+        })
+        .catch(() => {
+          // ignore error, keep existing cached user
+        });
     }
   }, [isAuthenticated, navigate]);
 
@@ -64,6 +75,8 @@ const DashboardLayout: React.FC = () => {
           <Outlet />
         </ErrorBoundary>
       </main>
+
+      <SupportChatbot />
     </div>
   );
 };

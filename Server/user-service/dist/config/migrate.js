@@ -21,6 +21,13 @@ const migration = `
     address       TEXT,
     kyc_status    VARCHAR(30)   DEFAULT 'PENDING',
     role          VARCHAR(20)   DEFAULT 'USER',
+    profile_picture TEXT,
+<<<<<<< Updated upstream
+    failed_login_attempts INTEGER DEFAULT 0,
+    is_locked     BOOLEAN       DEFAULT FALSE,
+=======
+    is_frozen     BOOLEAN       NOT NULL DEFAULT FALSE,
+>>>>>>> Stashed changes
     created_at    TIMESTAMP     DEFAULT NOW(),
     updated_at    TIMESTAMP     DEFAULT NOW()
   );
@@ -106,6 +113,34 @@ const migration = `
     created_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(user_id, account_number)
   );
+
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_picture TEXT;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS failed_login_attempts INTEGER DEFAULT 0;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE;
+  ALTER TABLE users ADD COLUMN IF NOT EXISTS is_frozen BOOLEAN DEFAULT FALSE;
+
+  CREATE TABLE IF NOT EXISTS loans (
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER       NOT NULL REFERENCES users(id),
+    amount            NUMERIC(15,2) NOT NULL,
+    tenure_months     INTEGER       NOT NULL,
+    interest_rate     NUMERIC(5,2)  NOT NULL,
+    monthly_payment   NUMERIC(15,2) NOT NULL,
+    total_repayment   NUMERIC(15,2) NOT NULL,
+    total_interest    NUMERIC(15,2) NOT NULL,
+    admin_fee         NUMERIC(15,2) NOT NULL DEFAULT 0,
+    purpose           TEXT,
+    status            VARCHAR(20)   NOT NULL DEFAULT 'PENDING'
+                      CHECK (status IN ('PENDING','APPROVED','REJECTED','ACTIVE','COMPLETED')),
+    rejection_reason  TEXT,
+    approved_at       TIMESTAMP,
+    disbursed_at      TIMESTAMP,
+    created_at        TIMESTAMP     DEFAULT NOW(),
+    updated_at        TIMESTAMP     DEFAULT NOW()
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_loans_user_id ON loans(user_id);
+  CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
 `;
 async function runMigration() {
     try {

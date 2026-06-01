@@ -35,6 +35,7 @@ const AdminFraudPage = React.lazy(() => import('./pages/admin/fraud/AdminFraudPa
 const KYCPage = React.lazy(() => import('./pages/admin/kyc/KYCPage'));
 const SettingsAdminPage = React.lazy(() => import('./pages/admin/settings/SettingsAdminPage'));
 const LoansAdminPage = React.lazy(() => import('./pages/admin/loans/LoansAdminPage'));
+const ChangeRequestsAdminPage = React.lazy(() => import('./pages/admin/change-requests/ChangeRequestsAdminPage'));
 
 import { realtime } from './lib/realtime';
 
@@ -83,6 +84,7 @@ const AppContent: React.FC = () => {
         <Route path="fraud" element={<Suspense fallback={<PageLoader />}><AdminFraudPage /></Suspense>} />
         <Route path="kyc" element={<Suspense fallback={<PageLoader />}><KYCPage /></Suspense>} />
         <Route path="loans" element={<Suspense fallback={<PageLoader />}><LoansAdminPage /></Suspense>} />
+        <Route path="change-requests" element={<Suspense fallback={<PageLoader />}><ChangeRequestsAdminPage /></Suspense>} />
         <Route path="settings" element={<Suspense fallback={<PageLoader />}><SettingsAdminPage /></Suspense>} />
       </Route>
     </Routes>

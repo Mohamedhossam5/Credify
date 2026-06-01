@@ -66,7 +66,7 @@
   font-size: 14px;
   color: var(--text-primary);
   width: 100%;
-  transition: all 0.25s;
+  transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
   user-select: none;
   font-family: "Inter", sans-serif;
 }
@@ -275,7 +275,7 @@
   border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 22px;
-  transition: all 0.25s;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -340,7 +340,7 @@
 }
 
 .conv-result-num {
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   font-variant-numeric: tabular-nums;
 }
 
@@ -484,7 +484,7 @@
   font-weight: 600;
   font-family: "Inter", sans-serif;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
@@ -521,7 +521,7 @@
   font-family: "Inter", sans-serif;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 

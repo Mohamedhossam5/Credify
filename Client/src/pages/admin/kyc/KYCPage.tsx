@@ -161,11 +161,18 @@ const KYCPage: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       {/* AI Face Verification Badge */}
-                      {faceScore !== null && (
+                      {faceScore !== null ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: facePassed ? 'rgba(0,232,143,0.1)' : 'rgba(255,77,106,0.1)', border: `1px solid ${facePassed ? 'rgba(0,232,143,0.2)' : 'rgba(255,77,106,0.2)'}` }}>
                           {facePassed ? <ShieldCheck size={13} style={{ color: 'var(--success, #00e88f)' }} /> : <ShieldAlert size={13} style={{ color: 'var(--danger, #ff4d6a)' }} />}
                           <span style={{ fontSize: '11px', fontWeight: 700, color: facePassed ? 'var(--success, #00e88f)' : 'var(--danger, #ff4d6a)' }}>
                             AI: {facePassed ? 'PASS' : 'FAIL'}
+                          </span>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: 'rgba(255,185,0,0.1)', border: '1px solid rgba(255,185,0,0.2)' }}>
+                          <AlertTriangle size={13} style={{ color: '#ffb900' }} />
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: '#ffb900' }}>
+                            AI: ERROR
                           </span>
                         </div>
                       )}
@@ -185,7 +192,7 @@ const KYCPage: React.FC = () => {
                       </div>
 
                       {/* AI Face Verification Report */}
-                      {faceScore !== null && (
+                      {faceScore !== null ? (
                         <div style={{ padding: '14px 16px', borderRadius: '12px', background: facePassed ? 'rgba(0,232,143,0.06)' : 'rgba(255,77,106,0.06)', border: `1px solid ${facePassed ? 'rgba(0,232,143,0.15)' : 'rgba(255,77,106,0.15)'}`, marginBottom: '16px' }}>
                           <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: facePassed ? 'var(--success, #00e88f)' : 'var(--danger, #ff4d6a)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {facePassed ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
@@ -204,6 +211,25 @@ const KYCPage: React.FC = () => {
                               <span style={{ fontSize: '10px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600 }}>Confidence</span>
                               <div style={{ fontSize: '14px', fontWeight: 800, color: facePassed ? 'var(--success, #00e88f)' : 'var(--danger, #ff4d6a)' }}>
                                 {facePassed ? 'High' : 'Low'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ padding: '14px 16px', borderRadius: '12px', background: 'rgba(255,185,0,0.06)', border: '1px solid rgba(255,185,0,0.15)', marginBottom: '16px' }}>
+                          <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: '#ffb900', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <AlertTriangle size={14} />
+                            AI Face Verification Report
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <div>
+                              <span style={{ fontSize: '10px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600 }}>Result</span>
+                              <div style={{ fontSize: '14px', fontWeight: 800, color: '#ffb900' }}>ERROR</div>
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <span style={{ fontSize: '10px', color: 'var(--text-muted, var(--text-secondary))', fontWeight: 600 }}>Details</span>
+                              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                Verification score unavailable due to a service error (e.g., no face detected). Please review manually.
                               </div>
                             </div>
                           </div>

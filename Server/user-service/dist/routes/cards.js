@@ -13,7 +13,7 @@ const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 // ─── POST /cards/request ────────────────────────────────────
 // Request a new debit or prepaid card
-router.post("/request", auth_1.authenticate, [
+router.post("/request", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.body)("cardType").isIn(["DEBIT", "PREPAID"]).withMessage("Card type must be DEBIT or PREPAID"),
     (0, express_validator_1.body)("dailyLimit").optional().isFloat({ gt: 0, max: 100000 }).withMessage("Daily limit must be between 0 and 100,000"),
 ], async (req, res) => {
@@ -139,7 +139,7 @@ router.get("/:cardId", auth_1.authenticate, [
 });
 // ─── POST /cards/:cardId/freeze ─────────────────────────────
 // Toggle freeze / unfreeze a card
-router.post("/:cardId/freeze", auth_1.authenticate, [
+router.post("/:cardId/freeze", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.param)("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
 ], async (req, res) => {
     try {
@@ -173,7 +173,7 @@ router.post("/:cardId/freeze", auth_1.authenticate, [
 });
 // ─── POST /cards/:cardId/cancel ─────────────────────────────
 // Permanently cancel a card
-router.post("/:cardId/cancel", auth_1.authenticate, [
+router.post("/:cardId/cancel", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.param)("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
 ], async (req, res) => {
     try {
@@ -215,7 +215,7 @@ router.post("/:cardId/cancel", auth_1.authenticate, [
 });
 // ─── POST /cards/:cardId/set-limit ──────────────────────────
 // Update the daily spending limit
-router.post("/:cardId/set-limit", auth_1.authenticate, [
+router.post("/:cardId/set-limit", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.param)("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
     (0, express_validator_1.body)("dailyLimit").isFloat({ gt: 0, max: 100000 }).withMessage("Daily limit must be between 0 and 100,000"),
 ], async (req, res) => {
@@ -250,7 +250,7 @@ router.post("/:cardId/set-limit", auth_1.authenticate, [
 });
 // ─── POST /cards/load ───────────────────────────────────────
 // Transfer money from main account → prepaid card
-router.post("/load", auth_1.authenticate, [
+router.post("/load", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.body)("cardId").isInt({ gt: 0 }).withMessage("Card ID is required"),
     (0, express_validator_1.body)("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
 ], async (req, res) => {
@@ -280,7 +280,7 @@ router.post("/load", auth_1.authenticate, [
 });
 // ─── POST /cards/unload ─────────────────────────────────────
 // Transfer money from prepaid card → main account
-router.post("/unload", auth_1.authenticate, [
+router.post("/unload", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.body)("cardId").isInt({ gt: 0 }).withMessage("Card ID is required"),
     (0, express_validator_1.body)("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
 ], async (req, res) => {
@@ -310,7 +310,7 @@ router.post("/unload", auth_1.authenticate, [
 });
 // ─── POST /cards/transfer ───────────────────────────────────
 // Transfer funds between two prepaid cards (same user)
-router.post("/transfer", auth_1.authenticate, [
+router.post("/transfer", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.body)("fromCardId").isInt({ gt: 0 }).withMessage("Source card ID is required"),
     (0, express_validator_1.body)("toCardId").isInt({ gt: 0 }).withMessage("Destination card ID is required"),
     (0, express_validator_1.body)("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
@@ -343,7 +343,7 @@ router.post("/transfer", auth_1.authenticate, [
 });
 // ─── POST /cards/:cardId/delivery ────────────────────────────
 // Request physical delivery of a card
-router.post("/:cardId/delivery", auth_1.authenticate, [
+router.post("/:cardId/delivery", auth_1.authenticate, auth_1.requireActiveUser, [
     (0, express_validator_1.param)("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
     (0, express_validator_1.body)("deliveryAddress").trim().notEmpty().withMessage("Delivery address is required"),
     (0, express_validator_1.body)("city").trim().notEmpty().withMessage("City is required"),

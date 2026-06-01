@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import User from "../models/User";
 import Account from "../models/Account";
+import Transaction from "../models/Transaction";
 
 const router = Router();
 
@@ -101,6 +102,58 @@ router.put("/users/:id/unlock", async (req: Request, res: Response): Promise<voi
     res.json({ message: "User account unlocked successfully." });
   } catch (err: any) {
     console.error("[Internal] Error unlocking account:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// GET /api/internal/users/:id/transactions
+router.get("/users/:id/transactions", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : undefined;
+    const account = await Account.findByUserId(userId);
+    const transactions = await Transaction.findByUserIdAndAccount(userId, account?.account_id, limit);
+    
+    res.json({ transactions });
+  } catch (err: any) {
+    console.error("[Internal] Error fetching transactions:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// PUT /api/internal/users/:id/freeze
+router.put("/users/:id/freeze", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+    await User.freezeAccount(userId);
+    res.json({ message: "User account frozen successfully." });
+  } catch (err: any) {
+    console.error("[Internal] Error freezing account:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// PUT /api/internal/users/:id/unfreeze
+router.put("/users/:id/unfreeze", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+    await User.unfreezeAccount(userId);
+    res.json({ message: "User account unfrozen successfully." });
+  } catch (err: any) {
+    console.error("[Internal] Error unfreezing account:", err.message);
     res.status(500).json({ error: "Internal server error." });
   }
 });

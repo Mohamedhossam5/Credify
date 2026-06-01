@@ -23,8 +23,8 @@ app.use((0, helmet_1.default)({ contentSecurityPolicy: false }));
 app.use((0, cors_1.default)());
 app.use((0, morgan_1.default)("dev"));
 const limiter = (0, express_rate_limit_1.default)({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5000, // Increased limit to allow background polling
     message: { error: "Too many requests, please try again later." },
 });
 app.use(limiter);
@@ -88,7 +88,7 @@ function forwardMultipart(serviceUrl, apiPath, req, res) {
     }
 }
 // ─── Auth Routes -> User Service ─────────────────────────────
-app.use("/api/auth", express_1.default.json());
+app.use("/api/auth", express_1.default.json({ limit: "50mb" }));
 app.post("/api/auth/register", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/register", req, res));
 app.post("/api/auth/login", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/login", req, res));
 app.post("/api/auth/verify-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-otp", req, res));
@@ -102,10 +102,14 @@ app.get("/api/auth/me", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/m
 app.post("/api/auth/forgot-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/forgot-password", req, res));
 app.post("/api/auth/verify-reset-otp", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/verify-reset-otp", req, res));
 app.post("/api/auth/reset-password", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/reset-password", req, res));
+app.post("/api/auth/profile-picture", (req, res) => forwardJSON(USER_SERVICE_URL, "/api/auth/profile-picture", req, res));
 // ─── Finance Routes -> User Service ──────────────────────────
 app.get("/api/fx-rates", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/fx-rates", req, res));
 app.post("/api/transfer/initiate", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/initiate", req, res));
 app.post("/api/transfer/confirm", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/confirm", req, res));
+app.get("/api/transfer/beneficiaries", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/beneficiaries", req, res));
+app.post("/api/transfer/beneficiaries", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/transfer/beneficiaries", req, res));
+app.delete("/api/transfer/beneficiaries/:id", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/transfer/beneficiaries/${req.params.id}`, req, res));
 app.get("/api/transactions", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
 // ─── Card Routes -> User Service ─────────────────────────────
 app.post("/api/cards/request", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/request", req, res));
@@ -120,12 +124,28 @@ app.post("/api/cards/transfer", express_1.default.json(), (req, res) => forwardJ
 app.get("/api/cards/deliveries/all", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/cards/deliveries/all", req, res));
 app.post("/api/cards/:cardId/delivery", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
 app.get("/api/cards/:cardId/delivery", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/cards/${req.params.cardId}/delivery`, req, res));
+// ─── Loan Routes -> User Service ─────────────────────────────
+app.get("/api/loans/calculate", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/calculate?${new url_1.URL(req.url, 'http://x').searchParams}`, req, res));
+app.post("/api/loans/apply", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/loans/apply", req, res));
+app.get("/api/loans/my", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/loans/my", req, res));
+app.get("/api/loans/all", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, req.originalUrl, req, res));
+app.post("/api/loans/:id/approve", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/${req.params.id}/approve`, req, res));
+app.post("/api/loans/:id/reject", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/loans/${req.params.id}/reject`, req, res));
 // ─── KYC Routes -> KYC Service ───────────────────────────────
 app.get("/api/kyc/status", express_1.default.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/status", req, res));
 app.post("/api/kyc/verify", express_1.default.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/verify", req, res));
 app.post("/api/kyc/upload/national-id", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/national-id", req, res));
 app.post("/api/kyc/upload/face-selfie", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/face-selfie", req, res));
 app.post("/api/kyc/upload/proof-of-address", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/proof-of-address", req, res));
+app.post("/api/kyc/upload/digital-signature", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/digital-signature", req, res));
+// ─── Change Request Routes -> User Service ───────────────────
+app.post("/api/change-requests", express_1.default.json({ limit: "50mb" }), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests", req, res));
+app.get("/api/change-requests", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests", req, res));
+app.post("/api/change-requests/send-otp", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests/send-otp", req, res));
+app.post("/api/change-requests/verify-otp", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, "/api/change-requests/verify-otp", req, res));
+app.get("/api/change-requests/:id", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}`, req, res));
+app.post("/api/change-requests/:id/documents", express_1.default.json({ limit: "50mb" }), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}/documents`, req, res));
+app.post("/api/change-requests/:id/messages", express_1.default.json(), (req, res) => forwardJSON(USER_SERVICE_URL, `/api/change-requests/${req.params.id}/messages`, req, res));
 // ─── Admin Routes ──────────────────────────────────────────────
 app.use("/api/admin", admin_1.default);
 // ─── Health Check ────────────────────────────────────────────

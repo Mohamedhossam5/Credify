@@ -20,6 +20,7 @@ export interface UserRecord {
   updated_at: string;
   failed_login_attempts: number;
   is_locked: boolean;
+  is_frozen: boolean;
   profile_picture?: string | null;
 }
 
@@ -59,7 +60,7 @@ class User {
 
   static async findById(id: number): Promise<UserRecord | null> {
     const { rows } = await pool.query(
-      "SELECT id, first_name, middle_name, last_name, email, phone_number, gender, id_number, birthdate, address, phone_verified, email_verified, kyc_status, role, profile_picture, created_at, failed_login_attempts, is_locked FROM users WHERE id = $1",
+      "SELECT id, first_name, middle_name, last_name, email, phone_number, gender, id_number, birthdate, address, phone_verified, email_verified, kyc_status, role, profile_picture, created_at, failed_login_attempts, is_locked, is_frozen FROM users WHERE id = $1",
       [id]
     );
     return rows[0] || null;
@@ -67,7 +68,7 @@ class User {
 
   static async findAll(): Promise<any[]> {
     const { rows } = await pool.query(`
-      SELECT u.id, u.first_name, u.middle_name, u.last_name, u.email, u.phone_number, u.gender, u.id_number, u.birthdate, u.address, u.kyc_status, u.role, u.profile_picture, u.created_at, u.is_locked, u.failed_login_attempts,
+      SELECT u.id, u.first_name, u.middle_name, u.last_name, u.email, u.phone_number, u.gender, u.id_number, u.birthdate, u.address, u.phone_verified, u.email_verified, u.kyc_status, u.role, u.profile_picture, u.created_at, u.is_locked, u.is_frozen, u.failed_login_attempts,
              a.account_id, a.balance
       FROM users u
       LEFT JOIN accounts a ON u.id = a.user_id
@@ -136,6 +137,20 @@ class User {
   static async unlockAccount(userId: number): Promise<void> {
     await pool.query(
       "UPDATE users SET is_locked = false, failed_login_attempts = 0, updated_at = NOW() WHERE id = $1",
+      [userId]
+    );
+  }
+
+  static async freezeAccount(userId: number): Promise<void> {
+    await pool.query(
+      "UPDATE users SET is_frozen = true, updated_at = NOW() WHERE id = $1",
+      [userId]
+    );
+  }
+
+  static async unfreezeAccount(userId: number): Promise<void> {
+    await pool.query(
+      "UPDATE users SET is_frozen = false, updated_at = NOW() WHERE id = $1",
       [userId]
     );
   }

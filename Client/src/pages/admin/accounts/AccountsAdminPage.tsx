@@ -21,7 +21,19 @@ interface AdminUser {
   account_id?: string;
   balance?: string;
   is_locked: boolean;
+  is_frozen: boolean;
   failed_login_attempts: number;
+  id_number: string;
+  birthdate: string;
+  address: string | null;
+  phone_verified: boolean;
+  email_verified: boolean;
+  rejection_reason: string | null;
+  national_id_front_file: string | null;
+  national_id_back_file: string | null;
+  face_selfie_file: string | null;
+  proof_of_address_file: string | null;
+  digital_signature_file: string | null;
 }
 
 const initials = (name: string) => name.split(" ").map(n => n[0]).join("");
@@ -40,13 +52,29 @@ const AccountsAdminPage: React.FC = () => {
 
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [frozenAccounts, setFrozenAccounts] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedAcc, setSelectedAcc] = useState<AdminUser | null>(null);
+  
+  const [transactionsOpen, setTransactionsOpen] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loadingTx, setLoadingTx] = useState(false);
+
+  const fetchTransactions = async (userId: number) => {
+    setLoadingTx(true);
+    setTransactionsOpen(true);
+    try {
+      const { data } = await api.get(`/admin/users/${userId}/transactions`);
+      setTransactions(data.transactions || []);
+    } catch(err) {
+      console.error("Failed to fetch transactions", err);
+    } finally {
+      setLoadingTx(false);
+    }
+  };
 
   const getDisplayStatus = (a: AdminUser) => {
     if (a.is_locked) return "locked";
-    if (frozenAccounts.has(a.id)) return "frozen";
+    if (a.is_frozen) return "frozen";
     if (a.kyc_status === "APPROVED") return "active";
     if (a.kyc_status === "REJECTED") return "blocked";
     return "pending";
@@ -63,16 +91,19 @@ const AccountsAdminPage: React.FC = () => {
     return true;
   });
 
-  const toggleFreeze = () => {
+  const toggleFreeze = async () => {
     if (!selectedAcc) return;
-    const newSet = new Set(frozenAccounts);
-    if (newSet.has(selectedAcc.id)) {
-      newSet.delete(selectedAcc.id);
-    } else {
-      newSet.add(selectedAcc.id);
+    try {
+      if (selectedAcc.is_frozen) {
+        await api.put(`/admin/users/${selectedAcc.id}/unfreeze`);
+      } else {
+        await api.put(`/admin/users/${selectedAcc.id}/freeze`);
+      }
+      await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setSelectedAcc({ ...selectedAcc, is_frozen: !selectedAcc.is_frozen });
+    } catch (err) {
+      console.error("Failed to toggle freeze status", err);
     }
-    setFrozenAccounts(newSet);
-    setDrawerOpen(false);
   };
 
   const handleUnlockAccount = async (userId: number) => {
@@ -295,6 +326,11 @@ const AccountsAdminPage: React.FC = () => {
                 ["Account ID", selectedAcc.account_id || 'N/A'],
                 ["Gender", selectedAcc.gender],
                 ["Member Since", new Date(selectedAcc.created_at).toLocaleDateString()],
+                ["National ID", selectedAcc.id_number || 'N/A'],
+                ["Birthdate", selectedAcc.birthdate || 'N/A'],
+                ["Address", selectedAcc.address || 'N/A'],
+                ["Phone Verified", selectedAcc.phone_verified ? "Yes" : "No"],
+                ["Email Verified", selectedAcc.email_verified ? "Yes" : "No"],
                 ["KYC App Status", selectedAcc.kyc_app_status?.replace(/_/g, ' ') || 'N/A']
               ].map(([k, v]) => (
                 <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
@@ -303,6 +339,43 @@ const AccountsAdminPage: React.FC = () => {
                 </div>
               ))}
             </div>
+
+            <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '14px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '10px' }}>KYC DOCUMENTS</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {selectedAcc.national_id_front_file && (
+                  <div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>National ID (Front)</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.national_id_front_file}`} alt="Front ID" style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+                {selectedAcc.national_id_back_file && (
+                  <div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>National ID (Back)</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.national_id_back_file}`} alt="Back ID" style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+                {selectedAcc.face_selfie_file && (
+                  <div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Face Selfie</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.face_selfie_file}`} alt="Selfie" style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+                {selectedAcc.proof_of_address_file && (
+                  <div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Proof of Address</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.proof_of_address_file}`} alt="Address" style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+                {selectedAcc.digital_signature_file && (
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Digital Signature</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.digital_signature_file}`} alt="Signature" style={{ width: '100%', maxWidth: '300px', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+                {!selectedAcc.national_id_front_file && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No KYC documents uploaded yet.</div>}
+              </div>
+            </div>
             <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '1px', marginBottom: '12px' }}>ACCOUNT ACTIONS</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               {selectedAcc.is_locked ? (
@@ -310,19 +383,63 @@ const AccountsAdminPage: React.FC = () => {
                   ✓ Unlock Account
                 </button>
               ) : selectedAcc.kyc_status === "APPROVED" ? (
-                <button className={`admin-btn ${frozenAccounts.has(selectedAcc.id) ? "btn-success" : "btn-danger"}`} onClick={toggleFreeze} style={{ justifyContent: 'center' }}>
-                  {frozenAccounts.has(selectedAcc.id) ? "✓ Unfreeze" : "❄ Freeze Account"}
+                <button className={`admin-btn ${selectedAcc.is_frozen ? "btn-success" : "btn-danger"}`} onClick={toggleFreeze} style={{ justifyContent: 'center' }}>
+                  {selectedAcc.is_frozen ? "✓ Unfreeze" : "❄ Freeze Account"}
                 </button>
               ) : (
                 <button className="admin-btn btn-ghost" disabled style={{ justifyContent: 'center', opacity: 0.5, cursor: 'not-allowed' }}>❄ Freeze (KYC not approved)</button>
               )}
               <button className="admin-btn btn-warn" onClick={() => { }} style={{ justifyContent: 'center' }}>⚠ Require KYC</button>
-              <button className="admin-btn btn-ghost" onClick={() => { }} style={{ justifyContent: 'center' }}>View Transactions</button>
+              <button className="admin-btn btn-ghost" onClick={() => fetchTransactions(selectedAcc.id)} style={{ justifyContent: 'center' }}>View Transactions</button>
               <button className="admin-btn btn-ghost" onClick={() => { }} style={{ justifyContent: 'center' }}>✉ Contact</button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Transactions Modal */}
+      {transactionsOpen && (
+        <div className="drawer-overlay open" onClick={() => setTransactionsOpen(false)} style={{ zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', width: '90%', maxWidth: '600px', maxHeight: '80vh', overflowY: 'auto', position: 'relative' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800 }}>Transactions for {selectedAcc?.first_name} {selectedAcc?.last_name}</h3>
+              <button onClick={() => setTransactionsOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              </button>
+            </div>
+            
+            {loadingTx ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}><Loader2 size={24} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent)' }} /></div>
+            ) : transactions.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>No transactions found for this user.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {transactions.map(tx => (
+                  <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-base)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '14px', marginBottom: '4px' }}>{tx.type.replace(/_/g, ' ')}</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{new Date(tx.created_at).toLocaleString()}</div>
+                      <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                        {tx.sender_id === selectedAcc?.id 
+                          ? `To: ${tx.recipient_name || tx.recipient_account || 'N/A'}` 
+                          : `From: ${tx.sender_id} (Internal)`}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '18px', fontWeight: 800, fontFamily: 'var(--font-mono)', color: tx.sender_id === selectedAcc?.id ? 'var(--danger)' : 'var(--success)' }}>
+                        {tx.sender_id === selectedAcc?.id ? '-' : '+'}${parseFloat(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </div>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', marginTop: '4px', textTransform: 'uppercase' }}>
+                        {tx.status}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -4,14 +4,14 @@ import Card from "../models/Card";
 import CardDelivery from "../models/CardDelivery";
 import Account from "../models/Account";
 import User from "../models/User";
-import { authenticate, AuthenticatedRequest } from "../middleware/auth";
+import { authenticate, requireActiveUser, AuthenticatedRequest } from "../middleware/auth";
 
 const router = Router();
 
 // ─── POST /cards/request ────────────────────────────────────
 // Request a new debit or prepaid card
 
-router.post("/request", authenticate, [
+router.post("/request", authenticate, requireActiveUser, [
   body("cardType").isIn(["DEBIT", "PREPAID"]).withMessage("Card type must be DEBIT or PREPAID"),
   body("dailyLimit").optional().isFloat({ gt: 0, max: 100000 }).withMessage("Daily limit must be between 0 and 100,000"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -163,7 +163,7 @@ router.get("/:cardId", authenticate, [
 // ─── POST /cards/:cardId/freeze ─────────────────────────────
 // Toggle freeze / unfreeze a card
 
-router.post("/:cardId/freeze", authenticate, [
+router.post("/:cardId/freeze", authenticate, requireActiveUser, [
   param("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -203,7 +203,7 @@ router.post("/:cardId/freeze", authenticate, [
 // ─── POST /cards/:cardId/cancel ─────────────────────────────
 // Permanently cancel a card
 
-router.post("/:cardId/cancel", authenticate, [
+router.post("/:cardId/cancel", authenticate, requireActiveUser, [
   param("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
@@ -252,7 +252,7 @@ router.post("/:cardId/cancel", authenticate, [
 // ─── POST /cards/:cardId/set-limit ──────────────────────────
 // Update the daily spending limit
 
-router.post("/:cardId/set-limit", authenticate, [
+router.post("/:cardId/set-limit", authenticate, requireActiveUser, [
   param("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
   body("dailyLimit").isFloat({ gt: 0, max: 100000 }).withMessage("Daily limit must be between 0 and 100,000"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -293,7 +293,7 @@ router.post("/:cardId/set-limit", authenticate, [
 // ─── POST /cards/load ───────────────────────────────────────
 // Transfer money from main account → prepaid card
 
-router.post("/load", authenticate, [
+router.post("/load", authenticate, requireActiveUser, [
   body("cardId").isInt({ gt: 0 }).withMessage("Card ID is required"),
   body("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -328,7 +328,7 @@ router.post("/load", authenticate, [
 // ─── POST /cards/unload ─────────────────────────────────────
 // Transfer money from prepaid card → main account
 
-router.post("/unload", authenticate, [
+router.post("/unload", authenticate, requireActiveUser, [
   body("cardId").isInt({ gt: 0 }).withMessage("Card ID is required"),
   body("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
 ], async (req: AuthenticatedRequest, res: Response): Promise<void> => {
@@ -363,7 +363,7 @@ router.post("/unload", authenticate, [
 // ─── POST /cards/transfer ───────────────────────────────────
 // Transfer funds between two prepaid cards (same user)
 
-router.post("/transfer", authenticate, [
+router.post("/transfer", authenticate, requireActiveUser, [
   body("fromCardId").isInt({ gt: 0 }).withMessage("Source card ID is required"),
   body("toCardId").isInt({ gt: 0 }).withMessage("Destination card ID is required"),
   body("amount").isFloat({ gt: 0 }).withMessage("Amount must be greater than 0"),
@@ -407,7 +407,7 @@ router.post("/transfer", authenticate, [
 // ─── POST /cards/:cardId/delivery ────────────────────────────
 // Request physical delivery of a card
 
-router.post("/:cardId/delivery", authenticate, [
+router.post("/:cardId/delivery", authenticate, requireActiveUser, [
   param("cardId").isInt({ gt: 0 }).withMessage("Invalid card ID"),
   body("deliveryAddress").trim().notEmpty().withMessage("Delivery address is required"),
   body("city").trim().notEmpty().withMessage("City is required"),

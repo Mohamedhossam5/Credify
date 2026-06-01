@@ -10,7 +10,7 @@
   --blue: #3b82f6; /* Softer Blue */
   --glow: rgba(0, 0, 0, 0.15); /* Replaced neon glow with soft shadow */
   --glow-blue: rgba(0, 0, 0, 0.1);
-  --glass: #1e293b; /* Solid card background instead of transparent */
+  --glass: rgba(30, 41, 59, 0.65); /* True glass background */
   --glass-border: #334155;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
@@ -36,7 +36,7 @@
   --blue: #3b82f6;
   --glow: rgba(0, 0, 0, 0.05);
   --glow-blue: rgba(0, 0, 0, 0.03);
-  --glass: #ffffff; /* Solid white cards */
+  --glass: rgba(255, 255, 255, 0.65); /* Translucent white cards */
   --glass-border: #e2e8f0;
   --text-primary: #0f172a;
   --text-secondary: #64748b;
@@ -54,7 +54,7 @@
 }
 
 :root {
-  --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-premium: cubic-bezier(0.34, 1.56, 0.64, 1);
   --dur-200: 200ms;
   --skel: rgba(226, 232, 240, 0.5);
   --skel-2: rgba(226, 232, 240, 0.32);
@@ -189,10 +189,11 @@
 .fx-card,
 .credit-card {
   transition:
-    background 0.35s ease,
-    border-color 0.35s ease,
-    color 0.35s ease,
-    box-shadow 0.35s ease;
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
 
 /* ---- SIDEBAR ---- */
@@ -304,7 +305,7 @@
   color: rgba(255, 255, 255, 0.55);
   font-size: 13.5px;
   font-weight: 500;
-  transition: all var(--dur-200) var(--ease-premium);
+  transition: background-color var(--dur-200), color var(--dur-200), transform var(--dur-200) var(--ease-premium);
   margin-bottom: 3px;
   position: relative;
   overflow: hidden;
@@ -450,7 +451,7 @@
   color: #ff4d6a;
   font-size: 13.5px;
   font-weight: 500;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
   border: 1px solid transparent;
   font-family: "Inter", sans-serif;
 }
@@ -548,7 +549,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .icon-btn:hover {
@@ -592,7 +593,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
   position: relative;
   overflow: hidden;
   color: var(--text-secondary);
@@ -658,6 +659,8 @@
 
 .glass-card {
   background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: var(--card-radius);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
@@ -848,7 +851,7 @@
   font-weight: 600;
   color: var(--text-primary);
   min-width: 148px;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   user-select: none;
   font-family: "Inter", sans-serif;
 }

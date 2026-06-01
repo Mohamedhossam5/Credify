@@ -10,6 +10,8 @@ import internalRoutes from "./routes/internal";
 import financeRoutes from "./routes/finance";
 import cardRoutes from "./routes/cards";
 import loanRoutes from "./routes/loans";
+import changeRequestRoutes from "./routes/change-requests";
+import ChangeRequest from "./models/ChangeRequest";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -21,6 +23,12 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json({ limit: "50mb" }));
 
+// ─── Auto-create tables ─────────────────────────────────────
+
+ChangeRequest.createTables().catch((err) =>
+  console.error("[User Service] Failed to create change_requests tables:", err.message)
+);
+
 // ─── Routes ──────────────────────────────────────────────────
 
 app.use("/api/auth", authRoutes);
@@ -28,6 +36,7 @@ app.use("/api/internal", internalRoutes);
 app.use("/api", financeRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/loans", loanRoutes);
+app.use("/api/change-requests", changeRequestRoutes);
 
 // ─── Health Check ────────────────────────────────────────────
 

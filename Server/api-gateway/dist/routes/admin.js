@@ -33,6 +33,7 @@ router.get("/dashboard", async (req, res) => {
                 national_id_back_file: kyc ? kyc.national_id_back_file : null,
                 face_selfie_file: kyc ? kyc.face_selfie_file : null,
                 proof_of_address_file: kyc ? kyc.proof_of_address_file : null,
+                digital_signature_file: kyc ? kyc.digital_signature_file : null,
             };
         });
         res.json({ users: merged });
@@ -86,6 +87,123 @@ router.get("/kyc/images/:filename", async (req, res) => {
     }
     catch (err) {
         console.error("[Admin API] Image proxy error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// ─── PUT /api/admin/users/:userId/unlock ─────────────────────
+router.put("/users/:userId/unlock", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/unlock`, { method: "PUT" });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Unlock user error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// ─── PUT /api/admin/users/:userId/freeze ─────────────────────
+router.put("/users/:userId/freeze", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/freeze`, { method: "PUT" });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Freeze user error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// ─── PUT /api/admin/users/:userId/unfreeze ───────────────────
+router.put("/users/:userId/unfreeze", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/unfreeze`, { method: "PUT" });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Unfreeze user error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// ─── GET /api/admin/users/:userId/transactions ───────────────
+router.get("/users/:userId/transactions", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}/transactions`);
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Get user transactions error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// ─── Change Request Admin Routes ─────────────────────────────
+// GET /api/admin/change-requests — list all change requests
+router.get("/change-requests", async (_req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/all`);
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Change requests list error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// GET /api/admin/change-requests/:id — get a single change request
+router.get("/change-requests/:id", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}`);
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Change request get error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// POST /api/admin/change-requests/:id/approve
+router.post("/change-requests/:id/approve", async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/approve`, { method: "POST" });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Change request approve error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// POST /api/admin/change-requests/:id/reject
+router.post("/change-requests/:id/reject", express_2.default.json(), async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/reject`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason: req.body?.reason }),
+        });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Change request reject error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
+// POST /api/admin/change-requests/:id/request-info
+router.post("/change-requests/:id/request-info", express_2.default.json(), async (req, res) => {
+    try {
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/change-requests/internal/${req.params.id}/request-info`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: req.body?.message }),
+        });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Change request request-info error:", err.message);
         res.status(502).json({ error: "Upstream service unavailable." });
     }
 });

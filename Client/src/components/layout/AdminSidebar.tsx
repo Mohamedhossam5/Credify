@@ -9,6 +9,7 @@ const preloadMap: Record<string, () => void> = {
   '/admin/transactions': () => import('../../pages/admin/transactions/TransactionsAdminPage'),
   '/admin/fraud': () => import('../../pages/admin/fraud/AdminFraudPage'),
   '/admin/kyc': () => import('../../pages/admin/kyc/KYCPage'),
+  '/admin/change-requests': () => import('../../pages/admin/change-requests/ChangeRequestsAdminPage'),
   '/admin/settings': () => import('../../pages/admin/settings/SettingsAdminPage'),
 };
 
@@ -99,6 +100,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
             </span>
             <span className="nav-label">KYC Verification</span>
             <span className="nav-badge" id="kyc-badge">5</span>
+          </NavLink>
+
+          <NavLink to="/admin/change-requests" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/change-requests')} onTouchStart={() => handlePreload('/admin/change-requests')}>
+            <span className="nav-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+            </span>
+            <span className="nav-label">Change Requests</span>
           </NavLink>
 
           <div className="nav-section-label">System</div>
