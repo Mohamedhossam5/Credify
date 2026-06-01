@@ -48,7 +48,7 @@ const SupportChatbot: React.FC = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [isLauncherPulse, setIsLauncherPulse] = useState(true);
-  
+
   const [messages, setMessages] = useState<Array<{ id: string; sender: 'user' | 'system'; text: string; timestamp: Date }>>([
     {
       id: 'welcome',
@@ -61,13 +61,10 @@ const SupportChatbot: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowTooltip(true);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
+  const [isHovered, setIsHovered] = useState(false);
 
+  // Removed automatic tooltip as per user request ("it sarts only if i click on it")
+  
   useEffect(() => {
     if (isChatOpen) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -176,21 +173,27 @@ const SupportChatbot: React.FC = () => {
     <>
       {/* Welcome Tooltip & Launcher (Floating fixed at the bottom-right of the screen) */}
       {!isChatOpen && (
-        <div style={{ 
-          position: 'fixed', 
-          bottom: '30px', 
-          right: '30px', 
-          zIndex: 9999, 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '14px',
-          animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-        }}>
+        <div 
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            opacity: isHovered ? 0 : 1,
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+        >
           {showTooltip && (
-            <div 
+            <div
               className="chat-welcome-tooltip-inline"
               onClick={toggleChat}
-              style={{ 
+              style={{
                 background: 'linear-gradient(135deg, var(--teal), var(--blue))',
                 color: '#fff',
                 padding: '9px 16px',
@@ -204,7 +207,7 @@ const SupportChatbot: React.FC = () => {
                 whiteSpace: 'nowrap'
               }}
             >
-              Need help? Ask me anything. 
+              Need help? Ask me anything.
               <div style={{
                 content: "''",
                 position: 'absolute',
@@ -217,8 +220,8 @@ const SupportChatbot: React.FC = () => {
               }} />
             </div>
           )}
-          
-          <button 
+
+          <button
             className={`chat-launcher-inline ${isLauncherPulse ? 'pulse-active' : ''}`}
             onClick={toggleChat}
             style={{
@@ -246,15 +249,15 @@ const SupportChatbot: React.FC = () => {
             aria-expanded={isChatOpen}
             tabIndex={0}
           >
-            <img 
-              src="/logos/icons8-chatbot.gif" 
-              alt="Support Assistant" 
-              style={{ 
-                width: '42px', 
-                height: '42px', 
+            <img
+              src="/logos/icons8-chatbot.gif"
+              alt="Support Assistant"
+              style={{
+                width: '42px',
+                height: '42px',
                 objectFit: 'contain',
                 borderRadius: '50%'
-              }} 
+              }}
             />
           </button>
         </div>
@@ -262,16 +265,16 @@ const SupportChatbot: React.FC = () => {
 
       {/* Expanded Floating Chat Panel */}
       {isChatOpen && (
-        <div 
-          className="glass-card" 
-          style={{ 
+        <div
+          className="glass-card"
+          style={{
             position: 'fixed',
             bottom: '30px',
             right: '30px',
-            width: '380px', 
+            width: '380px',
             height: '600px',
-            display: 'flex', 
-            flexDirection: 'column', 
+            display: 'flex',
+            flexDirection: 'column',
             overflow: 'hidden',
             animation: 'fadein 0.3s cubic-bezier(0.16, 1, 0.3, 1) both',
             padding: '24px',
@@ -281,13 +284,13 @@ const SupportChatbot: React.FC = () => {
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ 
-              width: '38px', 
-              height: '38px', 
-              borderRadius: '10px', 
-              background: 'rgba(14, 203, 203, 0.15)', 
-              display: 'flex', 
-              alignItems: 'center', 
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'rgba(14, 203, 203, 0.15)',
+              display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
               overflow: 'hidden'
             }}>
@@ -303,12 +306,12 @@ const SupportChatbot: React.FC = () => {
               </div>
             </div>
             {/* Close Button in header */}
-            <button 
+            <button
               onClick={toggleChat}
-              style={{ 
-                background: 'transparent', 
-                border: 'none', 
-                color: 'var(--text-secondary)', 
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
                 cursor: 'pointer',
                 padding: '4px',
                 display: 'flex',
@@ -325,33 +328,33 @@ const SupportChatbot: React.FC = () => {
           </div>
 
           {/* Scrollable Message History */}
-          <div 
-            style={{ 
+          <div
+            style={{
               flex: 1,
-              overflowY: 'auto', 
-              padding: '12px 14px', 
-              display: 'flex', 
-              flexDirection: 'column', 
+              overflowY: 'auto',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
               gap: '12px',
               background: 'rgba(0, 0, 0, 0.05)',
               borderRadius: '16px',
               border: '1px solid var(--glass-border)',
               marginBottom: '16px'
-            }} 
+            }}
             className="chat-messages-container"
           >
             {messages.map((msg) => (
-              <div 
-                key={msg.id} 
-                style={{ 
-                  display: 'flex', 
+              <div
+                key={msg.id}
+                style={{
+                  display: 'flex',
                   justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start',
                   animation: 'fadein 0.25s cubic-bezier(0.16, 1, 0.3, 1) both'
                 }}
               >
-                <div style={{ 
-                  maxWidth: '85%', 
-                  padding: '11px 15px', 
+                <div style={{
+                  maxWidth: '85%',
+                  padding: '11px 15px',
                   borderRadius: msg.sender === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                   background: msg.sender === 'user' ? 'linear-gradient(135deg, var(--teal), var(--blue))' : 'var(--navy-mid)',
                   color: msg.sender === 'user' ? '#fff' : 'var(--text-primary)',
@@ -361,10 +364,10 @@ const SupportChatbot: React.FC = () => {
                   border: msg.sender === 'user' ? 'none' : '1px solid var(--glass-border)'
                 }}>
                   {msg.text}
-                  <div style={{ 
-                    fontSize: '9px', 
-                    color: msg.sender === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)', 
-                    textAlign: 'right', 
+                  <div style={{
+                    fontSize: '9px',
+                    color: msg.sender === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-secondary)',
+                    textAlign: 'right',
                     marginTop: '4px',
                     fontFamily: mono
                   }}>
@@ -373,13 +376,13 @@ const SupportChatbot: React.FC = () => {
                 </div>
               </div>
             ))}
-            
+
             {/* Animated Typing Indicator */}
             {isTyping && (
               <div style={{ display: 'flex', justifyContent: 'flex-start', animation: 'fadein 0.2s ease both' }}>
-                <div style={{ 
-                  background: 'var(--navy-mid)', 
-                  padding: '10px 16px', 
+                <div style={{
+                  background: 'var(--navy-mid)',
+                  padding: '10px 16px',
                   borderRadius: '16px 16px 16px 4px',
                   display: 'flex',
                   alignItems: 'center',
@@ -392,13 +395,13 @@ const SupportChatbot: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             <div ref={chatEndRef} />
           </div>
 
           {/* Quick FAQs Pill Buttons */}
-          <div style={{ 
-            padding: '0 0 12px 0', 
+          <div style={{
+            padding: '0 0 12px 0',
             background: 'transparent'
           }}>
             <div style={{ fontSize: '10.5px', fontWeight: 'bold', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.8px', marginBottom: '8px', fontFamily: f }}>
@@ -430,36 +433,36 @@ const SupportChatbot: React.FC = () => {
           </div>
 
           {/* Custom Input Bar */}
-          <form 
+          <form
             onSubmit={handleSendMessage}
-            style={{ 
-              paddingTop: '12px', 
-              borderTop: '1px solid var(--glass-border)', 
+            style={{
+              paddingTop: '12px',
+              borderTop: '1px solid var(--glass-border)',
               background: 'transparent',
               display: 'flex',
               gap: '8px',
               alignItems: 'center'
             }}
           >
-            <input 
-              type="text" 
-              placeholder="Type a custom message..." 
+            <input
+              type="text"
+              placeholder="Type a custom message..."
               value={chatInput}
               onChange={e => setChatInput(e.target.value)}
-              style={{ 
-                flex: 1, 
-                background: 'var(--navy-mid)', 
-                border: '1px solid var(--glass-border)', 
-                borderRadius: '10px', 
-                padding: '10px 14px', 
-                color: 'var(--text-primary)', 
+              style={{
+                flex: 1,
+                background: 'var(--navy-mid)',
+                border: '1px solid var(--glass-border)',
+                borderRadius: '10px',
+                padding: '10px 14px',
+                color: 'var(--text-primary)',
                 fontSize: '13px',
                 outline: 'none',
                 fontFamily: f,
                 transition: 'border-color 0.2s'
               }}
             />
-            <button 
+            <button
               type="submit"
               disabled={!chatInput.trim()}
               style={{

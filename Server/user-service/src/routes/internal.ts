@@ -158,4 +158,20 @@ router.put("/users/:id/unfreeze", async (req: Request, res: Response): Promise<v
   }
 });
 
+// DELETE /api/internal/users/:id
+router.delete("/users/:id", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.id, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+    await User.delete(userId);
+    res.json({ message: "User deleted successfully." });
+  } catch (err: any) {
+    console.error("[Internal] Error deleting user:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 export default router;

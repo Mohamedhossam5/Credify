@@ -1,6 +1,7 @@
 import { Router, Response, NextFunction } from "express";
 import upload from "../config/upload";
 import KycApplication from "../models/KycApplication";
+import KycRequest from "../models/KycRequest";
 import { authenticate, AuthenticatedRequest } from "../middleware/auth";
 
 const router = Router();
@@ -321,6 +322,48 @@ router.use((err: any, _req: AuthenticatedRequest, res: Response, next: NextFunct
     return;
   }
   next(err);
+});
+
+// ─── GET /api/kyc/requests/my ──────────────────────────────────────
+router.get("/requests/my", async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const requests = await KycRequest.findAllByUserId(req.user!.id);
+    res.json({ requests });
+  } catch (err: any) {
+    console.error("[KYC Requests] Error:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// ─── POST /api/kyc/requests/:id/upload ──────────────────────────────
+router.post("/requests/:id/upload", upload.single("document"), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  try {
+    const requestId = parseInt(req.params.id, 10);
+    if (isNaN(requestId)) {
+      res.status(400).json({ error: "Invalid request ID." });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ error: "Document file is required." });
+      return;
+    }
+
+    // Verify this request belongs to the user
+    const pendingRequests = await KycRequest.findPendingByUserId(req.user!.id);
+    const request = pendingRequests.find(r => r.id === requestId);
+    
+    if (!request) {
+      res.status(404).json({ error: "Pending request not found." });
+      return;
+    }
+
+    const updated = await KycRequest.uploadDocument(requestId, req.file.filename);
+    res.json({ message: "Document uploaded successfully.", request: updated });
+  } catch (err: any) {
+    console.error("[KYC Upload Additional] Error:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
 });
 
 export default router;

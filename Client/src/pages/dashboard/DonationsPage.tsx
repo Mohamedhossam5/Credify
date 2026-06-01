@@ -159,7 +159,7 @@ const DonationsPage: React.FC = () => {
               <button onClick={resetPaymentForm} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px', borderRadius: '12px', border: '1px solid var(--glass-border)', background: 'var(--glass)', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 600, fontFamily: f, cursor: 'pointer', marginBottom: '24px', transition: 'all 0.2s ease' }}>
                 <ArrowLeft size={16} /> Back to Charities
               </button>
-              
+
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                 <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: provider.brandBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', margin: '0 auto 16px' }}>{provider.logo}</div>
                 <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0', fontFamily: f }}>{provider.name}</h2>
@@ -177,7 +177,7 @@ const DonationsPage: React.FC = () => {
 
                   <div style={{ marginBottom: '24px' }}>
                     <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1.2px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', fontFamily: f }}>Donor Name (Optional)</label>
-                    <input type="text" value={donorName} onChange={(e) => setDonorName(e.target.value)} placeholder="e.g. John Doe" className="premium-input" style={{ width: '100%', borderRadius: '14px', padding: '16px' }} />
+                    <input type="text" value={donorName} onChange={(e) => setDonorName(e.target.value)} placeholder="e.g. Mohamed Badawy" className="premium-input" style={{ width: '100%', borderRadius: '14px', padding: '16px' }} />
                   </div>
 
                   <div style={{ marginBottom: '32px' }}>

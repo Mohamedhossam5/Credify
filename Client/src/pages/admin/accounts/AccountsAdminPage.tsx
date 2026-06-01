@@ -58,6 +58,27 @@ const AccountsAdminPage: React.FC = () => {
   const [transactionsOpen, setTransactionsOpen] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loadingTx, setLoadingTx] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
+  
+  const [requireKycOpen, setRequireKycOpen] = useState(false);
+  const [requireKycMsg, setRequireKycMsg] = useState("");
+  const [isSubmittingKycReq, setIsSubmittingKycReq] = useState(false);
+  const [kycRequests, setKycRequests] = useState<any[]>([]);
+
+  const fetchKycRequests = async (userId: number) => {
+    try {
+      const { data } = await api.get(`/admin/users/${userId}/kyc-requests`);
+      setKycRequests(data.requests || []);
+    } catch(err) {
+      console.error("Failed to fetch KYC requests", err);
+    }
+  };
+
+  const openDrawer = (a: AdminUser) => {
+    setSelectedAcc(a);
+    setDrawerOpen(true);
+    fetchKycRequests(a.id);
+  };
 
   const fetchTransactions = async (userId: number) => {
     setLoadingTx(true);
@@ -113,6 +134,36 @@ const AccountsAdminPage: React.FC = () => {
       setDrawerOpen(false);
     } catch (err) {
       console.error("Failed to unlock account", err);
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!window.confirm("Are you sure you want to permanently delete this user? This action cannot be undone.")) return;
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setDrawerOpen(false);
+      setSelectedAcc(null);
+    } catch (err) {
+      console.error("Failed to delete user", err);
+      alert("Failed to delete user. Please try again.");
+    }
+  };
+
+  const handleRequireKycSubmit = async () => {
+    if (!selectedAcc || !requireKycMsg.trim()) return;
+    setIsSubmittingKycReq(true);
+    try {
+      await api.post(`/admin/users/${selectedAcc.id}/require-kyc`, { message: requireKycMsg });
+      alert("KYC Request sent successfully.");
+      setRequireKycOpen(false);
+      setRequireKycMsg("");
+      fetchKycRequests(selectedAcc.id);
+    } catch(err) {
+      console.error("Failed to require KYC", err);
+      alert("Failed to send request.");
+    } finally {
+      setIsSubmittingKycReq(false);
     }
   };
 
@@ -176,7 +227,7 @@ const AccountsAdminPage: React.FC = () => {
             const ds = getDisplayStatus(a);
             const fullName = `${a.first_name} ${a.last_name}`;
             return (
-              <div key={a.id} className="account-wide-card" onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+              <div key={a.id} className="account-wide-card" onClick={() => openDrawer(a)}>
                 {/* 1. User Info */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
@@ -218,7 +269,7 @@ const AccountsAdminPage: React.FC = () => {
 
                 {/* 6. Action Buttons */}
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }} onClick={(e) => e.stopPropagation()}>
-                  <button className="btn-details" onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+                  <button className="btn-details" onClick={() => openDrawer(a)}>
                     View Details
                   </button>
                 </div>
@@ -237,7 +288,7 @@ const AccountsAdminPage: React.FC = () => {
             const ds = getDisplayStatus(a);
             const fullName = `${a.first_name} ${a.last_name}`;
             return (
-              <div className="account-mobile-card" key={a.id} onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}>
+              <div className="account-mobile-card" key={a.id} onClick={() => openDrawer(a)}>
                 <div className="card-top">
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                     {initials(fullName)}
@@ -278,7 +329,7 @@ const AccountsAdminPage: React.FC = () => {
                     <button
                       className="btn-details"
                       style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '12px', fontWeight: 700 }}
-                      onClick={() => { setSelectedAcc(a); setDrawerOpen(true); }}
+                      onClick={() => openDrawer(a)}
                     >
                       View Details
                     </button>
@@ -373,6 +424,13 @@ const AccountsAdminPage: React.FC = () => {
                     <img src={`${api.defaults.baseURL}/admin/kyc/images/${selectedAcc.digital_signature_file}`} alt="Signature" style={{ width: '100%', maxWidth: '300px', borderRadius: '8px', border: '1px solid var(--border)' }} />
                   </div>
                 )}
+                
+                {kycRequests.filter(req => req.status === 'UPLOADED').map((req, idx) => (
+                  <div key={req.id} style={{ gridColumn: '1 / -1', marginTop: '12px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>Additional Doc: {req.message}</div>
+                    <img src={`${api.defaults.baseURL}/admin/kyc/images/${req.document_file}`} alt={`Additional ${idx}`} style={{ width: '100%', borderRadius: '8px', border: '1px solid var(--border)' }} />
+                  </div>
+                ))}
                 {!selectedAcc.national_id_front_file && <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No KYC documents uploaded yet.</div>}
               </div>
             </div>
@@ -389,9 +447,10 @@ const AccountsAdminPage: React.FC = () => {
               ) : (
                 <button className="admin-btn btn-ghost" disabled style={{ justifyContent: 'center', opacity: 0.5, cursor: 'not-allowed' }}>❄ Freeze (KYC not approved)</button>
               )}
-              <button className="admin-btn btn-warn" onClick={() => { }} style={{ justifyContent: 'center' }}>⚠ Require KYC</button>
+              <button className="admin-btn btn-warn" onClick={() => setRequireKycOpen(true)} style={{ justifyContent: 'center' }}>⚠ Require KYC</button>
               <button className="admin-btn btn-ghost" onClick={() => fetchTransactions(selectedAcc.id)} style={{ justifyContent: 'center' }}>View Transactions</button>
-              <button className="admin-btn btn-ghost" onClick={() => { }} style={{ justifyContent: 'center' }}>✉ Contact</button>
+              <button className="admin-btn btn-ghost" onClick={() => setContactOpen(true)} style={{ justifyContent: 'center' }}>✉ Contact</button>
+              <button className="admin-btn btn-danger" onClick={() => handleDeleteUser(selectedAcc.id)} style={{ gridColumn: '1 / -1', justifyContent: 'center', marginTop: '8px' }}>🗑 Delete User</button>
             </div>
           </div>
         )}
@@ -437,6 +496,76 @@ const AccountsAdminPage: React.FC = () => {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Contact Modal */}
+      {contactOpen && selectedAcc && (
+        <div className="drawer-overlay open" onClick={() => setContactOpen(false)} style={{ zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', width: '90%', maxWidth: '400px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px' }}>Contact {selectedAcc.first_name}</h3>
+            
+            <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '16px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(99,102,241,0.1)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Mail size={16} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>Email Address</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                  <a href={`mailto:${selectedAcc.email}`} style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>{selectedAcc.email}</a>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--bg-base)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(59,130,246,0.1)', color: 'var(--blue, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '2px' }}>Phone Number</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                  <a href={`tel:${selectedAcc.phone_number}`} style={{ color: 'var(--text-primary)', textDecoration: 'none' }}>{selectedAcc.phone_number}</a>
+                </div>
+              </div>
+            </div>
+
+            <button onClick={() => setContactOpen(false)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: 'var(--bg-base)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer', marginTop: '20px' }}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Require KYC Modal */}
+      {requireKycOpen && selectedAcc && (
+        <div className="drawer-overlay open" onClick={() => setRequireKycOpen(false)} style={{ zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: 'var(--radius-lg)', width: '90%', maxWidth: '400px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '12px' }}>Require Additional KYC</h3>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
+              Send a request to {selectedAcc.first_name} for additional documents.
+            </p>
+            <textarea 
+              value={requireKycMsg}
+              onChange={e => setRequireKycMsg(e.target.value)}
+              placeholder="e.g., Please upload a clearer image of your ID back"
+              style={{ width: '100%', minHeight: '100px', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg-base)', color: 'var(--text-primary)', marginBottom: '20px', fontSize: '14px', resize: 'vertical' }}
+            />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => setRequireKycOpen(false)} 
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleRequireKycSubmit} 
+                disabled={!requireKycMsg.trim() || isSubmittingKycReq}
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'var(--accent)', border: 'none', color: '#fff', fontWeight: 700, cursor: (!requireKycMsg.trim() || isSubmittingKycReq) ? 'not-allowed' : 'pointer', opacity: (!requireKycMsg.trim() || isSubmittingKycReq) ? 0.6 : 1 }}
+              >
+                {isSubmittingKycReq ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} /> : "Send Request"}
+              </button>
+            </div>
           </div>
         </div>
       )}

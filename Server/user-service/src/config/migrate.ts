@@ -18,12 +18,9 @@ const migration = `
     kyc_status    VARCHAR(30)   DEFAULT 'PENDING',
     role          VARCHAR(20)   DEFAULT 'USER',
     profile_picture TEXT,
-<<<<<<< Updated upstream
     failed_login_attempts INTEGER DEFAULT 0,
     is_locked     BOOLEAN       DEFAULT FALSE,
-=======
     is_frozen     BOOLEAN       NOT NULL DEFAULT FALSE,
->>>>>>> Stashed changes
     created_at    TIMESTAMP     DEFAULT NOW(),
     updated_at    TIMESTAMP     DEFAULT NOW()
   );

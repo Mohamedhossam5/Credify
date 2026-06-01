@@ -138,6 +138,21 @@ router.get("/users/:userId/transactions", async (req, res) => {
         res.status(502).json({ error: "Upstream service unavailable." });
     }
 });
+// ─── DELETE /api/admin/users/:userId ─────────────────────────
+router.delete("/users/:userId", async (req, res) => {
+    try {
+        // Delete KYC data first
+        await fetch(`${KYC_SERVICE_URL}/api/internal/kyc/${req.params.userId}`, { method: "DELETE" });
+        // Then delete User data
+        const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}`, { method: "DELETE" });
+        const data = await upstream.json();
+        res.status(upstream.status).json(data);
+    }
+    catch (err) {
+        console.error("[Admin API] Delete user error:", err.message);
+        res.status(502).json({ error: "Upstream service unavailable." });
+    }
+});
 // ─── Change Request Admin Routes ─────────────────────────────
 // GET /api/admin/change-requests — list all change requests
 router.get("/change-requests", async (_req, res) => {

@@ -31,6 +31,15 @@ const migration = `
 
   -- Add digital_signature column to existing tables
   ALTER TABLE kyc_applications ADD COLUMN IF NOT EXISTS digital_signature VARCHAR(500);
+
+  CREATE TABLE IF NOT EXISTS kyc_additional_requests (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    document_file VARCHAR(500),
+    created_at TIMESTAMP DEFAULT NOW()
+  );
 `;
 
 async function runMigration(): Promise<void> {

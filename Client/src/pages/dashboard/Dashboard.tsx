@@ -43,6 +43,15 @@ const Dashboard: React.FC = () => {
   });
   const cards = cardsData ?? [];
 
+  const { data: kycRequests } = useQuery({
+    queryKey: ['kyc-requests'],
+    queryFn: async () => {
+      const { data } = await api.get('/kyc/requests/my');
+      return data.requests || [];
+    },
+    enabled: !!user,
+  });
+
   const { payments, isLoadingPayments, allPayments = [] } = useTransactions();
 
   const filteredTx = useMemo(() => {
@@ -208,6 +217,27 @@ const Dashboard: React.FC = () => {
             </div>
 
           </div>
+
+          {/* KYC Request Banner */}
+          {kycRequests && kycRequests.filter((r: any) => r.status === 'PENDING').length > 0 && (
+            <div style={{ background: 'rgba(255, 77, 106, 0.05)', border: '1px solid rgba(255, 77, 106, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255, 77, 106, 0.1)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>Action Required: KYC Document</h4>
+                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>{kycRequests.filter((r: any) => r.status === 'PENDING')[0].message}</p>
+              </div>
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('open-kyc-upload', { detail: kycRequests.filter((r: any) => r.status === 'PENDING')[0] }))}
+                style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--danger)', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0, transition: 'opacity 0.2s' }}
+                onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+                onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                Upload Now
+              </button>
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="glass-card" style={{ padding: '24px 28px' }}>

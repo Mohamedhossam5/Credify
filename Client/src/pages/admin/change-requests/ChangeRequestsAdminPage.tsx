@@ -136,6 +136,215 @@ const ChangeRequestsAdminPage: React.FC = () => {
     }
   };
 
+  const renderRequestCard = (r: any, isReviewed: boolean = false) => {
+    const isExpanded = expandedId === r.id;
+    const isLoading = actionLoading === r.id;
+    const isRejectOpen = rejectId === r.id;
+    const isInfoOpen = infoId === r.id;
+    const statusConfig = STATUS_CONFIG[r.status] || STATUS_CONFIG.SUBMITTED;
+    const typeLabel = CHANGE_TYPE_LABELS[r.change_type] || r.change_type;
+    const reqMessages = messages[r.id] || [];
+    const name = `${r.first_name} ${r.last_name}`;
+
+    return (
+      <div key={r.id} className="admin-card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border, var(--glass-border))' }}>
+        {/* Header Row */}
+        <div
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', cursor: 'pointer' }}
+          onClick={() => handleExpand(r.id)}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--teal, #6366f1), var(--blue, #3b82f6))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
+              {r.profile_picture ? (
+                <img src={r.profile_picture} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+              ) : initials(r.first_name, r.last_name)}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{name}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted, var(--text-secondary))', fontFamily: '"DM Mono", monospace' }}>{r.email}</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            <span style={{
+              padding: '4px 10px', borderRadius: '8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px',
+              background: 'rgba(99, 102, 241, 0.1)', color: 'var(--teal)', border: '1px solid rgba(99, 102, 241, 0.2)',
+            }}>
+              {typeLabel}
+            </span>
+            <span className={`badge ${statusConfig.class}`} style={{ fontSize: '10px' }}>
+              {statusConfig.label}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-muted)', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Expanded Details */}
+        {isExpanded && (
+          <div style={{ padding: '0 20px 20px', borderTop: '1px solid var(--border, var(--glass-border))' }}>
+            {/* Request Details */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', padding: '16px 0', marginBottom: '8px', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Request ID</span>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--teal)', fontFamily: '"DM Mono", monospace', marginTop: '2px' }}>{r.request_id}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Submitted</span>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '2px' }}>{formatDate(r.created_at)}</div>
+              </div>
+              <div>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Phone</span>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', marginTop: '2px' }}>{r.phone_number}</div>
+              </div>
+            </div>
+
+            {/* Change Summary */}
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px' }}>Change Details</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.04)', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--danger, #ff4d6a)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Current Value</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', wordBreak: 'break-all' }}>{formatChangeValue(r.current_value)}</div>
+                </div>
+                <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--success, #00e88f)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>New Value</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', wordBreak: 'break-all' }}>{formatChangeValue(r.new_value)}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Documents */}
+            {r.documents && r.documents.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px' }}>Uploaded Documents</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {r.documents.map((doc: any, i: number) => (
+                    <div
+                      key={i}
+                      onClick={() => doc.data && setPreviewImage({ url: doc.data, label: doc.originalName || doc.name })}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px',
+                        border: '1px solid var(--border, var(--glass-border))', cursor: doc.data ? 'pointer' : 'default',
+                        background: 'var(--bg-base, rgba(255,255,255,0.02))', transition: 'all 0.2s',
+                      }}
+                    >
+                      <FileText size={14} style={{ color: 'var(--teal)', flexShrink: 0 }} />
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
+                          {doc.originalName || doc.name}
+                        </div>
+                        {doc.size && <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{(doc.size / 1024).toFixed(1)} KB</div>}
+                      </div>
+                      {doc.data && <Eye size={12} style={{ color: 'var(--text-muted)' }} />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Conversation Thread */}
+            {reqMessages.length > 0 && (
+              <div style={{ marginBottom: '16px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <MessageSquare size={12} /> Conversation Thread
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border, var(--glass-border))', maxHeight: '200px', overflowY: 'auto' }}>
+                  {reqMessages.map((msg: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                      <div style={{
+                        width: '24px', height: '24px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 800,
+                        background: msg.sender === 'ADMIN' ? 'rgba(245,158,11,0.15)' : msg.sender === 'USER' ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.06)',
+                        color: msg.sender === 'ADMIN' ? '#f59e0b' : msg.sender === 'USER' ? 'var(--teal)' : 'var(--text-muted)',
+                      }}>
+                        {msg.sender === 'ADMIN' ? 'A' : msg.sender === 'USER' ? 'U' : 'S'}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: msg.sender === 'ADMIN' ? '#f59e0b' : msg.sender === 'USER' ? 'var(--teal)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            {msg.sender === 'ADMIN' ? 'Compliance' : msg.sender === 'USER' ? 'Customer' : 'System'}
+                          </span>
+                          <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{formatTime(msg.created_at)}</span>
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{msg.message}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            {!isReviewed && (
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => handleApprove(r.id, name)}
+                  disabled={isLoading}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, var(--success, #00e88f), #059669)', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
+                >
+                  {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <CheckCircle2 size={14} />}
+                  Approve
+                </button>
+                <button
+                  onClick={() => { setRejectId(isRejectOpen ? null : r.id); setRejectReason(''); setInfoId(null); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: '1px solid rgba(255,77,106,0.3)', background: 'rgba(255,77,106,0.1)', color: 'var(--danger, #ff4d6a)', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  <XCircle size={14} /> Reject
+                </button>
+                <button
+                  onClick={() => { setInfoId(isInfoOpen ? null : r.id); setInfoMessage(''); setRejectId(null); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.08)', color: '#f59e0b', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  <MessageSquare size={14} /> Request Info
+                </button>
+              </div>
+            )}
+
+            {/* Reject Reason Input */}
+            {!isReviewed && isRejectOpen && (
+              <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  value={rejectReason}
+                  onChange={e => setRejectReason(e.target.value)}
+                  placeholder="Enter rejection reason..."
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'var(--bg-base, var(--input-bg))', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
+                />
+                <button
+                  onClick={() => handleReject(r.id, name)}
+                  disabled={isLoading}
+                  style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', background: 'var(--danger, #ff4d6a)', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
+                >
+                  {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : 'Confirm Reject'}
+                </button>
+                <button onClick={() => { setRejectId(null); setRejectReason(''); }} style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Cancel</button>
+              </div>
+            )}
+
+            {/* Request Info Input */}
+            {!isReviewed && isInfoOpen && (
+              <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  value={infoMessage}
+                  onChange={e => setInfoMessage(e.target.value)}
+                  placeholder="Message to customer (e.g., We need a clearer image of...)"
+                  style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'var(--bg-base, var(--input-bg))', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
+                />
+                <button
+                  onClick={() => handleRequestInfo(r.id)}
+                  disabled={isLoading}
+                  style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', background: '#f59e0b', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <><Send size={12} /> Send</>}
+                </button>
+                <button onClick={() => { setInfoId(null); setInfoMessage(''); }} style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Cancel</button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="fade-up" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -174,212 +383,7 @@ const ChangeRequestsAdminPage: React.FC = () => {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {pendingRequests.map(r => {
-              const isExpanded = expandedId === r.id;
-              const isLoading = actionLoading === r.id;
-              const isRejectOpen = rejectId === r.id;
-              const isInfoOpen = infoId === r.id;
-              const statusConfig = STATUS_CONFIG[r.status] || STATUS_CONFIG.SUBMITTED;
-              const typeLabel = CHANGE_TYPE_LABELS[r.change_type] || r.change_type;
-              const reqMessages = messages[r.id] || [];
-              const name = `${r.first_name} ${r.last_name}`;
-
-              return (
-                <div key={r.id} className="admin-card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border, var(--glass-border))' }}>
-                  {/* Header Row */}
-                  <div
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', cursor: 'pointer' }}
-                    onClick={() => handleExpand(r.id)}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                      <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--teal, #6366f1), var(--blue, #3b82f6))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
-                        {r.profile_picture ? (
-                          <img src={r.profile_picture} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-                        ) : initials(r.first_name, r.last_name)}
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)' }}>{name}</div>
-                        <div style={{ fontSize: '12px', color: 'var(--text-muted, var(--text-secondary))', fontFamily: '"DM Mono", monospace' }}>{r.email}</div>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                      <span style={{
-                        padding: '4px 10px', borderRadius: '8px', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px',
-                        background: 'rgba(99, 102, 241, 0.1)', color: 'var(--teal)', border: '1px solid rgba(99, 102, 241, 0.2)',
-                      }}>
-                        {typeLabel}
-                      </span>
-                      <span className={`badge ${statusConfig.class}`} style={{ fontSize: '10px' }}>
-                        {statusConfig.label}
-                      </span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-muted)', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}>
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Expanded Details */}
-                  {isExpanded && (
-                    <div style={{ padding: '0 20px 20px', borderTop: '1px solid var(--border, var(--glass-border))' }}>
-                      {/* Request Details */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', padding: '16px 0', marginBottom: '8px', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
-                        <div>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Request ID</span>
-                          <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--teal)', fontFamily: '"DM Mono", monospace', marginTop: '2px' }}>{r.request_id}</div>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Submitted</span>
-                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginTop: '2px' }}>{formatDate(r.created_at)}</div>
-                        </div>
-                        <div>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>Phone</span>
-                          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', marginTop: '2px' }}>{r.phone_number}</div>
-                        </div>
-                      </div>
-
-                      {/* Change Summary */}
-                      <div style={{ marginBottom: '16px' }}>
-                        <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px' }}>Change Details</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                          <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(239, 68, 68, 0.04)', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
-                            <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--danger, #ff4d6a)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Current Value</div>
-                            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', wordBreak: 'break-all' }}>{formatChangeValue(r.current_value)}</div>
-                          </div>
-                          <div style={{ padding: '12px 14px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
-                            <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--success, #00e88f)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>New Value</div>
-                            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', fontFamily: '"DM Mono", monospace', wordBreak: 'break-all' }}>{formatChangeValue(r.new_value)}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Documents */}
-                      {r.documents && r.documents.length > 0 && (
-                        <div style={{ marginBottom: '16px' }}>
-                          <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px' }}>Uploaded Documents</div>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                            {r.documents.map((doc: any, i: number) => (
-                              <div
-                                key={i}
-                                onClick={() => doc.data && setPreviewImage({ url: doc.data, label: doc.originalName || doc.name })}
-                                style={{
-                                  display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '10px',
-                                  border: '1px solid var(--border, var(--glass-border))', cursor: doc.data ? 'pointer' : 'default',
-                                  background: 'var(--bg-base, rgba(255,255,255,0.02))', transition: 'all 0.2s',
-                                }}
-                              >
-                                <FileText size={14} style={{ color: 'var(--teal)', flexShrink: 0 }} />
-                                <div style={{ minWidth: 0 }}>
-                                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '150px' }}>
-                                    {doc.originalName || doc.name}
-                                  </div>
-                                  {doc.size && <div style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{(doc.size / 1024).toFixed(1)} KB</div>}
-                                </div>
-                                {doc.data && <Eye size={12} style={{ color: 'var(--text-muted)' }} />}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Conversation Thread */}
-                      {reqMessages.length > 0 && (
-                        <div style={{ marginBottom: '16px' }}>
-                          <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <MessageSquare size={12} /> Conversation Thread
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', borderRadius: '12px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border, var(--glass-border))', maxHeight: '200px', overflowY: 'auto' }}>
-                            {reqMessages.map((msg, i) => (
-                              <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                <div style={{
-                                  width: '24px', height: '24px', borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', fontWeight: 800,
-                                  background: msg.sender === 'ADMIN' ? 'rgba(245,158,11,0.15)' : msg.sender === 'USER' ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.06)',
-                                  color: msg.sender === 'ADMIN' ? '#f59e0b' : msg.sender === 'USER' ? 'var(--teal)' : 'var(--text-muted)',
-                                }}>
-                                  {msg.sender === 'ADMIN' ? 'A' : msg.sender === 'USER' ? 'U' : 'S'}
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                                    <span style={{ fontSize: '10px', fontWeight: 700, color: msg.sender === 'ADMIN' ? '#f59e0b' : msg.sender === 'USER' ? 'var(--teal)' : 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                      {msg.sender === 'ADMIN' ? 'Compliance' : msg.sender === 'USER' ? 'Customer' : 'System'}
-                                    </span>
-                                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{formatTime(msg.created_at)}</span>
-                                  </div>
-                                  <div style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: 1.5 }}>{msg.message}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Actions */}
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <button
-                          onClick={() => handleApprove(r.id, name)}
-                          disabled={isLoading}
-                          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg, var(--success, #00e88f), #059669)', color: '#fff', fontSize: '13px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', opacity: isLoading ? 0.6 : 1 }}
-                        >
-                          {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <CheckCircle2 size={14} />}
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => { setRejectId(isRejectOpen ? null : r.id); setRejectReason(''); setInfoId(null); }}
-                          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: '1px solid rgba(255,77,106,0.3)', background: 'rgba(255,77,106,0.1)', color: 'var(--danger, #ff4d6a)', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
-                        >
-                          <XCircle size={14} /> Reject
-                        </button>
-                        <button
-                          onClick={() => { setInfoId(isInfoOpen ? null : r.id); setInfoMessage(''); setRejectId(null); }}
-                          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 20px', borderRadius: '10px', border: '1px solid rgba(245,158,11,0.3)', background: 'rgba(245,158,11,0.08)', color: '#f59e0b', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
-                        >
-                          <MessageSquare size={14} /> Request Info
-                        </button>
-                      </div>
-
-                      {/* Reject Reason Input */}
-                      {isRejectOpen && (
-                        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <input
-                            value={rejectReason}
-                            onChange={e => setRejectReason(e.target.value)}
-                            placeholder="Enter rejection reason…"
-                            style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'var(--bg-base, var(--input-bg))', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
-                          />
-                          <button
-                            onClick={() => handleReject(r.id, name)}
-                            disabled={isLoading}
-                            style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', background: 'var(--danger, #ff4d6a)', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap' }}
-                          >
-                            {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : 'Confirm Reject'}
-                          </button>
-                          <button onClick={() => { setRejectId(null); setRejectReason(''); }} style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Cancel</button>
-                        </div>
-                      )}
-
-                      {/* Request Info Input */}
-                      {isInfoOpen && (
-                        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <input
-                            value={infoMessage}
-                            onChange={e => setInfoMessage(e.target.value)}
-                            placeholder="Message to customer (e.g., We need a clearer image of…)"
-                            style={{ flex: 1, padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'var(--bg-base, var(--input-bg))', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
-                          />
-                          <button
-                            onClick={() => handleRequestInfo(r.id)}
-                            disabled={isLoading}
-                            style={{ padding: '10px 16px', borderRadius: '10px', border: 'none', background: '#f59e0b', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: isLoading ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '4px' }}
-                          >
-                            {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <><Send size={12} /> Send</>}
-                          </button>
-                          <button onClick={() => { setInfoId(null); setInfoMessage(''); }} style={{ padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', background: 'transparent', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>Cancel</button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {pendingRequests.map(r => renderRequestCard(r, false))}
           </div>
         )}
 
@@ -387,30 +391,8 @@ const ChangeRequestsAdminPage: React.FC = () => {
         {reviewedRequests.length > 0 && (
           <div style={{ marginTop: '32px' }}>
             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--text-muted, var(--text-secondary))', marginBottom: '12px' }}>Previously Reviewed</div>
-            <div className="admin-card" style={{ overflow: 'hidden' }}>
-              {reviewedRequests.map(r => {
-                const isApproved = r.status === 'APPROVED';
-                const typeLabel = CHANGE_TYPE_LABELS[r.change_type] || r.change_type;
-                return (
-                  <div key={r.id} className="kyc-reviewed-row">
-                    <div className="kyc-reviewed-left">
-                      <div className="kyc-status-circle" style={{ width: '32px', height: '32px', borderRadius: '50%', background: isApproved ? 'rgba(0,232,143,0.12)' : 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {isApproved ? <CheckCircle2 size={14} style={{ color: 'var(--success, #00e88f)' }} /> : <XCircle size={14} style={{ color: 'var(--danger, #ff4d6a)' }} />}
-                      </div>
-                      <div className="kyc-reviewed-info">
-                        <div className="kyc-reviewed-name">{r.first_name} {r.last_name}</div>
-                        <div className="kyc-reviewed-email">{typeLabel} · {r.request_id}</div>
-                      </div>
-                    </div>
-                    <div className="kyc-reviewed-right">
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginRight: '8px' }}>{formatDate(r.updated_at)}</span>
-                      <span className={`kyc-status-pill ${isApproved ? 'approved' : 'rejected'}`}>
-                        {isApproved ? 'APPROVED' : 'REJECTED'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {reviewedRequests.map(r => renderRequestCard(r, true))}
             </div>
           </div>
         )}

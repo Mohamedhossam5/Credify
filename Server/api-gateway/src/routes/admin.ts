@@ -102,6 +102,18 @@ router.get("/kyc/images/:filename", async (req: Request, res: Response): Promise
   }
 });
 
+// ─── GET /api/admin/kyc-additional-requests ────────────────
+router.get("/kyc-additional-requests", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(`${KYC_SERVICE_URL}/api/internal/kyc/additional-requests`);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Additional requests error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
 // ─── PUT /api/admin/users/:userId/unlock ─────────────────────
 router.put("/users/:userId/unlock", async (req: Request, res: Response): Promise<void> => {
   try {
@@ -155,6 +167,54 @@ router.get("/users/:userId/transactions", async (req: Request, res: Response): P
     res.status(upstream.status).json(data);
   } catch (err: any) {
     console.error("[Admin API] Get user transactions error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── DELETE /api/admin/users/:userId ─────────────────────────
+router.delete("/users/:userId", async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Delete KYC data first
+    await fetch(`${KYC_SERVICE_URL}/api/internal/kyc/${req.params.userId}`, { method: "DELETE" });
+    
+    // Then delete User data
+    const upstream = await fetch(`${USER_SERVICE_URL}/api/internal/users/${req.params.userId}`, { method: "DELETE" });
+    
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Delete user error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── POST /api/admin/users/:userId/require-kyc ─────────────────
+router.post("/users/:userId/require-kyc", express.json(), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(
+      `${KYC_SERVICE_URL}/api/internal/kyc/${req.params.userId}/require`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(req.body),
+      }
+    );
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Require KYC error:", err.message);
+    res.status(502).json({ error: "Upstream service unavailable." });
+  }
+});
+
+// ─── GET /api/admin/users/:userId/kyc-requests ─────────────────
+router.get("/users/:userId/kyc-requests", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const upstream = await fetch(`${KYC_SERVICE_URL}/api/internal/kyc/${req.params.userId}/requests`);
+    const data = await upstream.json();
+    res.status(upstream.status).json(data);
+  } catch (err: any) {
+    console.error("[Admin API] Get KYC requests error:", err.message);
     res.status(502).json({ error: "Upstream service unavailable." });
   }
 });

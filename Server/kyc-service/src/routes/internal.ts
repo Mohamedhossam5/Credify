@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import path from "path";
 import fs from "fs";
 import KycApplication from "../models/KycApplication";
+import KycRequest from "../models/KycRequest";
 
 const router = Router();
 
@@ -37,6 +38,17 @@ router.get("/kyc/all", async (_req: Request, res: Response): Promise<void> => {
     res.json({ records: mapped });
   } catch (err: any) {
     console.error("[Internal KYC] Error fetching records:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// GET /api/internal/kyc/additional-requests
+router.get("/kyc/additional-requests", async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const requests = await KycRequest.findAllUploaded();
+    res.json({ requests });
+  } catch (err: any) {
+    console.error("[Internal KYC Additional Requests] Error:", err.message);
     res.status(500).json({ error: "Internal server error." });
   }
 });
@@ -112,6 +124,63 @@ router.post("/kyc/:userId/reject", async (req: Request, res: Response): Promise<
     res.json({ message: "KYC application rejected." });
   } catch (err: any) {
     console.error("[Admin Reject] Error:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// POST /api/internal/kyc/:userId/require
+router.post("/kyc/:userId/require", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+    
+    const { message } = req.body;
+    if (!message) {
+      res.status(400).json({ error: "Message is required." });
+      return;
+    }
+
+    const request = await KycRequest.create(userId, message);
+    res.status(201).json(request);
+  } catch (err: any) {
+    console.error("[Admin Require KYC] Error:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// GET /api/internal/kyc/:userId/requests
+router.get("/kyc/:userId/requests", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+
+    const requests = await KycRequest.findAllByUserId(userId);
+    res.json({ requests });
+  } catch (err: any) {
+    console.error("[Admin KYC Requests] Error:", err.message);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
+
+// DELETE /api/internal/kyc/:userId
+router.delete("/kyc/:userId", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
+      res.status(400).json({ error: "Invalid user ID." });
+      return;
+    }
+    await KycApplication.deleteByUserId(userId);
+    await KycRequest.deleteByUserId(userId);
+    res.json({ message: "User KYC data deleted." });
+  } catch (err: any) {
+    console.error("[Internal KYC Delete] Error:", err.message);
     res.status(500).json({ error: "Internal server error." });
   }
 });

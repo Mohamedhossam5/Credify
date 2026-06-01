@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import myImage from '../../assets/1.png';
 
 // Preload map: hovering a sidebar item triggers the lazy-loaded chunk to download
 const preloadMap: Record<string, () => void> = {
   '/admin/dashboard': () => import('../../pages/admin/dashboard/AdminDashboardPage'),
   '/admin/accounts': () => import('../../pages/admin/accounts/AccountsAdminPage'),
   '/admin/transactions': () => import('../../pages/admin/transactions/TransactionsAdminPage'),
-  '/admin/fraud': () => import('../../pages/admin/fraud/AdminFraudPage'),
   '/admin/kyc': () => import('../../pages/admin/kyc/KYCPage'),
   '/admin/change-requests': () => import('../../pages/admin/change-requests/ChangeRequestsAdminPage'),
   '/admin/settings': () => import('../../pages/admin/settings/SettingsAdminPage'),
@@ -42,11 +42,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
 
       <nav id="admin-sidebar" className={`${collapsed ? 'collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo">
-          <div className="logo-icon">
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="36" height="36" rx="10" fill="#2563eb" />
-              <path d="M10 18C10 13.58 13.58 10 18 10C20.21 10 22.21 10.9 23.66 12.34L21.54 14.46C20.65 13.57 19.39 13 18 13C15.24 13 13 15.24 13 18C13 20.76 15.24 23 18 23C19.39 23 20.65 22.43 21.54 21.54L23.66 23.66C22.21 25.1 20.21 26 18 26C13.58 26 10 22.42 10 18Z" fill="white" />
-            </svg>
+          <div className="logo-icon" style={{ background: 'transparent' }}>
+            <img src={myImage} alt="Credify" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
           </div>
           <span className="logo-text">Credify</span>
         </div>
@@ -85,14 +82,6 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
           </NavLink>
 
           <div className="nav-section-label">Security</div>
-          
-          <NavLink to="/admin/fraud" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/fraud')} onTouchStart={() => handlePreload('/admin/fraud')}>
-            <span className="nav-icon">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-            </span>
-            <span className="nav-label">Fraud Detection</span>
-            <span className="nav-badge" id="fraud-badge">3</span>
-          </NavLink>
 
           <NavLink to="/admin/kyc" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/kyc')} onTouchStart={() => handlePreload('/admin/kyc')}>
             <span className="nav-icon">
@@ -135,9 +124,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
         </div>
 
         <div className="sidebar-footer" onClick={() => { navigate('/admin/settings'); onCloseMobile(); }}>
-          <div className="avatar">MN</div>
+          <div className="avatar">CA</div>
           <div className="user-info">
-            <div className="user-name">Mahmoud Nady</div>
+            <div className="user-name">Credify Admin</div>
             <div className="user-role">Admin</div>
           </div>
         </div>

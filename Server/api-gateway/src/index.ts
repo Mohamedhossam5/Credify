@@ -158,6 +158,8 @@ app.post("/api/kyc/upload/national-id", (req, res) => forwardMultipart(KYC_SERVI
 app.post("/api/kyc/upload/face-selfie", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/face-selfie", req, res));
 app.post("/api/kyc/upload/proof-of-address", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/proof-of-address", req, res));
 app.post("/api/kyc/upload/digital-signature", (req, res) => forwardMultipart(KYC_SERVICE_URL, "/api/kyc/upload/digital-signature", req, res));
+app.get("/api/kyc/requests/my", express.json(), (req, res) => forwardJSON(KYC_SERVICE_URL, "/api/kyc/requests/my", req, res));
+app.post("/api/kyc/requests/:id/upload", (req, res) => forwardMultipart(KYC_SERVICE_URL, `/api/kyc/requests/${req.params.id}/upload`, req, res));
 
 // ─── Change Request Routes -> User Service ───────────────────
 

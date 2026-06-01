@@ -162,6 +162,26 @@ class User {
     );
     return rows[0] || null;
   }
+
+  static async delete(userId: number): Promise<void> {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query("DELETE FROM card_deliveries WHERE user_id = $1", [userId]);
+      await client.query("DELETE FROM cards WHERE user_id = $1", [userId]);
+      await client.query("DELETE FROM transactions WHERE sender_id = $1", [userId]);
+      await client.query("DELETE FROM beneficiaries WHERE user_id = $1", [userId]);
+      await client.query("DELETE FROM loans WHERE user_id = $1", [userId]);
+      await client.query("DELETE FROM accounts WHERE user_id = $1", [userId]);
+      await client.query("DELETE FROM users WHERE id = $1", [userId]);
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
 }
 
 export default User;

@@ -7,13 +7,14 @@ import { api } from '../lib/api';
 // ─── Types ───────────────────────────────────────────────────
 export interface Notification {
   id: string;
-  type: 'received' | 'sent' | 'system' | 'card' | 'security';
+  type: 'received' | 'sent' | 'system' | 'card' | 'security' | 'kyc_request';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
   icon: 'arrow-down' | 'arrow-up' | 'shield' | 'card' | 'bell' | 'check';
   color: string; // CSS color string for the icon background
+  metadata?: any;
 }
 
 // ─── LocalStorage helpers ────────────────────────────────────
@@ -60,6 +61,17 @@ export const useNotifications = () => {
       return data.cards || [];
     },
     refetchInterval: 30000, // Real-time updates every 30 seconds
+  });
+
+  // Fetch pending KYC requests
+  const { data: kycRequests } = useQuery({
+    queryKey: ['kyc-requests'],
+    queryFn: async () => {
+      const { data } = await api.get('/kyc/requests/my');
+      return data.requests || [];
+    },
+    enabled: !!user,
+    refetchInterval: 15000,
   });
 
   // Build notifications from real data
@@ -163,10 +175,41 @@ export const useNotifications = () => {
       }
     }
 
+    // 4. KYC Requests
+    if (kycRequests && kycRequests.length > 0) {
+      kycRequests.forEach((req: any) => {
+        const id = `kyc-req-${req.id}-${req.status}`;
+        if (req.status === 'PENDING') {
+          items.push({
+            id,
+            type: 'kyc_request',
+            title: 'Action Required: Additional KYC',
+            message: req.message,
+            timestamp: new Date(req.created_at),
+            read: readIds.has(id),
+            icon: 'shield',
+            color: 'rgba(255, 77, 106, 0.15)',
+            metadata: { requestId: req.id }
+          });
+        } else if (req.status === 'UPLOADED') {
+          items.push({
+            id,
+            type: 'system',
+            title: 'Document Uploaded',
+            message: 'Your additional document has been uploaded and is pending admin review.',
+            timestamp: new Date(req.created_at),
+            read: readIds.has(id),
+            icon: 'check',
+            color: 'rgba(0, 232, 143, 0.15)',
+          });
+        }
+      });
+    }
+
     // Sort by newest first
     items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     return items;
-  }, [rawTransactions, cardsData, currentAccountId, user, readUpdateTick]);
+  }, [rawTransactions, cardsData, kycRequests, currentAccountId, user, readUpdateTick]);
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 

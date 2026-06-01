@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '../../lib/api';
 
 interface AdminNavbarProps {
   onToggleSidebar: () => void;
@@ -23,6 +25,88 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ onToggleSidebar, onToggleThem
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const { data: dashboardData } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/dashboard');
+      return data.users || [];
+    },
+    refetchInterval: 15000,
+  });
+
+  const { data: loansData } = useQuery({
+    queryKey: ['admin-loans', 'ALL'],
+    queryFn: async () => {
+      const { data } = await api.get('/loans/all');
+      return data.loans || [];
+    },
+    refetchInterval: 15000,
+  });
+
+  const { data: crData } = useQuery({
+    queryKey: ['admin-change-requests'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/change-requests');
+      return data.requests || [];
+    },
+    refetchInterval: 15000,
+  });
+
+  const { data: addlKycData } = useQuery({
+    queryKey: ['admin-additional-kyc'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/kyc-additional-requests');
+      return data.requests || [];
+    },
+    refetchInterval: 15000,
+  });
+
+  const pendingKyc = dashboardData?.filter((u: any) => u.kyc_app_status === 'PENDING_ADMIN_REVIEW') || [];
+  const pendingLoans = loansData?.filter((l: any) => l.status === 'PENDING') || [];
+  const pendingCr = crData?.filter((r: any) => ['SUBMITTED', 'UNDER_REVIEW', 'WAITING_FOR_CUSTOMER'].includes(r.status)) || [];
+  const uploadedAddlKyc = addlKycData?.filter((r: any) => r.status === 'UPLOADED') || [];
+
+  const notifications = [
+    ...pendingKyc.map((k: any) => ({
+      id: `kyc-${k.id}`,
+      type: 'KYC',
+      title: 'New KYC Application',
+      desc: `${k.first_name} ${k.last_name}`,
+      time: new Date(k.created_at).toLocaleDateString(),
+      color: '#3b82f6',
+      link: '/admin/kyc'
+    })),
+    ...pendingLoans.map((l: any) => ({
+      id: `loan-${l.id}`,
+      type: 'Loan',
+      title: 'New Loan Request',
+      desc: `EGP ${parseFloat(l.amount).toLocaleString()} from ${l.first_name} ${l.last_name}`,
+      time: new Date(l.created_at).toLocaleDateString(),
+      color: '#10b981',
+      link: '/admin/loans'
+    })),
+    ...pendingCr.map((c: any) => ({
+      id: `cr-${c.id}`,
+      type: 'Change Request',
+      title: 'Profile Change Request',
+      desc: `${c.first_name} ${c.last_name}`,
+      time: new Date(c.created_at).toLocaleDateString(),
+      color: '#f59e0b',
+      link: '/admin/change-requests'
+    })),
+    ...uploadedAddlKyc.map((r: any) => ({
+      id: `addl-kyc-${r.id}`,
+      type: 'Additional KYC',
+      title: 'User Uploaded Requested Doc',
+      desc: `User ${r.user_id} uploaded requested document`,
+      time: new Date(r.created_at).toLocaleDateString(),
+      color: '#ef4444',
+      link: '/admin/kyc'
+    }))
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+  const totalNotifs = notifications.length;
 
   return (
     <header id="admin-topbar">
@@ -73,22 +157,30 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ onToggleSidebar, onToggleThem
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
-            <span className="notif-dot" id="notif-dot"></span>
+            <span className="notif-dot" id="notif-dot" style={{ display: totalNotifs > 0 ? 'block' : 'none' }}></span>
           </button>
 
           <div className="notif-dropdown" id="notif-dropdown" style={{ display: notifOpen ? 'block' : 'none' }}>
             <div className="notif-header">
-              <span className="notif-header-title">Notifications</span>
-              <span className="notif-clear" onClick={() => setNotifOpen(false)}>Clear all</span>
+              <span className="notif-header-title">Notifications {totalNotifs > 0 && `(${totalNotifs})`}</span>
+              <span className="notif-clear" onClick={() => setNotifOpen(false)}>Close</span>
             </div>
-            <div id="notif-list">
-              <div className="notif-item">
-                <div className="notif-dot-icon" style={{ background: '#dc2626' }}></div>
-                <div>
-                  <div className="notif-text" style={{ fontWeight: 600 }}>Critical fraud alert: Yuki Tanaka — $25,000 wire blocked</div>
-                  <div className="notif-time">2m ago</div>
+            <div id="notif-list" style={{ maxHeight: '350px', overflowY: 'auto' }}>
+              {notifications.length === 0 ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No pending requests
                 </div>
-              </div>
+              ) : (
+                notifications.map(n => (
+                  <div className="notif-item" key={n.id} onClick={() => { navigate(n.link); setNotifOpen(false); }} style={{ cursor: 'pointer' }}>
+                    <div className="notif-dot-icon" style={{ background: n.color }}></div>
+                    <div>
+                      <div className="notif-text" style={{ fontWeight: 600 }}>{n.title}: {n.desc}</div>
+                      <div className="notif-time">{n.time}</div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -96,7 +188,7 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ onToggleSidebar, onToggleThem
         <div style={{ width: '1px', height: '22px', background: 'var(--border)', margin: '0 2px' }} className="hidden sm:block"></div>
 
         <div className="avatar" style={{ width: '34px', height: '34px', fontSize: '12px', cursor: 'pointer' }} onClick={() => navigate('/admin/settings')}>
-          MN
+          CA
         </div>
       </div>
     </header>

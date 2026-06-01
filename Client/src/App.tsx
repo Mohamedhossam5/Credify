@@ -31,7 +31,6 @@ const RejectedPage = React.lazy(() => import('./pages/auth/RejectedPage'));
 const AdminDashboardPage = React.lazy(() => import('./pages/admin/dashboard/AdminDashboardPage'));
 const AccountsAdminPage = React.lazy(() => import('./pages/admin/accounts/AccountsAdminPage'));
 const TransactionsAdminPage = React.lazy(() => import('./pages/admin/transactions/TransactionsAdminPage'));
-const AdminFraudPage = React.lazy(() => import('./pages/admin/fraud/AdminFraudPage'));
 const KYCPage = React.lazy(() => import('./pages/admin/kyc/KYCPage'));
 const SettingsAdminPage = React.lazy(() => import('./pages/admin/settings/SettingsAdminPage'));
 const LoansAdminPage = React.lazy(() => import('./pages/admin/loans/LoansAdminPage'));
@@ -81,7 +80,6 @@ const AppContent: React.FC = () => {
         <Route path="dashboard" element={<Suspense fallback={<PageLoader />}><AdminDashboardPage /></Suspense>} />
         <Route path="accounts" element={<Suspense fallback={<PageLoader />}><AccountsAdminPage /></Suspense>} />
         <Route path="transactions" element={<Suspense fallback={<PageLoader />}><TransactionsAdminPage /></Suspense>} />
-        <Route path="fraud" element={<Suspense fallback={<PageLoader />}><AdminFraudPage /></Suspense>} />
         <Route path="kyc" element={<Suspense fallback={<PageLoader />}><KYCPage /></Suspense>} />
         <Route path="loans" element={<Suspense fallback={<PageLoader />}><LoansAdminPage /></Suspense>} />
         <Route path="change-requests" element={<Suspense fallback={<PageLoader />}><ChangeRequestsAdminPage /></Suspense>} />
