@@ -18,13 +18,12 @@
   to { opacity: 1; }
 }
 
-/* ── Chat Widget Container ───────────────────────────────────── */
 .cr-chatbot {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  width: 420px;
-  height: 640px;
+  width: 370px;
+  height: 590px;
   max-height: calc(100vh - 48px);
   background: var(--navy);
   border: 1px solid var(--glass-border);
@@ -197,10 +196,10 @@
 .cr-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   scroll-behavior: smooth;
 }
 
@@ -1023,4 +1022,12 @@
   .cr-chatbot {
     border-radius: 0;
   }
+}
+
+/* ── Hide Support Chatbot elements when Change Request Chatbot is active ── */
+body:has(.cr-chatbot) .chat-welcome-tooltip-inline,
+body:has(.cr-chatbot) .chat-launcher-inline {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
