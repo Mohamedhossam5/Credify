@@ -153,7 +153,7 @@ const ExchangePage: React.FC = () => {
               <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px', borderRadius: '50%', background: bgColor }}></div>
               <div className="fx-card-header">
                 <div className="fx-flag-img-lg" style={{ borderColor }}>
-                  <img src={`https://flagcdn.com/w80/${c.iso}.png`} alt={c.code} loading="lazy" />
+                  <img src={`https://flagcdn.com/w80/${c.iso}.png`} alt={c.code} />
                 </div>
                 <div>
                   <div className="text-[var(--text-primary)]" style={{ fontFamily: '"Inter", sans-serif', fontWeight: 800, fontSize: '16px', letterSpacing: '-0.3px' }}>{c.code}</div>
@@ -240,7 +240,7 @@ const ExchangePage: React.FC = () => {
                         onClick={() => handleSelectFx(c.code)}
                       >
                         <div className="fx-flag-img">
-                          <img src={`https://flagcdn.com/w40/${c.iso}.png`} alt={c.code} loading="lazy" />
+                          <img src={`https://flagcdn.com/w40/${c.iso}.png`} alt={c.code} />
                         </div>
                         <span className="fx-code">{c.code}</span>
                         <span className="fx-name">{c.name}</span>

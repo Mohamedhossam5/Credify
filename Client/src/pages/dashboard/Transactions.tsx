@@ -118,7 +118,7 @@ const Transactions: React.FC = () => {
                   {txs.map((tx, txIndex) => {
                     const amtClass = tx.status === 'received' ? 'positive' : 'negative';
                     const badgeClass = tx.status === 'received' ? 'badge-success' : 'badge-danger';
-                    const delay = (groupIndex * txs.length + txIndex) * 45;
+                    const delay = Math.min((groupIndex * txs.length + txIndex) * 12, 180);
                     return (
                       <div className="tx-card" style={{ animationDelay: `${delay}ms` }} key={tx.id}>
                         <div

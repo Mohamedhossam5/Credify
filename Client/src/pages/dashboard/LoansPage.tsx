@@ -50,7 +50,7 @@ const LoansPage: React.FC = () => {
       } finally {
         if (!cancelled) setIsCalculating(false);
       }
-    }, 300);
+    }, 100);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [amount, tenure]);
 

@@ -645,7 +645,7 @@ const BillPaymentPage: React.FC = () => {
                 <button
                   onClick={async () => {
                     setPaymentStep('inquiry');
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 380));
                     // Generate random bill amount between 50 and 600 EGP
                     const randomAmount = Math.floor(Math.random() * 550) + 50;
                     setBillAmount(randomAmount.toString());
@@ -1451,7 +1451,7 @@ const BillPaymentPage: React.FC = () => {
                 <button
                   onClick={async () => {
                     setPaymentStep('inquiry');
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 380));
                     // Generate random bill amount between 150 and 800 EGP
                     const randomAmount = Math.floor(Math.random() * 650) + 150;
                     setBillAmount(randomAmount.toString());
@@ -1804,7 +1804,7 @@ const BillPaymentPage: React.FC = () => {
                 <button
                   onClick={async () => {
                     setPaymentStep('inquiry');
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 380));
                     // Generate random bill amount between 20 and 300 EGP
                     const randomAmount = Math.floor(Math.random() * 280) + 20;
                     setBillAmount(randomAmount.toString());
@@ -2157,7 +2157,7 @@ const BillPaymentPage: React.FC = () => {
                 <button
                   onClick={async () => {
                     setPaymentStep('inquiry');
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 380));
                     // Generate random bill amount between 20 and 400 EGP
                     const randomAmount = Math.floor(Math.random() * 380) + 20;
                     setBillAmount(randomAmount.toString());

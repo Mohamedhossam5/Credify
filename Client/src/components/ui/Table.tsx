@@ -38,7 +38,7 @@ const Table: React.FC<TableProps> = ({ columns, data, emptyMessage = "No data fo
               <tr
                 key={item.id || index}
                 className="table-row-enter"
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animationDelay: `${Math.min(index * 12, 200)}ms` }}
               >
                 {columns.map((col) => (
                   <td key={col.key}>

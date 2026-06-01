@@ -18,7 +18,7 @@ export const useKycFlow = () => {
   const runSequence = async () => {
     // Brief uploading animation, then go straight to pending
     const targets = [40, 80, 100];
-    const durations = [800, 600, 400];
+    const durations = [350, 250, 150];
     
     for (let i = 0; i < targets.length; i++) {
       setActiveStep(i);

@@ -4,11 +4,12 @@ import Navbar from '../../components/shared/Navbar';
 import Footer from '../../components/shared/Footer';
 import { CreditCard, Smartphone, Link as LinkIcon, QrCode } from 'lucide-react';
 import applePayMockup from '../../assets/apple_pay_mockup.png';
-import paymentsHero from '../../assets/payments_hero.png';
+import dashboardDark from '../../assets/dashboard 1 .jpeg';
+import dashboardMobile from '../../assets/dashboard 2 .jpeg';
 
 // Preload the hero image immediately when the JS chunk is downloaded (before React renders)
 const preloadHero = new Image();
-preloadHero.src = paymentsHero;
+preloadHero.src = dashboardDark;
 
 const PaymentsPage: React.FC = () => {
   const features = [
@@ -41,8 +42,8 @@ const PaymentsPage: React.FC = () => {
       {/* Hero Section */}
       <div className="relative pt-[140px] md:pt-[160px] pb-16 md:pb-32 overflow-hidden bg-gradient-to-b from-[#E0F2FE] to-white">
         <div className="absolute top-0 w-full h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#DCFCE7]/60 via-[#E0F2FE]/40 to-transparent"></div>
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-24">
-          <div className="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start">
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10 flex flex-col lg:flex-row items-center lg:items-start gap-16 lg:gap-20">
+          <div className="w-full lg:w-[38%] shrink-0 text-center lg:text-left flex flex-col items-center lg:items-start">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 border border-[#3b82f6]/20 text-[#3b82f6] font-semibold text-sm mb-6 md:mb-8 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse"></span>
               Global Infrastructure
@@ -72,19 +73,33 @@ const PaymentsPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex-1 relative w-full flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[600px]">
+          <div className="w-full lg:w-[62%] relative flex justify-center lg:justify-end mt-12 lg:mt-0 lg:pt-16">
+            <div className="relative w-full max-w-[760px] flex flex-row items-end justify-between gap-4 sm:gap-6">
               {/* Decorative Background Elements */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-[#4ade80]/20 to-[#3b82f6]/20 rounded-full blur-[80px]"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-tr from-[#4ade80]/30 to-[#3b82f6]/30 rounded-full blur-[80px]"></div>
               
-              {/* Hero Image */}
-              <img 
-                src={paymentsHero} 
-                alt="Global Payments Dashboard" 
-                fetchPriority="high"
-                loading="eager"
-                className="relative z-10 w-[104%] -ml-[2%] object-contain mix-blend-multiply hover:scale-[1.02] transition-transform duration-700 ease-out contrast-125 brightness-110 [clip-path:inset(2%)]" 
-              />
+              {/* Desktop Dashboard Card (Clean Rounded Frame) */}
+              <div className="relative z-10 w-[72%] rounded-2xl overflow-hidden border border-slate-900/10 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] bg-[#0c1017] transition-all duration-700 ease-out hover:-translate-y-1 hover:shadow-[0_45px_80px_-20px_rgba(0,0,0,0.4)]">
+                {/* Desktop Screenshot */}
+                <img 
+                  src={dashboardDark} 
+                  alt="Credify Desktop Web Dashboard" 
+                  fetchPriority="high"
+                  loading="eager"
+                  className="w-full h-auto object-contain" 
+                />
+              </div>
+
+              {/* Mobile Dashboard Device Card (Clean iPhone Mockup sitting side-by-side on the right - ZERO overlap) */}
+              <div className="relative z-10 w-[25%] shrink-0 shadow-[0_32px_50px_rgba(0,0,0,0.35)] transition-all duration-500 hover:scale-[1.05] hover:-translate-y-1">
+                <img 
+                  src={dashboardMobile} 
+                  alt="Credify Mobile App Dashboard" 
+                  loading="eager"
+                  className="w-full h-auto object-contain"
+                  style={{ clipPath: 'inset(1px round 38px)' }}
+                />
+              </div>
             </div>
           </div>
         </div>

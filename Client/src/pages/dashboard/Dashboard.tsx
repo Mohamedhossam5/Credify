@@ -26,6 +26,7 @@ const Dashboard: React.FC = () => {
   const user = useAuthStore((s) => s.user);
   const [txFilter, setTxFilter] = useState<'all' | 'sent' | 'received'>('all');
   const [moneyFlowFilter, setMoneyFlowFilter] = useState<'all' | 'today' | 'yesterday' | 'week' | 'month'>('today');
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
 
   const { data: accountData, isLoading: isLoadingBalance } = useQuery({
     queryKey: ['balance'],
@@ -292,7 +293,7 @@ const Dashboard: React.FC = () => {
                   <p style={{ fontFamily: f, fontSize: '12px', color: 'var(--text-secondary)', margin: 0 }}>Apply for a physical or virtual card.</p>
                 </div>
               ) : (() => {
-                const card = cards[0];
+                const card = cards[activeCardIndex] || cards[0];
                 const isDebit = card.card_type === 'DEBIT';
                 const cardGrad = isDebit
                   ? 'linear-gradient(135deg, #1a1f2e 0%, #2d3548 50%, #1a1f2e 100%)'
@@ -351,7 +352,24 @@ const Dashboard: React.FC = () => {
                     {cards.length > 1 && (
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '16px' }}>
                         {cards.map((_, i) => (
-                          <div key={i} style={{ width: i === 0 ? '20px' : '6px', height: '6px', borderRadius: '3px', background: i === 0 ? 'var(--teal)' : 'var(--glass-border)', transition: 'all 0.3s ease' }} />
+                          <button
+                            key={i}
+                            onClick={() => setActiveCardIndex(i)}
+                            style={{
+                              width: i === activeCardIndex ? '20px' : '6px',
+                              height: '6px',
+                              borderRadius: '3px',
+                              background: i === activeCardIndex ? 'var(--teal)' : 'var(--text-secondary)',
+                              border: 'none',
+                              padding: 0,
+                              cursor: 'pointer',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                              opacity: i === activeCardIndex ? 1 : 0.5,
+                            }}
+                            onMouseEnter={(e) => { if (i !== activeCardIndex) e.currentTarget.style.opacity = '1'; }}
+                            onMouseLeave={(e) => { if (i !== activeCardIndex) e.currentTarget.style.opacity = '0.5'; }}
+                            title={`View Card ${i + 1}`}
+                          />
                         ))}
                       </div>
                     )}
