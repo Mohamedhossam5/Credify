@@ -9,7 +9,10 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-[2px] bg-f-border rounded-[32px] overflow-hidden border border-f-border mb-[60px] md:mb-[100px]">
           <div className="bg-f-dark p-6 sm:p-10 flex items-center gap-5 transition-all duration-500 cursor-pointer hover:bg-white/5 group">
             <div className="w-[60px] h-[60px] bg-gradient-to-br from-[#14b8a61a] to-[#0ea5e91a] rounded-[20px] flex justify-center items-center text-[22px] text-f-primary border border-[#14b8a633] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-f-primary group-hover:text-white shrink-0">
-              <i className="fa-regular fa-paper-plane"></i>
+              <svg className="w-6 h-6 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
             </div>
             <div>
               <h5 className="font-bold text-lg mb-1">Chat with us</h5>
@@ -18,7 +21,9 @@ const Footer: React.FC = () => {
           </div>
           <div className="bg-f-dark p-6 sm:p-10 flex items-center gap-5 transition-all duration-500 cursor-pointer hover:bg-white/5 group">
             <div className="w-[60px] h-[60px] bg-gradient-to-br from-[#14b8a61a] to-[#0ea5e91a] rounded-[20px] flex justify-center items-center text-[22px] text-f-primary border border-[#14b8a633] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-f-primary group-hover:text-white shrink-0">
-              <i className="fa-solid fa-phone-volume"></i>
+              <svg className="w-6 h-6 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
             </div>
             <div>
               <h5 className="font-bold text-lg mb-1">24/7 Hotline</h5>
@@ -27,7 +32,9 @@ const Footer: React.FC = () => {
           </div>
           <div className="bg-f-dark p-6 sm:p-10 flex items-center gap-5 transition-all duration-500 cursor-pointer hover:bg-white/5 group">
             <div className="w-[60px] h-[60px] bg-gradient-to-br from-[#14b8a61a] to-[#0ea5e91a] rounded-[20px] flex justify-center items-center text-[22px] text-f-primary border border-[#14b8a633] transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-f-primary group-hover:text-white shrink-0">
-              <i className="fa-solid fa-shield-halved"></i>
+              <svg className="w-6 h-6 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
             </div>
             <div>
               <h5 className="font-bold text-lg mb-1">Secure HQ</h5>
@@ -46,7 +53,10 @@ const Footer: React.FC = () => {
               <div className="flex bg-f-glass-white border border-f-border rounded-full p-1.5 focus-within:border-f-primary transition-colors">
                 <input type="email" placeholder="Your Email" className="bg-transparent border-none py-2.5 px-5 text-white outline-none flex-grow text-sm w-full min-w-0" />
                 <button className="bg-f-primary text-white border-none w-[45px] h-[45px] rounded-full cursor-pointer transition-all duration-300 hover:bg-f-secondary hover:rotate-45 flex justify-center items-center shrink-0">
-                  <i className="fa-solid fa-arrow-right"></i>
+                  <svg className="w-5 h-5 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
                 </button>
               </div>
             </div>

@@ -51,6 +51,7 @@ const Dashboard: React.FC = () => {
       return data.requests || [];
     },
     enabled: !!user,
+    refetchInterval: 3000,
   });
 
   const { payments, isLoadingPayments, allPayments = [] } = useTransactions();
@@ -62,7 +63,7 @@ const Dashboard: React.FC = () => {
 
   const { totalReceived, totalSent } = useMemo(() => {
     let received = 0, sent = 0;
-    
+
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const yesterdayStart = todayStart - 86400000;
@@ -173,11 +174,11 @@ const Dashboard: React.FC = () => {
                   value={moneyFlowFilter}
                   onChange={(v) => setMoneyFlowFilter(v as any)}
                   options={[
-                    { value: 'today',     label: 'Today' },
+                    { value: 'today', label: 'Today' },
                     { value: 'yesterday', label: 'Yesterday' },
-                    { value: 'week',      label: 'Last 7 Days' },
-                    { value: 'month',     label: 'Last 30 Days' },
-                    { value: 'all',       label: 'All Time' },
+                    { value: 'week', label: 'Last 7 Days' },
+                    { value: 'month', label: 'Last 30 Days' },
+                    { value: 'all', label: 'All Time' },
                   ]}
                 />
               </div>
@@ -221,15 +222,16 @@ const Dashboard: React.FC = () => {
 
           {/* KYC Request Banner */}
           {kycRequests && kycRequests.filter((r: any) => r.status === 'PENDING').length > 0 && (
-            <div style={{ background: 'rgba(255, 77, 106, 0.05)', border: '1px solid rgba(255, 77, 106, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255, 77, 106, 0.1)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+            <div className="kyc-request-banner" style={{ background: 'rgba(255, 77, 106, 0.05)', border: '1px solid rgba(255, 77, 106, 0.2)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div className="kyc-banner-icon" style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255, 77, 106, 0.1)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01" /></svg>
               </div>
-              <div style={{ flex: 1 }}>
+              <div className="kyc-banner-text" style={{ flex: 1 }}>
                 <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>Action Required: KYC Document</h4>
                 <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-muted)' }}>{kycRequests.filter((r: any) => r.status === 'PENDING')[0].message}</p>
               </div>
-              <button 
+              <button
+                className="kyc-banner-btn"
                 onClick={() => window.dispatchEvent(new CustomEvent('open-kyc-upload', { detail: kycRequests.filter((r: any) => r.status === 'PENDING')[0] }))}
                 style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--danger)', color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0, transition: 'opacity 0.2s' }}
                 onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
@@ -446,6 +448,21 @@ const Dashboard: React.FC = () => {
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
+        }
+        @media (max-width: 767px) {
+          .kyc-request-banner {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+            text-align: center !important;
+          }
+          .kyc-banner-icon {
+            margin: 0 auto !important;
+          }
+          .kyc-banner-btn {
+            width: 100% !important;
+            padding: 10px 16px !important;
+          }
         }
       `}</style>
     </section>

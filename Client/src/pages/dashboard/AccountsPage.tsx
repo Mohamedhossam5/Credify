@@ -136,10 +136,11 @@ const AccountsPage: React.FC = () => {
                 {/* Card visual + clickable header */}
                 <div
                   onClick={() => setExpandedId(expanded ? null : card.id)}
+                  className="card-row-wrapper"
                   style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '16px 20px', cursor: 'pointer', transition: 'background 0.2s ease' }}
                 >
                   {/* Mini card visual */}
-                  <div style={{
+                  <div className="card-visual-wrapper" style={{
                     width: '200px', minWidth: '200px', height: '120px', borderRadius: '16px', background: cardGrad,
                     padding: '14px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                     position: 'relative', overflow: 'hidden', flexShrink: 0,
@@ -166,8 +167,8 @@ const AccountsPage: React.FC = () => {
                   </div>
 
                   {/* Card info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <div className="card-details-wrapper" style={{ flex: 1, minWidth: 0 }}>
+                    <div className="card-details-header" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                       <span style={{ fontFamily: f, fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>{card.card_type} Card</span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 600, color: statusDot(card.status), background: `${statusDot(card.status)}15`, padding: '3px 10px', borderRadius: '20px', fontFamily: f }}>● {card.status}</span>
                     </div>
@@ -178,7 +179,7 @@ const AccountsPage: React.FC = () => {
                   </div>
 
                   {/* Expand arrow */}
-                  <ChevronDown size={20} style={{ color: 'var(--text-secondary)', transition: 'transform 0.3s ease', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }} />
+                  <ChevronDown className="card-chevron-arrow" size={20} style={{ color: 'var(--text-secondary)', transition: 'transform 0.3s ease', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', flexShrink: 0 }} />
                 </div>
 
                 {/* Expandable details */}
@@ -291,6 +292,39 @@ const AccountsPage: React.FC = () => {
           </div>
         </div>
       )}
+      <style>{`
+        @media (max-width: 767px) {
+          #accounts.page {
+            padding: 16px !important;
+          }
+          .card-row-wrapper {
+            position: relative !important;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 16px !important;
+            padding: 24px 16px 20px !important;
+          }
+          .card-visual-wrapper {
+            margin: 0 auto !important;
+          }
+          .card-details-wrapper {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .card-details-header {
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+          }
+          .card-chevron-arrow {
+            position: absolute !important;
+            right: 16px !important;
+            top: 24px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

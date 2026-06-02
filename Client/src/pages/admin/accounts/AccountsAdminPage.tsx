@@ -65,6 +65,19 @@ const AccountsAdminPage: React.FC = () => {
   const [isSubmittingKycReq, setIsSubmittingKycReq] = useState(false);
   const [kycRequests, setKycRequests] = useState<any[]>([]);
 
+  // Premium UI notifications & modals states
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState<number | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setToast({ message, type });
+    // Reset toast after 3.5 seconds
+    setTimeout(() => {
+      setToast(null);
+    }, 3500);
+  };
+
   const fetchKycRequests = async (userId: number) => {
     try {
       const { data } = await api.get(`/admin/users/${userId}/kyc-requests`);
@@ -77,6 +90,7 @@ const AccountsAdminPage: React.FC = () => {
   const openDrawer = (a: AdminUser) => {
     setSelectedAcc(a);
     setDrawerOpen(true);
+    setRequireKycMsg(""); // Reset input message on each user drawer click
     fetchKycRequests(a.id);
   };
 
@@ -137,16 +151,24 @@ const AccountsAdminPage: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
-    if (!window.confirm("Are you sure you want to permanently delete this user? This action cannot be undone.")) return;
+  const confirmDeleteUser = (userId: number) => {
+    setUserIdToDelete(userId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteUserSubmit = async () => {
+    if (!userIdToDelete) return;
     try {
-      await api.delete(`/admin/users/${userId}`);
+      await api.delete(`/admin/users/${userIdToDelete}`);
       await queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setDrawerOpen(false);
       setSelectedAcc(null);
+      setDeleteConfirmOpen(false);
+      setUserIdToDelete(null);
+      showToast("User account has been permanently deleted.", "success");
     } catch (err) {
       console.error("Failed to delete user", err);
-      alert("Failed to delete user. Please try again.");
+      showToast("Failed to delete user. Please try again.", "error");
     }
   };
 
@@ -155,13 +177,14 @@ const AccountsAdminPage: React.FC = () => {
     setIsSubmittingKycReq(true);
     try {
       await api.post(`/admin/users/${selectedAcc.id}/require-kyc`, { message: requireKycMsg });
-      alert("KYC Request sent successfully.");
+      showToast("Additional KYC Request has been sent to the user.", "success");
       setRequireKycOpen(false);
       setRequireKycMsg("");
-      fetchKycRequests(selectedAcc.id);
+      setDrawerOpen(false); // Close details drawer
+      setSelectedAcc(null); // Clear selected account
     } catch(err) {
       console.error("Failed to require KYC", err);
-      alert("Failed to send request.");
+      showToast("Failed to send KYC request. Please try again.", "error");
     } finally {
       setIsSubmittingKycReq(false);
     }
@@ -233,9 +256,9 @@ const AccountsAdminPage: React.FC = () => {
                   <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-2), var(--accent))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 700, color: '#fff', flexShrink: 0 }}>
                     {initials(fullName)}
                   </div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)' }}>{fullName}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{a.middle_name || 'N/A'}</div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={fullName}>{fullName}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={a.middle_name || 'N/A'}>{a.middle_name || 'N/A'}</div>
                   </div>
                 </div>
 
@@ -342,7 +365,7 @@ const AccountsAdminPage: React.FC = () => {
       </div>
 
       {/* Drawer */}
-      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={() => setDrawerOpen(false)}></div>
+      <div className={`drawer-overlay ${drawerOpen ? 'open' : ''}`} onClick={() => { setDrawerOpen(false); setSelectedAcc(null); }}></div>
       <div className={`drawer-panel ${drawerOpen ? 'open' : ''}`}>
         <button onClick={() => setDrawerOpen(false)} style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)' }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -450,7 +473,7 @@ const AccountsAdminPage: React.FC = () => {
               <button className="admin-btn btn-warn" onClick={() => setRequireKycOpen(true)} style={{ justifyContent: 'center' }}>⚠ Require KYC</button>
               <button className="admin-btn btn-ghost" onClick={() => fetchTransactions(selectedAcc.id)} style={{ justifyContent: 'center' }}>View Transactions</button>
               <button className="admin-btn btn-ghost" onClick={() => setContactOpen(true)} style={{ justifyContent: 'center' }}>✉ Contact</button>
-              <button className="admin-btn btn-danger" onClick={() => handleDeleteUser(selectedAcc.id)} style={{ gridColumn: '1 / -1', justifyContent: 'center', marginTop: '8px' }}>🗑 Delete User</button>
+              <button className="admin-btn btn-danger" onClick={() => confirmDeleteUser(selectedAcc.id)} style={{ gridColumn: '1 / -1', justifyContent: 'center', marginTop: '8px' }}>🗑 Delete User</button>
             </div>
           </div>
         )}
@@ -564,6 +587,74 @@ const AccountsAdminPage: React.FC = () => {
                 style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'var(--accent)', border: 'none', color: '#fff', fontWeight: 700, cursor: (!requireKycMsg.trim() || isSubmittingKycReq) ? 'not-allowed' : 'pointer', opacity: (!requireKycMsg.trim() || isSubmittingKycReq) ? 0.6 : 1 }}
               >
                 {isSubmittingKycReq ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} /> : "Send Request"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification Container */}
+      <style>{`
+        @keyframes toastSlideIn {
+          0% { transform: translateX(120%) scale(0.9); opacity: 0; }
+          100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+      `}</style>
+      {toast && (
+        <div 
+          className="fixed top-24 right-6 z-[9999] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.22)] border backdrop-blur-xl"
+          style={{
+            animation: 'toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            background: toast.type === 'success' ? 'rgba(6, 78, 59, 0.92)' : 'rgba(153, 27, 27, 0.92)',
+            borderColor: toast.type === 'success' ? 'rgba(52, 211, 153, 0.25)' : 'rgba(248, 113, 113, 0.25)',
+            color: '#fff',
+          }}
+        >
+          {toast.type === 'success' ? (
+            <div className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
+              <svg className="w-3.5 h-3.5 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-rose-500/20 border border-rose-400/30 flex items-center justify-center shrink-0">
+              <svg className="w-3.5 h-3.5 text-rose-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+          )}
+          <span className="text-sm font-bold tracking-wide">{toast.message}</span>
+        </div>
+      )}
+
+      {/* Delete User Confirmation Modal */}
+      {deleteConfirmOpen && (
+        <div className="drawer-overlay open" onClick={() => setDeleteConfirmOpen(false)} style={{ zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface)', padding: '28px', borderRadius: 'var(--radius-lg)', width: '90%', maxWidth: '420px', border: '1px solid var(--border)', boxShadow: '0 25px 70px rgba(0,0,0,0.35)' }}>
+            <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: '20px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(239,68,68,0.1)', color: 'var(--danger)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>Permanently Delete User?</h3>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                  Are you absolutely sure you want to delete this account? All associated transaction histories, KYC data, and bank cards will be permanently erased. <strong>This action cannot be undone.</strong>
+                </p>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                onClick={() => setDeleteConfirmOpen(false)} 
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteUserSubmit} 
+                style={{ flex: 1, padding: '12px', borderRadius: '8px', background: 'var(--danger)', border: 'none', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Permanently Delete
               </button>
             </div>
           </div>

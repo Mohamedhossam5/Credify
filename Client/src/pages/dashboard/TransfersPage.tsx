@@ -294,12 +294,12 @@ const TransfersPage: React.FC = () => {
 
   return (
     <section id="transfers" className="page active" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: '1400px' }}>
+      <div className="transfers-container" style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', width: '100%', maxWidth: '1400px' }}>
 
         {/* Left Spacer */}
-        <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: '24px' }}>
+        <div className="transfers-left-col" style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', paddingRight: '24px' }}>
           {/* Left Column: Beneficiaries Dropdown */}
-          <div ref={beneficiaryRef} style={{ position: 'relative', width: '240px', flexShrink: 0, zIndex: 50 }}>
+          <div ref={beneficiaryRef} className="transfers-beneficiary-wrap" style={{ position: 'relative', width: '240px', flexShrink: 0, zIndex: 50 }}>
             <label style={{ ...labelStyle, marginBottom: '12px' }}><Star size={13} /> Saved Beneficiaries</label>
             {beneficiaries.length > 0 ? (
               <>
@@ -313,7 +313,7 @@ const TransfersPage: React.FC = () => {
                 </button>
 
                 {isBeneficiariesOpen && (
-                  <div style={{
+                  <div className="transfers-dropdown-container" style={{
                     position: 'absolute', top: '100%', left: 0, width: '100%', marginTop: '6px', background: 'var(--floating-menu-bg, #ffffff)', borderRadius: '14px', border: '1px solid rgba(0,0,0,0.06)', padding: '6px', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px', overflowY: 'auto', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 20px 48px -10px rgba(0, 0, 0, 0.15)', animation: 'floatingMenuIn 0.18s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}>
                     {beneficiaries.map(b => (
@@ -525,7 +525,7 @@ const TransfersPage: React.FC = () => {
               </div>
 
               {/* Form Fields */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div className="transfers-grid-fields" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={labelStyle}><User size={13} /> Recipient Name</label>
                   <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. Ahmed Nady" />
@@ -536,7 +536,7 @@ const TransfersPage: React.FC = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div className="transfers-grid-fields" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div style={{ position: 'relative' }}>
                   <label style={labelStyle}><DollarSign size={13} /> Amount (EGP)</label>
                   <input type="text" value={amtStr} onChange={onAmt} className="premium-input" style={{ ...inputStyle, fontFamily: mono, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }} placeholder="0.00" />
@@ -554,7 +554,7 @@ const TransfersPage: React.FC = () => {
 
               {/* Conditional fields for DOMESTIC / INTERNATIONAL */}
               {transferType !== 'SAME_BANK' && (
-                <div style={{ display: 'grid', gridTemplateColumns: transferType === 'INTERNATIONAL' ? '1fr 1fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
+                <div className="transfers-grid-fields" style={{ display: 'grid', gridTemplateColumns: transferType === 'INTERNATIONAL' ? '1fr 1fr' : '1fr', gap: '20px', marginBottom: '20px' }}>
                   <div>
                     <label style={labelStyle}><Building2 size={13} /> Recipient Bank</label>
                     <input type="text" value={recipientBank} onChange={e => setRecipientBank(e.target.value)} className="premium-input" style={inputStyle} placeholder="e.g. National Bank of Egypt" />
@@ -601,9 +601,74 @@ const TransfersPage: React.FC = () => {
         </div>
 
         {/* Right Spacer */}
-        <div style={{ flex: 1 }}></div>
+        <div className="transfers-right-col" style={{ flex: 1 }}></div>
 
       </div>
+      <style>{`
+        /* Styles for Tablets and Mobile (up to 1024px) */
+        @media (max-width: 1024px) {
+          .transfers-container {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 20px !important;
+            padding: 0 !important;
+          }
+          .transfers-left-col {
+            padding-right: 0 !important;
+            justify-content: center !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: none !important;
+          }
+          .transfers-beneficiary-wrap {
+            width: 100% !important;
+            max-width: 320px !important;
+            margin: 0 auto !important;
+          }
+          .transfers-right-col {
+            display: none !important;
+          }
+          .transfers-dropdown-container {
+            position: relative !important;
+            top: 0 !important;
+            margin-top: 12px !important;
+            max-height: 120px !important;
+            box-shadow: none !important;
+            border: 1.5px solid var(--glass-border) !important;
+            background: var(--glass) !important;
+            backdrop-filter: blur(12px) !important;
+            margin-bottom: 8px !important;
+          }
+          /* Premium custom scrollbar styling for mobile/tablet dropdown */
+          .transfers-dropdown-container::-webkit-scrollbar {
+            width: 4px !important;
+          }
+          .transfers-dropdown-container::-webkit-scrollbar-thumb {
+            background: var(--teal) !important;
+            border-radius: 4px !important;
+          }
+          .transfers-dropdown-container::-webkit-scrollbar-track {
+            background: transparent !important;
+          }
+        }
+
+        /* Specific Styles for Mobile Phones (up to 767px) */
+        @media (max-width: 767px) {
+          #transfers.page {
+            padding: 16px !important;
+          }
+          #transfer-panel {
+            padding: 24px 16px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          .transfers-grid-fields {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+            margin-bottom: 16px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

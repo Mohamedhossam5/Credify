@@ -71,7 +71,7 @@ export const useNotifications = () => {
       return data.requests || [];
     },
     enabled: !!user,
-    refetchInterval: 15000,
+    refetchInterval: 3000,
   });
 
   // Build notifications from real data

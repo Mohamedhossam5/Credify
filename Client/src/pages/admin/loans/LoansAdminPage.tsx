@@ -11,7 +11,7 @@ import { realtime, RealtimeEvent } from '../../../lib/realtime';
 
 // ─── Helpers ─────────────────────────────────────────────────
 const f = '"Inter",sans-serif';
-const mono = '"DM Mono",monospace';
+const mono = '"JetBrains Mono",monospace';
 const formatEGP = (val: number) => val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: React.ReactNode; label: string }> = {
@@ -167,12 +167,11 @@ const LoansAdminPage: React.FC = () => {
       </div>
 
       {/* Loans Table */}
-      <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+      <div style={{ padding: '0', overflow: 'hidden' }}>
         {/* Table Header */}
         <div className="loans-table-header" style={{
           display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px',
-          padding: '14px 24px', borderBottom: '1px solid var(--glass-border)',
-          background: 'var(--glass)',
+          padding: '10px 24px', marginBottom: '8px', opacity: 0.8,
         }}>
           {['ID', 'Applicant', 'Amount', 'Tenure', 'Rate', 'Status', 'Actions'].map((h) => (
             <span key={h} style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', fontFamily: f }}>{h}</span>
@@ -185,28 +184,22 @@ const LoansAdminPage: React.FC = () => {
             <Loader2 size={28} style={{ color: 'var(--teal)', animation: 'spin 1s linear infinite' }} />
           </div>
         ) : filteredLoans.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--text-secondary)' }}>
+          <div className="glass-card" style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--text-secondary)' }}>
             <Landmark size={36} style={{ opacity: 0.3, marginBottom: '12px' }} />
             <p style={{ fontSize: '14px', fontWeight: 500 }}>No loan applications found</p>
           </div>
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="loans-desktop-table">
+            <div className="loans-desktop-table" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {filteredLoans.map((loan: any) => {
                 const status = STATUS_CONFIG[loan.status] || STATUS_CONFIG.PENDING;
                 const isExpanded = expandedLoanId === loan.id;
                 return (
-                  <div key={loan.id}>
+                  <div key={loan.id} className={`loan-card-wrapper ${isExpanded ? 'expanded' : ''}`}>
                     <div
+                      className="loan-wide-row"
                       onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
-                      style={{
-                        display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px',
-                        padding: '16px 24px', alignItems: 'center', cursor: 'pointer',
-                        borderBottom: '1px solid var(--glass-border)', transition: 'background 0.15s',
-                      }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--row-hover)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
                       <span style={{ fontSize: '12px', fontWeight: 600, fontFamily: mono, color: 'var(--text-secondary)' }}>#{loan.id}</span>
 
@@ -280,7 +273,7 @@ const LoansAdminPage: React.FC = () => {
 
                     {/* Expanded Row Details */}
                     {isExpanded && (
-                      <div style={{ padding: '16px 24px', background: 'var(--glass)', borderBottom: '1px solid var(--glass-border)' }}>
+                      <div className="loan-expanded-details">
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
                           {[
                             { l: 'Monthly Payment', v: `EGP ${formatEGP(parseFloat(loan.monthly_payment))}` },
@@ -522,6 +515,35 @@ const LoansAdminPage: React.FC = () => {
           </div>
         </div>
       )}
+      
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media (max-width: 767px) {
+          .loans-filter-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 16px !important;
+          }
+          .loans-tabs-container {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            width: 100% !important;
+            gap: 4px !important;
+            padding: 4px !important;
+          }
+          .loans-tabs-container button {
+            padding: 8px 4px !important;
+            text-align: center !important;
+            width: 100% !important;
+            font-size: 11px !important;
+          }
+          .loans-filter-row > div:last-child {
+            width: 100% !important;
+          }
+          .loans-filter-row input {
+            width: 100% !important;
+          }
+        }
+      `}} />
     </div>
   );
 };

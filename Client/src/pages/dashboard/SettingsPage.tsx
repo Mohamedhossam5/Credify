@@ -209,7 +209,7 @@ const SettingsPage: React.FC = () => {
             </div>
             <div className="section-title" style={{ color: 'var(--text-primary)', fontSize: '16px' }}>Personal Information</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+          <div className="settings-info-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.8px', color: 'var(--text-secondary)', marginBottom: '8px', fontFamily: f }}>First Name</label>
               <input type="text" className="premium-input" style={{ ...inputStyle, opacity: 0.7, cursor: 'not-allowed' }} value={formValues.firstName} readOnly />
@@ -381,11 +381,11 @@ const SettingsPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-                  <button className="btn-primary" style={{ fontSize: '13px', padding: '10px 20px', background: 'linear-gradient(135deg, #4F46E5, #8B5CF6)', boxShadow: '0 4px 16px rgba(79, 70, 229, 0.3)', border: 'none' }} onClick={submitPasswordChange}>
+                <div className="password-actions-flex" style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+                  <button className="btn-primary password-update-btn" style={{ fontSize: '13px', padding: '10px 20px', background: 'linear-gradient(135deg, #4F46E5, #8B5CF6)', boxShadow: '0 4px 16px rgba(79, 70, 229, 0.3)', border: 'none' }} onClick={submitPasswordChange}>
                     Update Password
                   </button>
-                  <button onClick={togglePwSection} style={{ padding: '10px 20px', borderRadius: '12px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: f }}>
+                  <button className="password-cancel-btn" onClick={togglePwSection} style={{ padding: '10px 20px', borderRadius: '12px', background: 'transparent', border: '1px solid var(--glass-border)', color: 'var(--text-secondary)', fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s', fontFamily: f }}>
                     Cancel
                   </button>
                 </div>
@@ -529,6 +529,40 @@ const SettingsPage: React.FC = () => {
           address: formValues.address,
         }}
       />
+      <style>{`
+        @media (max-width: 767px) {
+          #settings.page {
+            padding: 16px !important;
+            padding-bottom: 80px !important;
+          }
+          .settings-info-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .settings-info-grid > div {
+            grid-column: auto !important;
+            width: 100% !important;
+          }
+          .cr-settings-trigger {
+            margin-top: 28px !important;
+          }
+          .password-actions-flex {
+            gap: 8px !important;
+          }
+          .password-update-btn {
+            font-size: 11px !important;
+            padding: 10px 12px !important;
+            white-space: nowrap !important;
+            flex: 1.5 !important;
+          }
+          .password-cancel-btn {
+            font-size: 11px !important;
+            padding: 10px 12px !important;
+            flex: 1 !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

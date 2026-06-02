@@ -120,13 +120,13 @@ const DonationsPage: React.FC = () => {
   return (
     <div className="dashboard-content">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--glass)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="donation-header-flex" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+          <div className="donation-heart-wrap" style={{ width: '48px', height: '48px', borderRadius: '16px', background: 'var(--glass)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Heart size={24} style={{ color: 'var(--teal)' }} />
           </div>
           <div>
-            <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0', fontFamily: f }}>Make a Donation</h1>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0, fontFamily: f }}>Support your favorite charities and NGOs securely.</p>
+            <h1 className="donation-title-text" style={{ fontSize: '28px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0', fontFamily: f }}>Make a Donation</h1>
+            <p className="donation-desc-text" style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: 0, fontFamily: f }}>Support your favorite charities and NGOs securely.</p>
           </div>
         </div>
 
@@ -242,6 +242,29 @@ const DonationsPage: React.FC = () => {
           )}
         </div>
       </div>
+      <style>{`
+        @media (max-width: 767px) {
+          .donation-header-flex {
+            gap: 12px !important;
+            margin-bottom: 20px !important;
+          }
+          .donation-heart-wrap {
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 12px !important;
+          }
+          .donation-heart-wrap svg {
+            width: 18px !important;
+            height: 18px !important;
+          }
+          .donation-title-text {
+            font-size: 20px !important;
+          }
+          .donation-desc-text {
+            font-size: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

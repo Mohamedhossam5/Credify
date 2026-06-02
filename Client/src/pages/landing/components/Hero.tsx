@@ -71,7 +71,10 @@ const Hero: React.FC = () => {
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1s_ease-in-out] pointer-events-none"></span>
               <span className="relative z-10">Get Started</span>
               <div className="relative z-10 w-8 h-8 sm:w-10 sm:h-10 bg-white/10 rounded-full flex justify-center items-center transition-all duration-300 group-hover:rotate-45 group-hover:bg-white/20">
-                <i className="fa-solid fa-arrow-right text-xs sm:text-sm"></i>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
               </div>
             </Link>
           </div>

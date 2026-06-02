@@ -60,6 +60,17 @@ const AdminDashboardPage: React.FC = () => {
   const transactions = txData ?? [];
   const loading = isLoadingUsers || isLoadingTx;
 
+  // 6 most recent registered users (sorted by date descending)
+  const recentUsersList = [...users]
+    .filter(u => u.role !== 'ADMIN')
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
+
+  // 6 most recent transactions (sorted by date descending)
+  const recentTransactionsList = [...transactions]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 6);
+
   // ── Derived stats ──
   const totalUsers = users.filter(u => u.role !== 'ADMIN').length;
   const pendingKyc = users.filter(u => u.kyc_app_status === 'PENDING_ADMIN_REVIEW').length;
@@ -129,13 +140,13 @@ const AdminDashboardPage: React.FC = () => {
             <div className="section-title" style={{ margin: 0 }}>All Users</div>
             <button onClick={() => navigate('/admin/accounts')} style={{ fontSize: '11px', color: 'var(--teal, #0ecbcb)', fontWeight: 600, fontFamily: f, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>View All <ChevronRight size={12} /></button>
           </div>
-          <div style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '12px' }}>
-            {users.filter(u => u.role !== 'ADMIN').slice(0, 3).map(u => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {recentUsersList.map(u => {
               const statusColor = u.kyc_status === 'APPROVED' ? 'var(--success, #00e88f)' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? '#f59e0b' : u.kyc_status === 'REJECTED' ? 'var(--danger, #ff4d6a)' : 'var(--text-muted, var(--text-secondary))';
               const statusLabel = u.kyc_status === 'APPROVED' ? 'APPROVED' : u.kyc_app_status === 'PENDING_ADMIN_REVIEW' ? 'PENDING REVIEW' : u.kyc_status === 'REJECTED' ? 'REJECTED' : u.kyc_app_status?.replace(/_/g, ' ') || 'PENDING';
               const initials = (u.first_name[0] + u.last_name[0]).toUpperCase();
               return (
-                <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
+                <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--teal, #0ecbcb), var(--blue, #1a6fff))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800, color: '#fff', flexShrink: 0 }}>{initials}</div>
                     <div style={{ minWidth: 0 }}>
@@ -157,11 +168,10 @@ const AdminDashboardPage: React.FC = () => {
             <div className="section-title" style={{ margin: 0 }}>Recent Transactions</div>
             <button onClick={() => navigate('/admin/transactions')} style={{ fontSize: '11px', color: 'var(--teal, #0ecbcb)', fontWeight: 600, fontFamily: f, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>View All <ChevronRight size={12} /></button>
           </div>
-          <div style={{ maxHeight: '420px', overflowY: 'auto', paddingRight: '12px' }}>
-            {transactions.slice(0, 15).map(tx => {
-              const isSent = true; // All transactions in the global list are outgoing from sender
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {recentTransactionsList.map(tx => {
               return (
-                <div key={tx.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
+                <div key={tx.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border, var(--glass-border))' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                     <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(255,77,106,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <ArrowUpRight size={14} style={{ color: 'var(--danger, #ff4d6a)' }} />

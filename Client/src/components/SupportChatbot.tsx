@@ -45,6 +45,7 @@ const faqs = [
 
 const SupportChatbot: React.FC = () => {
   const { user } = useAuthStore();
+  const isSettingsPage = window.location.pathname.includes('/settings');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [isLauncherPulse, setIsLauncherPulse] = useState(true);
@@ -185,7 +186,7 @@ const SupportChatbot: React.FC = () => {
             alignItems: 'center',
             gap: '14px',
             animation: 'slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            opacity: isHovered ? 0 : 1,
+            opacity: (isHovered && !isSettingsPage) ? 0 : 1,
             transition: 'opacity 0.3s ease-in-out'
           }}
         >
@@ -266,7 +267,7 @@ const SupportChatbot: React.FC = () => {
       {/* Expanded Floating Chat Panel */}
       {isChatOpen && (
         <div
-          className="glass-card"
+          className="glass-card global-support-chatbot"
           style={{
             position: 'fixed',
             bottom: '30px',
@@ -486,6 +487,23 @@ const SupportChatbot: React.FC = () => {
           </form>
         </div>
       )}
+      <style>{`
+        @media (max-width: 767px) {
+          .global-support-chatbot {
+            bottom: auto !important;
+            right: auto !important;
+            top: 54% !important;
+            left: 50% !important;
+            transform: translate(-50%, -46%) !important;
+            width: 92% !important;
+            max-width: 380px !important;
+            height: 82% !important;
+            max-height: 565px !important;
+            border-radius: 20px !important;
+            padding: 16px !important;
+          }
+        }
+      `}</style>
     </>
   );
 };

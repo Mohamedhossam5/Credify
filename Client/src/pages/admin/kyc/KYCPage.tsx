@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Loader2, CheckCircle2, XCircle, AlertTriangle, Eye, ShieldCheck, ShieldAlert, RefreshCw } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, AlertTriangle, Eye, ShieldCheck, ShieldAlert, RefreshCw, FileText } from 'lucide-react';
 import { api } from '../../../lib/api';
 import toast from 'react-hot-toast';
 import { realtime, RealtimeEvent } from '../../../lib/realtime';
@@ -114,8 +114,8 @@ const KYCPage: React.FC = () => {
     return (
       <div key={u.id} className="admin-card" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--border, var(--glass-border))' }}>
         {/* Header Row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', cursor: 'pointer' }} onClick={() => setExpandedUser(isExpanded ? null : u.id)}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+        <div className="kyc-card-header" onClick={() => setExpandedUser(isExpanded ? null : u.id)}>
+          <div className="kyc-header-user" style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--teal, #0ecbcb), var(--blue, #1a6fff))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 800, color: '#fff', flexShrink: 0 }}>
               {initials(u.first_name, u.last_name)}
             </div>
@@ -124,7 +124,7 @@ const KYCPage: React.FC = () => {
               <div style={{ fontSize: '12px', color: 'var(--text-muted, var(--text-secondary))', fontFamily: '"DM Mono", monospace' }}>{u.email}</div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="kyc-header-badges" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {/* AI Face Verification Badge */}
             {faceScore !== null ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: '8px', background: facePassed ? 'rgba(0,232,143,0.1)' : 'rgba(255,77,106,0.1)', border: `1px solid ${facePassed ? 'rgba(0,232,143,0.2)' : 'rgba(255,77,106,0.2)'}` }}>
@@ -144,7 +144,7 @@ const KYCPage: React.FC = () => {
             <span className={`badge ${isReviewed ? (u.kyc_status === 'APPROVED' ? 'badge-green' : 'badge-red') : 'badge-yellow'}`} style={{ fontSize: '10px' }}>
               {isReviewed ? u.kyc_status : 'PENDING REVIEW'}
             </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-muted, var(--text-secondary))', transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s ease' }}><polyline points="6 9 12 15 18 9" /></svg>
+            <svg className="kyc-chevron-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0)' }}><polyline points="6 9 12 15 18 9" /></svg>
           </div>
         </div>
 
@@ -205,7 +205,7 @@ const KYCPage: React.FC = () => {
 
             {/* Document Previews */}
             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--text-muted, var(--text-secondary))', marginBottom: '10px' }}>Uploaded Documents</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+            <div className="kyc-docs-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginBottom: '20px' }}>
               {[
                 { file: u.national_id_front_file, label: 'ID Front' },
                 { file: u.national_id_back_file, label: 'ID Back' },
@@ -213,26 +213,29 @@ const KYCPage: React.FC = () => {
                 { file: u.proof_of_address_file, label: 'Proof of Address' },
               ].map((doc, i) => {
                 const url = getImageUrl(doc.file);
+                const hasDoc = !!url;
                 return (
-                  <div key={i} onClick={() => url && setPreviewImage({ url, label: `${doc.label} — ${u.first_name} ${u.last_name}` })} style={{
-                    borderRadius: '10px', border: '1px solid var(--border, var(--glass-border))', overflow: 'hidden', cursor: url ? 'pointer' : 'default', transition: 'all 0.2s ease', position: 'relative',
-                  }}>
-                    {url ? (
-                      <div style={{ position: 'relative' }}>
-                        <img src={url} alt={doc.label} style={{ width: '100%', height: '90px', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                        <div style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '6px', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <Eye size={12} style={{ color: '#fff' }} />
+                  <div 
+                    key={i} 
+                    className={`kyc-doc-card ${hasDoc ? 'has-doc' : 'no-doc'}`}
+                    onClick={() => url && setPreviewImage({ url, label: `${doc.label} — ${u.first_name} ${u.last_name}` })}
+                  >
+                    <div className="kyc-doc-info">
+                      <div className="kyc-doc-icon-container">
+                        <FileText size={14} />
+                      </div>
+                      <div className="kyc-doc-meta">
+                        <div className="kyc-doc-label">{doc.label}</div>
+                        <div className={`kyc-doc-status ${hasDoc ? 'status-uploaded' : 'status-missing'}`}>
+                          {hasDoc ? '✓ UPLOADED' : '✗ NOT UPLOADED'}
                         </div>
                       </div>
-                    ) : (
-                      <div style={{ height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base, rgba(255,255,255,0.02))', color: 'var(--text-muted, var(--text-secondary))' }}>
-                        <XCircle size={20} />
-                      </div>
-                    )}
-                    <div style={{ padding: '6px 8px', fontSize: '10px', fontWeight: 700, color: url ? 'var(--text-primary)' : 'var(--text-muted, var(--text-secondary))', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      {doc.label}
-                      {!url && <span style={{ display: 'block', fontSize: '9px', fontWeight: 500, color: 'var(--danger, #ff4d6a)' }}>Not uploaded</span>}
                     </div>
+                    {hasDoc && (
+                      <button className="kyc-eye-btn" aria-label="View Document">
+                        <Eye size={12} />
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -245,41 +248,29 @@ const KYCPage: React.FC = () => {
             </div>
             {(() => {
               const sigUrl = getImageUrl(u.digital_signature_file);
+              const hasSig = !!sigUrl;
               return (
-                <div
+                <div 
+                  className={`kyc-doc-card ${hasSig ? 'has-doc' : 'no-doc'}`}
                   onClick={() => sigUrl && setPreviewImage({ url: sigUrl, label: `Digital Signature — ${u.first_name} ${u.last_name}` })}
-                  style={{
-                    borderRadius: '12px',
-                    border: '1px solid var(--border, var(--glass-border))',
-                    overflow: 'hidden',
-                    cursor: sigUrl ? 'pointer' : 'default',
-                    transition: 'all 0.2s ease',
-                    marginBottom: '20px',
-                    maxWidth: '280px',
-                    background: sigUrl ? '#fff' : 'var(--bg-base, rgba(255,255,255,0.02))',
-                  }}
+                  style={{ maxWidth: '320px', marginBottom: '20px' }}
                 >
-                  {sigUrl ? (
-                    <div style={{ position: 'relative' }}>
-                      <img
-                        src={sigUrl}
-                        alt="Digital Signature"
-                        style={{ width: '100%', height: '80px', objectFit: 'contain', display: 'block', padding: '8px', background: '#fff' }}
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                      />
-                      <div style={{ position: 'absolute', top: '6px', right: '6px', width: '24px', height: '24px', borderRadius: '6px', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Eye size={12} style={{ color: '#fff' }} />
+                  <div className="kyc-doc-info">
+                    <div className="kyc-doc-icon-container">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </div>
+                    <div className="kyc-doc-meta">
+                      <div className="kyc-doc-label">Signature</div>
+                      <div className={`kyc-doc-status ${hasSig ? 'status-uploaded' : 'status-missing'}`}>
+                        {hasSig ? '✓ UPLOADED' : '✗ NOT PROVIDED'}
                       </div>
                     </div>
-                  ) : (
-                    <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted, var(--text-secondary))' }}>
-                      <XCircle size={20} />
-                    </div>
-                  )}
-                  <div style={{ padding: '6px 8px', fontSize: '10px', fontWeight: 700, color: sigUrl ? 'var(--text-primary)' : 'var(--text-muted, var(--text-secondary))', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.5px', borderTop: '1px solid var(--border, var(--glass-border))' }}>
-                    Signature
-                    {!sigUrl && <span style={{ display: 'block', fontSize: '9px', fontWeight: 500, color: 'var(--danger, #ff4d6a)' }}>Not provided</span>}
                   </div>
+                  {hasSig && (
+                    <button className="kyc-eye-btn" aria-label="View Signature">
+                      <Eye size={12} />
+                    </button>
+                  )}
                 </div>
               );
             })()}
@@ -385,6 +376,167 @@ const KYCPage: React.FC = () => {
           </div>
         </div>
       )}
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Custom styles for KYC Page document pills and responsiveness */
+        .kyc-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 20px;
+          cursor: pointer;
+          user-select: none;
+          position: relative;
+        }
+
+        .kyc-chevron-arrow {
+          color: var(--text-muted, var(--text-secondary));
+          transition: transform 0.25s ease;
+          flex-shrink: 0;
+        }
+
+        /* Document Card */
+        .kyc-doc-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px;
+          background: var(--bg-card, rgba(255, 255, 255, 0.02));
+          border: 1px solid var(--border, var(--glass-border));
+          border-radius: 12px;
+          cursor: default;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          user-select: none;
+        }
+
+        .kyc-doc-card.has-doc {
+          cursor: pointer;
+        }
+
+        .kyc-doc-card.has-doc:hover {
+          background: rgba(14, 203, 203, 0.04) !important;
+          border-color: rgba(14, 203, 203, 0.35) !important;
+          box-shadow: 0 4px 12px rgba(14, 203, 203, 0.04);
+          transform: translateY(-1px);
+        }
+
+        .kyc-doc-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+        }
+
+        .kyc-doc-icon-container {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--border, var(--glass-border));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-secondary);
+          flex-shrink: 0;
+          transition: all 0.25s ease;
+        }
+
+        .kyc-doc-card.has-doc:hover .kyc-doc-icon-container {
+          background: rgba(14, 203, 203, 0.1) !important;
+          border-color: rgba(14, 203, 203, 0.2) !important;
+          color: var(--teal) !important;
+        }
+
+        .kyc-doc-meta {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+        }
+
+        .kyc-doc-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--text-primary);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .kyc-doc-status {
+          font-size: 8.5px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          margin-top: 2px;
+        }
+
+        .kyc-doc-status.status-uploaded {
+          color: var(--success, #00e88f);
+        }
+
+        .kyc-doc-status.status-missing {
+          color: var(--danger, #ff4d6a);
+        }
+
+        /* Circular Eye Button */
+        .kyc-eye-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(14, 203, 203, 0.08);
+          border: 1px solid rgba(14, 203, 203, 0.18);
+          color: var(--teal, #0ecbcb);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          border: none;
+          outline: none;
+        }
+
+        .kyc-doc-card.has-doc:hover .kyc-eye-btn,
+        .kyc-eye-btn:hover {
+          background: var(--teal, #0ecbcb) !important;
+          border-color: var(--teal, #0ecbcb) !important;
+          color: #fff !important;
+          transform: scale(1.05);
+          box-shadow: 0 0 10px rgba(14, 203, 203, 0.3);
+        }
+
+        @media (max-width: 767px) {
+          .kyc-card-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            padding: 16px 40px 16px 16px !important;
+          }
+          
+          .kyc-chevron-arrow {
+            position: absolute !important;
+            right: 16px !important;
+            top: 24px !important;
+          }
+
+          .kyc-header-user {
+            width: 100% !important;
+          }
+
+          .kyc-header-badges {
+            width: 100% !important;
+            justify-content: flex-start !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .kyc-docs-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}} />
     </>
   );
 };

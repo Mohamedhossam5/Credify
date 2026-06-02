@@ -156,6 +156,38 @@ const Transactions: React.FC = () => {
           </div>
         )}
       </div>
+      <style>{`
+        @media (max-width: 767px) {
+          #transactions.page {
+            padding: 16px !important;
+          }
+          .section-header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 8px !important;
+            margin-bottom: 16px !important;
+          }
+          .section-title {
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            white-space: nowrap !important;
+            letter-spacing: -0.3px !important;
+          }
+          .search-input {
+            width: 140px !important;
+            padding: 8px 12px 8px 32px !important;
+            font-size: 12px !important;
+            border-radius: 10px !important;
+          }
+          .search-icon {
+            left: 10px !important;
+            width: 12px !important;
+            height: 12px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

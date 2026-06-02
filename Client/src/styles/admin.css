@@ -729,40 +729,51 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 10px;
   border-radius: 999px;
   white-space: nowrap;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+  transition: all 0.2s ease;
 }
 
 .badge-green {
-  background: #d1fae5;
-  color: #065f46;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.18) !important;
 }
 
 .badge-red {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.18) !important;
 }
 
 .badge-yellow {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(245, 158, 11, 0.08) !important;
+  color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.18) !important;
 }
 
 .badge-blue {
-  background: #dbeafe;
-  color: #1e40af;
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.18) !important;
 }
 
 .badge-purple {
-  background: #ede9fe;
-  color: #5b21b6;
+  background: rgba(139, 92, 246, 0.08) !important;
+  color: #8b5cf6 !important;
+  border-color: rgba(139, 92, 246, 0.18) !important;
 }
 
 .badge-gray {
-  background: #f1f5f9;
+  background: rgba(154, 171, 184, 0.08) !important;
+  color: #9aabb8 !important;
+  border-color: rgba(154, 171, 184, 0.18) !important;
   color: #64748b;
 }
 
@@ -1075,7 +1086,7 @@
   position: fixed;
   inset: 0;
   z-index: 150;
-  background: rgba(0, 0, 0, 0.25);
+  background: transparent;
 }
 
 .drawer-overlay.open {
@@ -1103,49 +1114,93 @@
 
 @media (max-width: 600px) {
   .drawer-panel {
-    width: 100vw;
-    right: -100vw;
-    padding: 20px 16px;
+    width: 100% !important;
+    right: -100% !important;
+    padding: 20px 16px !important;
+    box-sizing: border-box !important;
+    border-left: none !important;
+  }
+
+  .drawer-panel.open {
+    right: 0 !important;
+    left: 0 !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .data-table th {
+    padding: 8px 10px !important;
+    font-size: 10px !important;
+  }
+
+  .data-table td {
+    padding: 12px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .modern-table-card {
+    padding: 12px 10px !important;
   }
 }
 
 /* ── TABLES ── */
+.modern-table-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  padding: 16px 20px;
+}
+
 .data-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
 .data-table th {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 10px 16px;
+  padding: 8px 20px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border: none;
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 13px 16px;
+  padding: 16px 20px;
   font-size: 13px;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
   color: var(--text-primary);
   vertical-align: middle;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.data-table tr:last-child td {
-  border-bottom: none;
+.data-table td:first-child {
+  border-left: 1px solid var(--border);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.data-table td:last-child {
+  border-right: 1px solid var(--border);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 .data-table tbody tr {
-  transition: background var(--transition-fast);
   cursor: pointer;
 }
 
-.data-table tbody tr:hover {
-  background: var(--bg-base);
+.data-table tbody tr:hover td {
+  background: var(--bg-surface);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.05);
 }
 
 /* ── MOBILE CARD LIST ── */
@@ -2015,31 +2070,38 @@
 
 .account-wide-card {
   display: grid;
-  grid-template-columns: 1.5fr 2.2fr 1fr 1.3fr 1.5fr 1.2fr; /* 6 columns default (Desktop) */
-  align-items: start; /* Align blocks to top so labels (EMAIL, BALANCE, KYC) line up perfectly */
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 2.2fr) minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1.2fr) minmax(0, 1fr);
+  /* strictly aligned columns */
+  align-items: center;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 18px 24px;
+  padding: 20px 24px;
   gap: 20px;
-  box-shadow: var(--shadow-card);
-  transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.account-wide-card > div {
-  min-width: 0; /* Critical Grid Fix: Prevents cells from overflowing container due to long text/emails */
+.account-wide-card>div {
+  min-width: 0;
+  /* Critical Grid Fix: Prevents cells from overflowing container due to long text/emails */
 }
 
-.account-wide-card > div:first-child,
-.account-wide-card > div:last-child {
-  align-self: center; /* Center the avatar/name and action button vertically */
+.account-wide-card>div:first-child,
+.account-wide-card>div:last-child {
+  align-self: center;
+  /* Center the avatar/name and action button vertically */
 }
 
 .account-wide-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--border-accent);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.08);
+  border-color: var(--accent);
 }
 
 .account-wide-card .col-label {
@@ -2070,16 +2132,17 @@
 }
 
 .btn-details {
-  background: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
+  border-radius: 10px;
+  padding: 10px 20px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  transition: opacity 0.15s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
@@ -2087,7 +2150,49 @@
 }
 
 .btn-details:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+}
+
+/* ── LOANS MANAGEMENT PREMIUM STYLING ── */
+.loan-card-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loan-card-wrapper:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.08);
+  border-color: var(--accent);
+}
+
+.loan-card-wrapper.expanded {
+  border-color: var(--accent);
+  box-shadow: 0 16px 40px rgba(37, 99, 235, 0.12);
+}
+
+.loan-wide-row {
+  display: grid;
+  grid-template-columns: 60px 1.5fr 1fr 0.6fr 0.7fr 1fr 140px;
+  align-items: center;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.loan-wide-row:hover {
+  background: var(--bg-card-hover);
+}
+
+.loan-expanded-details {
+  padding: 20px 24px;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border);
 }
 
 /* Premium Filter Header Styling */
@@ -2196,16 +2301,24 @@
 /* Tablet Optimizations (Screens 768px to 1024px) */
 @media (max-width: 1024px) and (min-width: 768px) {
   .account-wide-card {
-    grid-template-columns: 1.4fr 1.8fr 1fr 1.2fr 1.2fr 1.1fr; /* 6 columns layout for tablet! */
+    grid-template-columns: 2.3fr 2.1fr 1.1fr 1.1fr 1.1fr !important;
     padding: 14px 16px;
     gap: 12px;
   }
   
+  .account-wide-card .col-phone {
+    display: none !important;
+  }
+
+  .account-wide-card > div:nth-child(2) {
+    padding-left: 12px !important;
+  }
+
   .account-wide-card .col-label {
     font-size: 9px;
     margin-bottom: 2px;
   }
-  
+
   .account-wide-card .col-value {
     font-size: 12.5px;
   }
@@ -2227,9 +2340,10 @@
     gap: 12px;
     padding: 12px 16px;
   }
-  
+
   .modern-search-wrap {
-    max-width: 240px; /* Compact search bar on tablet */
+    max-width: 240px;
+    /* Compact search bar on tablet */
   }
 
   .filter-chips-area {
@@ -2256,6 +2370,7 @@
     flex-direction: column;
     gap: 16px;
   }
+
   .mobile-accounts-list {
     display: none;
   }
@@ -2265,6 +2380,7 @@
   .desktop-accounts-list {
     display: none;
   }
+
   .mobile-accounts-list {
     display: flex;
     flex-direction: column;
@@ -2295,8 +2411,9 @@
     width: 100%;
   }
 
-  .filter-chip-group > span {
-    width: 55px; /* Equal label width to vertically align status and type filter lists perfectly! */
+  .filter-chip-group>span {
+    width: 55px;
+    /* Equal label width to vertically align status and type filter lists perfectly! */
     flex-shrink: 0;
     font-size: 9px !important;
     color: var(--text-muted);
@@ -2330,6 +2447,10 @@
   gap: 14px;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .account-mobile-card:hover {
@@ -2400,14 +2521,17 @@
   .txn-stats-grid {
     gap: 8px !important;
   }
+
   .txn-stats-grid .card {
     padding: 10px 8px !important;
   }
-  .txn-stats-grid .card > div:first-child {
+
+  .txn-stats-grid .card>div:first-child {
     font-size: 8px !important;
     letter-spacing: 0.5px !important;
   }
-  .txn-stats-grid .card > div:last-child {
+
+  .txn-stats-grid .card>div:last-child {
     font-size: 14px !important;
   }
 }
@@ -2417,6 +2541,7 @@
   .desktop-table {
     display: block !important;
   }
+
   .mobile-card-container {
     display: none !important;
   }
@@ -2426,6 +2551,7 @@
   .desktop-table {
     display: none !important;
   }
+
   .mobile-card-container {
     display: flex !important;
     flex-direction: column;
@@ -2542,7 +2668,8 @@
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  word-spacing: 3px; /* Small premium space between words as requested! */
+  word-spacing: 3px;
+  /* Small premium space between words as requested! */
 }
 
 .kyc-status-pill.approved {
@@ -2577,14 +2704,17 @@
 
   .kyc-reviewed-email {
     font-size: 10.5px;
-    max-width: 190px; /* Increased to allow full emails like mahmoudnady99@gmail.com to display without being cut off! */
+    max-width: 190px;
+    /* Increased to allow full emails like mahmoudnady99@gmail.com to display without being cut off! */
   }
 
   .kyc-status-pill {
     font-size: 8.5px;
-    padding: 2px 6px; /* Compact padding and border as requested! */
+    padding: 2px 6px;
+    /* Compact padding and border as requested! */
     border-radius: 5px;
-    word-spacing: 2px; /* Balanced word spacing on mobile */
+    word-spacing: 2px;
+    /* Balanced word spacing on mobile */
   }
 
   .kyc-status-pill.pending {

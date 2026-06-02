@@ -4,6 +4,7 @@ import { useNotifications } from '../../hooks/useNotifications';
 import { createPortal } from 'react-dom';
 import { useAuthStore } from '../../store/authStore';
 import { api } from '../../lib/api';
+import toast from 'react-hot-toast';
 
 interface DashboardNavbarProps {
   onToggleSidebar: () => void;
@@ -450,12 +451,12 @@ const DashboardNavbar: React.FC<DashboardNavbarProps> = ({ onToggleSidebar }) =>
                     const fd = new FormData();
                     fd.append('document', kycUploadFile);
                     await api.post(`/kyc/requests/${activeKycNotif.metadata.requestId}/upload`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-                    alert("Document uploaded successfully.");
+                    toast.success("Document uploaded successfully.", { position: 'top-right' });
                     setKycUploadOpen(false);
                     setKycUploadFile(null);
                   } catch (err) {
                     console.error("KYC Upload Error", err);
-                    alert("Failed to upload document.");
+                    toast.error("Failed to upload document.", { position: 'top-right' });
                   } finally {
                     setIsUploadingKyc(false);
                   }
