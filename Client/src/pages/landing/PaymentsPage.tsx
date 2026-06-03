@@ -90,10 +90,10 @@ const PaymentsPage: React.FC = () => {
       <div className="relative pt-[120px] md:pt-[140px] pb-12 md:pb-20 overflow-hidden bg-gradient-to-b from-[#E0F2FE] to-white">
         <div className="absolute top-0 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#DCFCE7]/60 via-[#E0F2FE]/40 to-transparent" />
 
-        <div className="max-w-[1400px] mx-auto px-6 sm:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-10">
+        <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-16 relative z-10 flex flex-col lg:flex-row items-center gap-8 lg:gap-12 xl:gap-20">
 
           {/* Left: Text */}
-          <div className="w-full lg:w-[36%] shrink-0 text-center lg:text-left flex flex-col items-center lg:items-start">
+          <div className="w-full lg:w-[44%] shrink-0 text-center lg:text-left flex flex-col items-center lg:items-start">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 border border-[#3b82f6]/20 text-[#3b82f6] font-semibold text-sm mb-5 md:mb-7 backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
               Global Infrastructure
@@ -104,15 +104,19 @@ const PaymentsPage: React.FC = () => {
                 Global Payments
               </span>
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed mb-7 md:mb-9 max-w-xl">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed mb-7 md:mb-9 max-w-xl lg:max-w-none">
               Move money faster, safer, and smarter. Whether you are splitting bills with friends or accepting international business payments, our infrastructure has you covered.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Link
                 to="/register"
-                className="bg-slate-900 hover:bg-[#22c55e] text-white text-center font-bold py-4 px-10 rounded-full shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="relative group bg-slate-900 hover:bg-[#22c55e] text-white text-center font-bold py-4 px-10 rounded-full shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
               >
-                Start processing
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Start processing
+                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </span>
+                <div className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[30deg] transition-all duration-700 group-hover:left-[100%]" />
               </Link>
             </div>
 
@@ -140,63 +144,59 @@ const PaymentsPage: React.FC = () => {
           </div>
 
           {/* Right: Mockups */}
-          <div className="w-full lg:w-[60%] relative mt-10 lg:mt-0 flex justify-center items-center">
-            {/* Ambient Background Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] bg-gradient-to-tr from-[#4ade80]/20 via-[#3b82f6]/25 to-[#6366f1]/20 rounded-full blur-[90px] pointer-events-none" />
+          <div className="w-full lg:w-[50%] relative mt-10 lg:mt-0 flex justify-center lg:justify-end items-center">
             
+            {/* Ambient Background Glow - Calm */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-gradient-to-tr from-[#4ade80]/10 via-[#3b82f6]/15 to-[#6366f1]/10 rounded-full blur-[80px] pointer-events-none" />
+
             {/* Layered Mockup Space */}
-            <div className="relative w-full max-w-[620px] lg:max-w-none" style={{ paddingRight: '16%', paddingBottom: '13%' }}>
+            <div className="relative w-full max-w-[500px] lg:max-w-[540px] xl:max-w-[580px] mx-auto lg:ml-auto lg:mr-0 px-4 sm:px-6 pb-6">
               
-              {/* Desktop Browser Window Mockup */}
-              <div
-                className="relative z-10 w-full rounded-2xl overflow-hidden bg-[#0c1017] transition-all duration-700 ease-out hover:-translate-y-2 hover:shadow-[0_45px_90px_-20px_rgba(0,0,0,0.75)] animate-[fadeInUp_0.8s_ease-out]"
-                style={{
-                  boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 4px 6px -1px rgba(0,0,0,0.1), 0 25px 60px -15px rgba(0,0,0,0.5), 0 50px 100px -20px rgba(0,0,0,0.6)',
-                }}
-              >
-                {/* Browser Header Bar */}
-                <div className="flex items-center justify-center px-4 py-2.5 bg-[#0d131f] border-b border-white/5 select-none">
-                  <div className="text-[10px] text-slate-400 font-mono bg-white/5 px-4 py-0.5 rounded-full border border-white/5 tracking-wider">
-                    credify.com
+              {/* Desktop MacBook Pro Mockup (Ultra-Refined) */}
+              <div className="relative z-10 w-full drop-shadow-2xl animate-[fadeInUp_0.8s_ease-out]">
+                {/* Screen Bezel & Display */}
+                <div className="relative mx-auto w-full sm:w-[94%] bg-[#121212] p-[4px] sm:p-[6px] rounded-t-[12px] sm:rounded-t-[16px] border border-slate-700/50 flex flex-col shadow-lg">
+                  {/* Delicate Screen Notch */}
+                  <div className="absolute top-[4px] sm:top-[6px] left-1/2 -translate-x-1/2 w-[12%] h-[6px] sm:h-[8px] bg-[#121212] rounded-b-[4px] z-30 flex justify-center items-end pb-[1px]">
+                    <div className="w-[3px] h-[3px] rounded-full bg-white/10" />
+                  </div>
+                  
+                  {/* Screen Content Wrapper */}
+                  <div className="relative rounded-t-[8px] sm:rounded-t-[10px] overflow-hidden bg-[#0a0a0a] aspect-[16/10] border border-[#222]">
+                    <img
+                      src={dashboardDark}
+                      alt="Credify Desktop Dashboard"
+                      fetchPriority="high"
+                      loading="eager"
+                      className="w-full h-full object-cover object-left-top block"
+                    />
+                  </div>
+                  
+                  {/* Bottom Black Bezel with Text */}
+                  <div className="relative w-full h-[14px] sm:h-[18px] flex items-center justify-center">
+                    <span className="text-[5px] sm:text-[7px] font-medium text-slate-400 tracking-[0.25em] select-none opacity-80">
+                      MacBook Pro
+                    </span>
                   </div>
                 </div>
-
-                <div className="relative">
-                  <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent z-10" />
-                  <img
-                    src={dashboardDark}
-                    alt="Credify Desktop Dashboard"
-                    fetchPriority="high"
-                    loading="eager"
-                    className="w-full h-auto object-contain block"
-                  />
+                
+                {/* MacBook Silver Base */}
+                <div className="relative mx-auto w-[102%] sm:w-[98%] -left-[1%] sm:left-0 h-[8px] sm:h-[10px] bg-gradient-to-b from-[#e2e8f0] to-[#94a3b8] rounded-b-[8px] sm:rounded-b-[12px] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),_0_20px_40px_rgba(0,0,0,0.2)] border-t border-slate-300">
+                  {/* Thumb groove */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[10%] h-[3px] sm:h-[4px] bg-[#64748b] shadow-[inset_0_1px_1px_rgba(0,0,0,0.4)] rounded-b-[3px]" />
                 </div>
               </div>
 
-              {/* Mobile Phone Mockup (Floats in bottom-right) */}
+              {/* Mobile Phone Mockup (Using image's built-in frame) */}
               <div
-                className="absolute z-20 transition-all duration-700 hover:scale-[1.04] hover:-translate-y-3 bottom-[-6%] right-[2%] w-[28%] sm:bottom-[-15%] sm:right-[-4%] sm:w-[23.8%]"
-                style={{
-                  filter: 'drop-shadow(0 30px 70px rgba(0,0,0,0.5))',
-                }}
+                className="absolute z-20 bottom-[-4%] right-[0%] sm:right-[2%] w-[22%] sm:w-[20%] drop-shadow-[0_20px_40px_rgba(0,0,0,0.25)] transition-transform hover:-translate-y-1 duration-500"
               >
-                {/* iPhone Bezel and Dynamic Island Frame */}
-                <div className="relative rounded-[36px] p-[5.5px] bg-[#161617] border border-[#2d2d30] shadow-2xl ring-1 ring-white/10 ring-offset-1 ring-offset-slate-900">
-                  {/* Dynamic Island Notch */}
-                  <div className="absolute top-3.5 left-1/2 -translate-x-1/2 w-[35%] h-[9px] bg-black rounded-full z-30" />
-                  {/* Speaker Grill */}
-                  <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-[15%] h-[2px] bg-[#333] rounded-full z-30" />
-                  
-                  {/* Screen Content Wrapper */}
-                  <div className="relative rounded-[31px] overflow-hidden bg-white">
-                    <img
-                      src={dashboardMobile}
-                      alt="Credify Mobile Dashboard"
-                      loading="eager"
-                      className="w-full h-auto object-contain block"
-                    />
-                  </div>
-                </div>
+                <img
+                  src={dashboardMobile}
+                  alt="Credify Mobile Dashboard"
+                  loading="eager"
+                  className="w-full h-auto block rounded-[20px] sm:rounded-[28px]"
+                />
               </div>
 
             </div>
@@ -211,16 +211,16 @@ const PaymentsPage: React.FC = () => {
           <div className="flex-1 text-center md:text-left flex flex-col items-center md:items-start">
 
             {/* Coming Soon Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#3b82f6]/20 text-[#3b82f6] font-semibold text-sm mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 border border-[#3b82f6]/20 text-[#3b82f6] font-semibold text-sm mb-6 shadow-sm backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
               Coming Soon
             </div>
 
             <h2 className="text-4xl md:text-[44px] lg:text-6xl font-[900] text-slate-900 mb-6 tracking-tight leading-[1.1]">
               <span className="whitespace-normal md:whitespace-nowrap">Apple Pay is coming</span> <br className="hidden md:block lg:hidden" /> to{' '}
-              <span className="bg-gradient-to-r from-[#4ade80] to-[#3b82f6] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#4ade80] to-[#3b82f6] bg-clip-text text-transparent drop-shadow-sm pr-0.5">
                 Credify
-              </span>.
+              </span><span className="text-slate-300">.</span>
             </h2>
 
             <p className="text-base md:text-lg text-slate-500 mb-8 leading-relaxed">
@@ -244,21 +244,24 @@ const PaymentsPage: React.FC = () => {
               <Link
                 to="#"
                 onClick={(e) => e.preventDefault()}
-                className="group inline-flex items-center gap-2.5 bg-slate-900 hover:bg-slate-700 text-white font-bold py-3.5 px-7 rounded-full shadow-xl transition-all duration-300 hover:-translate-y-1 text-sm"
+                className="group relative inline-flex items-center justify-center gap-2.5 bg-slate-900 hover:bg-[#3b82f6] text-white font-bold py-3.5 px-7 rounded-full shadow-xl transition-all duration-300 hover:-translate-y-1 text-sm overflow-hidden"
               >
-                <svg
-                  className="w-4 h-4 text-white transition-transform duration-300 group-hover:rotate-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 01-3.46 0" />
-                </svg>
-                Notify me
+                <span className="relative z-10 flex items-center gap-2.5">
+                  <svg
+                    className="w-4 h-4 text-white transition-transform duration-300 group-hover:rotate-12"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 01-3.46 0" />
+                  </svg>
+                  Notify me
+                </span>
+                <div className="absolute top-0 -left-[100%] w-[120%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[30deg] transition-all duration-700 group-hover:left-[100%]" />
               </Link>
               <Link
                 to="#"
@@ -279,65 +282,80 @@ const PaymentsPage: React.FC = () => {
 
           </div>
 
-          {/* Right: Apple Pay Image */}
-          <div className="flex-1 w-full flex justify-center items-center relative py-8">
-            {/* Dynamic Layered Ambient Light */}
+          {/* Right: Apple Pay Image - Clean & Professional */}
+          <div className="flex-1 w-full flex justify-center items-center relative py-12 lg:py-4">
+            
+            {/* Soft Ambient Backdrop */}
             <div
-              className="absolute w-[120%] h-[120%] bg-[radial-gradient(circle,rgba(34,197,94,0.18)_0%,rgba(59,130,246,0.14)_35%,transparent_65%)] blur-[80px] pointer-events-none"
-              style={{ top: '-10%', left: '-10%' }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(circle,rgba(59,130,246,0.08)_0%,rgba(74,222,128,0.05)_45%,transparent_70%)] blur-[60px] pointer-events-none"
             />
             
-            {/* 3D Perspective Container */}
-            <div 
-              className="relative w-[90%] md:w-[110%] lg:w-[90%] max-w-[560px] transition-all duration-750 ease-out [perspective:1200px] md:scale-110 lg:scale-100 md:translate-x-6 lg:translate-x-0"
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* Backing Glasscard Panel */}
-              <div 
-                className="absolute -inset-4 rounded-3xl bg-slate-900/5 border border-slate-900/10 backdrop-blur-[6px] -z-10 shadow-[0_30px_70px_rgba(0,0,0,0.04)] hidden sm:block"
-                style={{ 
-                  transform: 'translateZ(-20px) rotateY(-10deg) rotateX(6deg)',
-                  boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)'
-                }}
-              />
+            {/* Elegant Floating Container */}
+            <div className="relative w-[90%] md:w-[100%] lg:w-[95%] max-w-[540px] transition-transform duration-700 ease-out hover:-translate-y-3">
+              
+              {/* Subtle accent glow behind the image */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#3b82f6]/10 to-[#4ade80]/10 rounded-3xl blur-2xl -z-10" />
 
-              {/* Tilting Mockup Image */}
+              {/* The Apple Pay Mockup Image */}
               <img
                 src={applePayMockup}
-                alt="Apple Pay Mockup"
-                className="w-full h-auto object-contain block transition-all duration-700 ease-out cursor-pointer hover:scale-[1.05]"
-                style={{
-                  transform: 'rotateY(-12deg) rotateX(8deg)',
-                  filter: 'drop-shadow(20px 30px 50px rgba(0,0,0,0.18))',
-                  transformStyle: 'preserve-3d'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'rotateY(-4deg) rotateX(3deg)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'rotateY(-12deg) rotateX(8deg)';
-                }}
+                alt="Apple Pay on Credify"
+                className="w-full h-auto object-contain block drop-shadow-[0_20px_40px_rgba(0,0,0,0.1)] transition-all duration-700 hover:drop-shadow-[0_30px_50px_rgba(0,0,0,0.15)] relative z-10"
               />
+              
             </div>
           </div>
         </div>
       </div>
 
-      {/* Features Grid */}
-      <div className="py-16 md:py-24 max-w-7xl mx-auto px-6 sm:px-12 bg-white">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      {/* Features Premium Glass Grid */}
+      <div className="py-20 md:py-32 max-w-7xl mx-auto px-6 sm:px-12 relative overflow-hidden">
+        {/* Stunning Ambient Mesh Background */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-[1000px] pointer-events-none -z-10">
+          <div className="absolute top-0 left-10 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-blue-400/20 rounded-full blur-[80px] sm:blur-[100px] mix-blend-multiply animate-[pulse_6s_ease-in-out_infinite]" />
+          <div className="absolute bottom-10 right-10 w-[300px] sm:w-[400px] h-[300px] sm:h-[400px] bg-emerald-400/20 rounded-full blur-[80px] sm:blur-[100px] mix-blend-multiply animate-[pulse_8s_ease-in-out_infinite_reverse]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] bg-teal-200/20 rounded-full blur-[100px] sm:blur-[120px] mix-blend-multiply" />
+        </div>
+
+        <div className="text-center mb-16 md:mb-20 relative z-10">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-[900] text-slate-900 tracking-tight mb-5 leading-tight">
+            Everything you need to <span className="bg-gradient-to-r from-[#4ade80] to-[#3b82f6] bg-clip-text text-transparent">scale</span>
+          </h2>
+          <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            A complete financial infrastructure designed to help you process payments, send payouts, and manage your entire business effortlessly.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 relative z-10">
           {features.map((feature, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 hover:shadow-xl transition-shadow duration-300 group"
+              className="relative overflow-hidden rounded-[28px] p-8 bg-white/70 backdrop-blur-2xl border border-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 hover:border-[#3b82f6]/30 transition-all duration-500 group cursor-pointer flex flex-col items-start"
             >
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-[#E0F2FE] group-hover:bg-[#DCFCE7] transition-colors duration-500">
+              {/* Subtle inner highlight */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-transparent pointer-events-none rounded-[28px]" />
+
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-gradient-to-br from-[#E0F2FE] to-blue-50 group-hover:from-blue-100 group-hover:to-[#E0F2FE] shadow-[inset_0_1px_1px_rgba(255,255,255,1)] transition-all duration-500 relative z-10">
                 {React.cloneElement(feature.icon as React.ReactElement<any>, {
-                  className: 'w-8 h-8 text-[#3b82f6] group-hover:text-[#22c55e] transition-colors duration-500'
+                  className: 'w-7 h-7 text-[#3b82f6] group-hover:text-[#22c55e] transition-colors duration-500'
                 })}
               </div>
-              <h3 className="text-xl font-[900] text-slate-900 mb-3 tracking-tight">{feature.title}</h3>
-              <p className="text-slate-500 leading-relaxed font-medium text-sm sm:text-base">{feature.description}</p>
+              
+              <h3 className="text-xl font-[900] text-slate-900 mb-3 tracking-tight relative z-10">
+                {feature.title}
+              </h3>
+              
+              <p className="leading-relaxed font-medium text-sm sm:text-base text-slate-500 relative z-10">
+                {feature.description}
+              </p>
+
+              {/* Minimalist interactive arrow */}
+              <div className="mt-8 flex items-center text-[#3b82f6] font-semibold text-sm opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 relative z-10">
+                Learn more
+                <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </div>
             </div>
           ))}
         </div>
