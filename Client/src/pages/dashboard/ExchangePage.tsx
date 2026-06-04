@@ -31,7 +31,6 @@ const fxCurrencies = [
   { iso: "za", code: "ZAR", name: "South African Rand", rate: 2.75, change: +0.06 },
   { iso: "ng", code: "NGN", name: "Nigerian Naira", rate: 0.032, change: -0.001 },
   { iso: "ke", code: "KES", name: "Kenyan Shilling", rate: 0.39, change: +0.01 },
-  { iso: "il", code: "ILS", name: "Israeli Shekel", rate: 13.8, change: +0.15 },
   { iso: "nz", code: "NZD", name: "New Zealand Dollar", rate: 30.2, change: -0.05 },
   { iso: "kr", code: "KRW", name: "South Korean Won", rate: 0.037, change: 0 },
   { iso: "th", code: "THB", name: "Thai Baht", rate: 1.48, change: +0.02 },
