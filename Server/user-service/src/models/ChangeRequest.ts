@@ -105,9 +105,14 @@ class ChangeRequest {
   }
 
   // ── Find by User ────────────────────────────────────────────
-  static async findByUserId(userId: number): Promise<ChangeRequestRecord[]> {
+  static async findByUserId(userId: number): Promise<(ChangeRequestRecord & { admin_response?: string })[]> {
     const { rows } = await pool.query(
-      `SELECT * FROM change_requests WHERE user_id = $1 ORDER BY created_at DESC`,
+      `SELECT cr.*, 
+              (SELECT message FROM change_request_messages crm 
+               WHERE crm.request_id = cr.id AND sender IN ('ADMIN', 'SYSTEM')
+               ORDER BY created_at DESC LIMIT 1) as admin_response
+       FROM change_requests cr 
+       WHERE user_id = $1 ORDER BY created_at DESC`,
       [userId]
     );
     return rows;

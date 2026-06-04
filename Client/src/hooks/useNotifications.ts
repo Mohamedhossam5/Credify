@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { financeService, type TransactionRecord } from '../services/finance.service';
 import { useAuthStore } from '../store/authStore';
 import { api } from '../lib/api';
+import { changeRequestService } from '../services/change-request.service';
 
 // ─── Types ───────────────────────────────────────────────────
 export interface Notification {
@@ -72,6 +73,17 @@ export const useNotifications = () => {
     },
     enabled: !!user,
     refetchInterval: 3000,
+  });
+
+  // Fetch change requests
+  const { data: changeRequests } = useQuery({
+    queryKey: ['change-requests'],
+    queryFn: async () => {
+      const { requests } = await changeRequestService.list();
+      return requests || [];
+    },
+    enabled: !!user,
+    refetchInterval: 10000,
   });
 
   // Build notifications from real data
@@ -206,10 +218,52 @@ export const useNotifications = () => {
       });
     }
 
+    // 5. Change Requests
+    if (changeRequests && changeRequests.length > 0) {
+      changeRequests.forEach((req: any) => {
+        if (req.status === 'WAITING_FOR_CUSTOMER' || req.status === 'APPROVED' || req.status === 'REJECTED') {
+          const id = `change-req-${req.id}-${req.status}`;
+          
+          let title = '';
+          let message = '';
+          let icon: Notification['icon'] = 'bell';
+          let color = '';
+          
+          if (req.status === 'WAITING_FOR_CUSTOMER') {
+            title = 'Action Required: Change Request';
+            message = req.admin_response || `Admin requested more info for your ${req.change_type} change. Please check the chatbot.`;
+            icon = 'bell';
+            color = 'rgba(245, 158, 11, 0.15)'; // warning/orange
+          } else if (req.status === 'APPROVED') {
+            title = 'Change Request Approved';
+            message = req.admin_response || `Your request to change ${req.change_type} has been approved.`;
+            icon = 'check';
+            color = 'rgba(0, 232, 143, 0.15)'; // success/green
+          } else if (req.status === 'REJECTED') {
+            title = 'Change Request Rejected';
+            message = req.admin_response || `Your request to change ${req.change_type} was rejected.`;
+            icon = 'arrow-up';
+            color = 'rgba(255, 77, 106, 0.15)'; // danger/red
+          }
+
+          items.push({
+            id,
+            type: 'system',
+            title,
+            message,
+            timestamp: new Date(req.updated_at),
+            read: readIds.has(id),
+            icon,
+            color,
+          });
+        }
+      });
+    }
+
     // Sort by newest first
     items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     return items;
-  }, [rawTransactions, cardsData, kycRequests, currentAccountId, user, readUpdateTick]);
+  }, [rawTransactions, cardsData, kycRequests, changeRequests, currentAccountId, user, readUpdateTick]);
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
