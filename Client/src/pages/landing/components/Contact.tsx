@@ -102,35 +102,35 @@ const Contact: React.FC = () => {
           <form onSubmit={handleSubmit}>
             <div className="relative mb-6 group flex items-center">
               <UserIcon className="absolute left-5 text-slate-400 w-5 h-5 transition-all duration-400 group-focus-within:text-accent" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Your Full Name" 
-                required 
+                placeholder="Your Full Name"
+                required
                 className="w-full p-[18px] pr-5 pl-[55px] border-2 border-slate-100 rounded-2xl bg-slate-50 text-base text-dark outline-none transition-all duration-400 focus:border-accent focus:bg-white focus:shadow-[0_10px_20px_rgba(20,184,166,0.08)]"
               />
             </div>
             <div className="relative mb-6 group flex items-center">
               <MailIcon className="absolute left-5 text-slate-400 w-5 h-5 transition-all duration-400 group-focus-within:text-accent" />
-              <input 
-                type="email" 
+              <input
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="Email Address" 
-                required 
+                placeholder="Email Address"
+                required
                 className="w-full p-[18px] pr-5 pl-[55px] border-2 border-slate-100 rounded-2xl bg-slate-50 text-base text-dark outline-none transition-all duration-400 focus:border-accent focus:bg-white focus:shadow-[0_10px_20px_rgba(20,184,166,0.08)]"
               />
             </div>
             <div className="relative mb-6 group flex items-start">
               <SendIcon className="absolute left-5 top-5 text-slate-400 w-5 h-5 transition-all duration-400 group-focus-within:text-accent" />
-              <textarea 
+              <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
-                placeholder="Tell us more about your inquiry..." 
+                placeholder="Tell us more about your inquiry..."
                 className="w-full h-[200px] resize-none p-[18px] pr-5 pl-[55px] border-2 border-slate-100 rounded-2xl bg-slate-50 text-base text-dark outline-none transition-all duration-400 focus:border-accent focus:bg-white focus:shadow-[0_10px_20px_rgba(20,184,166,0.08)]"
               ></textarea>
             </div>
@@ -139,13 +139,13 @@ const Contact: React.FC = () => {
             </button>
           </form>
           <div className="mt-[30px] flex gap-[15px]">
-            <a href="#" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
+            <a href="https://www.facebook.com/mahmoud.nadykahraba.5" target="_blank" rel="noopener noreferrer" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
               <FacebookIcon className="w-5 h-5" />
             </a>
-            <a href="#" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
+            <a href="" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
               <TwitterIcon className="w-5 h-5" />
             </a>
-            <a href="#" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
+            <a href="https://www.linkedin.com/in/mohamed-badawy1/" target="_blank" rel="noopener noreferrer" className="w-[45px] h-[45px] rounded-xl bg-slate-100 flex justify-center items-center text-dark no-underline transition-all duration-400 hover:bg-dark hover:text-white">
               <LinkedinIcon className="w-5 h-5" />
             </a>
           </div>
@@ -183,11 +183,11 @@ const Contact: React.FC = () => {
           {!mapLoaded && (
             <div className="absolute inset-0 bg-[#f8fafc] flex flex-col justify-center items-center gap-4 z-[4]">
               {/* Animated Moving Shimmer Background */}
-              <div 
-                className="absolute inset-0 bg-[linear-gradient(90deg,#f1f5f9_25%,#e2e8f0_50%,#f1f5f9_75%)] bg-[length:200%_100%] opacity-65" 
+              <div
+                className="absolute inset-0 bg-[linear-gradient(90deg,#f1f5f9_25%,#e2e8f0_50%,#f1f5f9_75%)] bg-[length:200%_100%] opacity-65"
                 style={{ animation: 'mapShimmer 1.6s infinite linear' }}
               />
-              
+
               {/* Dual Pulsing Locator Rings */}
               <div className="relative flex items-center justify-center z-10">
                 <span className="absolute w-16 h-16 bg-accent/20 rounded-full animate-ping" />
@@ -196,7 +196,7 @@ const Contact: React.FC = () => {
                   <MapPinIcon className="w-8 h-8 text-accent animate-bounce" />
                 </div>
               </div>
-              
+
               <div className="text-center z-10 mt-2 px-6">
                 <h5 className="text-slate-800 font-extrabold text-sm tracking-wide">Connecting Map Service</h5>
                 <p className="text-slate-500 text-[11px] font-medium mt-1 animate-pulse">Establishing encrypted location secure bridge...</p>
