@@ -361,35 +361,41 @@ const ChangeRequestChatbot: React.FC<ChangeRequestChatbotProps> = ({
       addBotMessage('Please review your request before submission.', undefined, 600);
       scrollToBottom();
     } else {
-      if (!newValue.trim()) {
+      let finalValue = newValue.trim();
+
+      if (!finalValue) {
         toast.error('Please enter the new value.');
         return;
       }
 
       if (selectedType?.key === 'PHONE_NUMBER') {
-        const phoneRegex = /^\+20\d{10}$/;
-        if (!phoneRegex.test(newValue.trim())) {
-          toast.error('Phone number must start with +20 and have exactly 10 digits after it.');
+        const rawPhone = finalValue.replace(/[\s\-()]/g, '');
+        const phoneRegex = /^(?:\+?20)?0?1[0-25][0-9]{8}$/;
+        if (!phoneRegex.test(rawPhone)) {
+          toast.error('Enter a valid Egyptian phone number (e.g. 01012345678).');
           return;
         }
+        const cleaned = rawPhone.replace(/^\+?20/, '').replace(/^0/, '');
+        finalValue = `+20${cleaned}`;
+        setNewValue(finalValue);
       }
 
       if (selectedType?.key === 'EMAIL_ADDRESS') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(newValue.trim())) {
+        if (!emailRegex.test(finalValue)) {
           toast.error('Please enter a valid email address.');
           return;
         }
       }
 
-      addUserMessage(newValue);
+      addUserMessage(finalValue);
 
       if (selectedType?.key === 'PHONE_NUMBER' || selectedType?.key === 'EMAIL_ADDRESS') {
         setIsSubmitting(true);
         try {
-          await changeRequestService.sendOtp(selectedType.key, newValue);
+          await changeRequestService.sendOtp(selectedType.key, finalValue);
           setStep('otp-verification');
-          addBotMessage(`I've sent a verification code to ${newValue}. Please enter it below.`, undefined, 600);
+          addBotMessage(`I've sent a verification code to ${finalValue}. Please enter it below.`, undefined, 600);
           scrollToBottom();
         } catch (err: any) {
           toast.error(err?.message || 'Failed to send verification code.');
