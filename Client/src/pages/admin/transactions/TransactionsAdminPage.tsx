@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../../../lib/api';
 import { Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // ── TRANSACTIONS DATA ──
 interface TransactionRecord {
@@ -101,6 +102,229 @@ const TransactionsAdminPage: React.FC = () => {
     setSelectedTxnId(null);
   };
 
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      toast.error("No transactions to export");
+      return;
+    }
+
+    // Clean XML strings to prevent syntax breakages
+    const escapeXml = (str: string) => {
+      if (!str) return "";
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    };
+
+    const xmlHeader = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>Credify Admin</Author>
+  <Created>${new Date().toISOString()}</Created>
+ </DocumentProperties>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="10" ss:Color="#374151"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="Title">
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="16" ss:Bold="1" ss:Color="#0F766E"/>
+  </Style>
+  <Style ss:ID="Meta">
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="9" ss:Italic="1" ss:Color="#6B7280"/>
+  </Style>
+  <Style ss:ID="Header">
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="10" ss:Color="#FFFFFF" ss:Bold="1"/>
+   <Interior ss:Color="#1E293B" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#475569"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#475569"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#475569"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#475569"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellNormal">
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="CellAlternate">
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="AmountStyle">
+   <NumberFormat ss:Format="#,##0.00\ &quot;USD&quot;"/>
+   <Alignment ss:Horizontal="Right"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="AmountStyleAlt">
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="#,##0.00\ &quot;USD&quot;"/>
+   <Alignment ss:Horizontal="Right"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="StatusCompleted">
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="10" ss:Color="#15803D" ss:Bold="1"/>
+   <Interior ss:Color="#DCFCE7" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="StatusFlagged">
+   <Font ss:FontName="Segoe UI" x:Family="Swiss" ss:Size="10" ss:Color="#B91C1C" ss:Bold="1"/>
+   <Interior ss:Color="#FEE2E2" ss:Pattern="Solid"/>
+   <Alignment ss:Horizontal="Center"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DateStyle">
+   <NumberFormat ss:Format="yyyy-mm-dd hh:mm:ss"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+  <Style ss:ID="DateStyleAlt">
+   <Interior ss:Color="#F8FAFC" ss:Pattern="Solid"/>
+   <NumberFormat ss:Format="yyyy-mm-dd hh:mm:ss"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1" ss:Color="#E2E8F0"/>
+   </Borders>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Transactions Ledger">
+  <Table>
+   <Column ss:Width="100"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="180"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="100"/>
+   <Column ss:Width="120"/>
+   <Column ss:Width="150"/>
+   <Row ss:Height="26">
+    <Cell ss:StyleID="Title"><Data ss:Type="String">Credify Bank - Transactions Ledger</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="Meta"><Data ss:Type="String">Exported on: ${new Date().toLocaleString()}</Data></Cell>
+   </Row>
+   <Row ss:Height="18">
+    <Cell ss:StyleID="Meta"><Data ss:Type="String">Total Transactions: ${filtered.length}</Data></Cell>
+   </Row>
+   <Row ss:Height="24">
+    <Cell ss:StyleID="Header"><Data ss:Type="String">TXN ID</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Sender</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Recipient</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Amount</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Fee</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Status</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Type</Data></Cell>
+    <Cell ss:StyleID="Header"><Data ss:Type="String">Date &amp; Time</Data></Cell>
+   </Row>
+`;
+
+    let rows = "";
+    filtered.forEach((t, index) => {
+      const isAlt = index % 2 !== 0;
+      const cellStyle = isAlt ? "CellAlternate" : "CellNormal";
+      const amtStyle = isAlt ? "AmountStyleAlt" : "AmountStyle";
+      const dtStyle = isAlt ? "DateStyleAlt" : "DateStyle";
+      
+      const isFlagged = flaggedTransactions.has(t.id);
+      const statusText = isFlagged ? "FLAGGED" : "COMPLETED";
+      const statusStyle = isFlagged ? "StatusFlagged" : "StatusCompleted";
+
+      const senderName = `${t.sender_first_name || ""} ${t.sender_last_name || ""}`.trim() || "N/A";
+      const recipientName = t.recipient_name || "N/A";
+      const typeText = t.type.replace(/_/g, ' ').toUpperCase();
+      
+      const amtVal = parseFloat(t.amount.toString()) || 0;
+      const feeVal = parseFloat((t.fee || 0).toString()) || 0;
+
+      // Format to ISO string compatible with Excel ss:Type="DateTime"
+      // Date format required: YYYY-MM-DDTHH:MM:SS.SSS
+      let formattedDate = "";
+      try {
+        formattedDate = new Date(t.created_at).toISOString();
+      } catch (e) {
+        formattedDate = new Date().toISOString();
+      }
+
+      rows += `   <Row ss:Height="20">
+    <Cell ss:StyleID="${cellStyle}"><Data ss:Type="String">TXN-${t.id}</Data></Cell>
+    <Cell ss:StyleID="${cellStyle}"><Data ss:Type="String">${escapeXml(senderName)}</Data></Cell>
+    <Cell ss:StyleID="${cellStyle}"><Data ss:Type="String">${escapeXml(recipientName)}</Data></Cell>
+    <Cell ss:StyleID="${amtStyle}"><Data ss:Type="Number">${amtVal}</Data></Cell>
+    <Cell ss:StyleID="${amtStyle}"><Data ss:Type="Number">${feeVal}</Data></Cell>
+    <Cell ss:StyleID="${statusStyle}"><Data ss:Type="String">${statusText}</Data></Cell>
+    <Cell ss:StyleID="${cellStyle}"><Data ss:Type="String">${escapeXml(typeText)}</Data></Cell>
+    <Cell ss:StyleID="${dtStyle}"><Data ss:Type="DateTime">${formattedDate}</Data></Cell>
+   </Row>\n`;
+    });
+
+    const xmlFooter = `  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    try {
+      const blob = new Blob([xmlHeader + rows + xmlFooter], { type: "application/vnd.ms-excel;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `transactions_ledger_${new Date().toISOString().slice(0, 10)}.xls`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Transactions exported successfully");
+    } catch (err: any) {
+      toast.error("Failed to export transactions");
+    }
+  };
+
   if (loading) {
     return (
       <div className="fade-up" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
@@ -118,7 +342,7 @@ const TransactionsAdminPage: React.FC = () => {
               <h1 className="page-title">Transactions</h1>
               <p className="page-subtitle">Ledger · Payments · {txnData.length} records</p>
             </div>
-            <button className="btn btn-ghost">Export ↗</button>
+            <button onClick={handleExport} className="btn btn-ghost">Export ↗</button>
           </div>
         </div>
 

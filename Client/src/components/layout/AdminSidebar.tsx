@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
+import { api } from '../../lib/api';
 import myImage from '../../assets/1.png';
 
 // Preload map: hovering a sidebar item triggers the lazy-loaded chunk to download
@@ -22,6 +24,16 @@ interface AdminSidebarProps {
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  const { data: usersData } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: async () => {
+      const { data } = await api.get('/admin/dashboard');
+      return data.users || [];
+    },
+  });
+
+  const pendingKycCount = (usersData || []).filter((u: any) => u.kyc_app_status === 'PENDING_ADMIN_REVIEW').length;
 
   const handlePreload = useCallback((path: string) => {
     preloadMap[path]?.();
@@ -88,7 +100,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed, mobileOpen, onCl
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /><polyline points="16 11 17.5 12.5 21 9" /></svg>
             </span>
             <span className="nav-label">KYC Verification</span>
-            <span className="nav-badge" id="kyc-badge">5</span>
+            {pendingKycCount > 0 && (
+              <span className="nav-badge" id="kyc-badge">{pendingKycCount}</span>
+            )}
           </NavLink>
 
           <NavLink to="/admin/change-requests" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={onCloseMobile} onMouseEnter={() => handlePreload('/admin/change-requests')} onTouchStart={() => handlePreload('/admin/change-requests')}>
