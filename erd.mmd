@@ -1,0 +1,175 @@
+erDiagram
+    USERS ||--o{ ACCOUNTS : "has"
+    USERS ||--o{ TRANSACTIONS : "sends"
+    USERS ||--o{ CARDS : "owns"
+    USERS ||--o{ CARD_DELIVERIES : "requests"
+    USERS ||--o{ BENEFICIARIES : "saves"
+    USERS ||--o{ LOANS : "applies_for"
+    USERS ||--|| KYC_APPLICATIONS : "submits"
+    USERS ||--o{ KYC_ADDITIONAL_REQUESTS : "receives"
+    USERS ||--o{ CHANGE_REQUESTS : "creates"
+    
+    CARDS ||--o{ CARD_DELIVERIES : "has"
+    CHANGE_REQUESTS ||--o{ CHANGE_REQUEST_MESSAGES : "contains"
+
+    USERS {
+        int id PK
+        string first_name
+        string middle_name
+        string last_name
+        string email UK
+        string password_hash
+        string phone_number
+        boolean phone_verified
+        boolean email_verified
+        string gender
+        string id_number UK
+        date birthdate
+        text address
+        string kyc_status
+        string role
+        text profile_picture
+        int failed_login_attempts
+        boolean is_locked
+        boolean is_frozen
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ACCOUNTS {
+        int id PK
+        int user_id FK
+        string account_id UK
+        numeric balance
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TRANSACTIONS {
+        int id PK
+        int sender_id FK
+        string sender_account_id
+        string type
+        numeric amount
+        numeric fee
+        string currency
+        string status
+        string recipient_name
+        string recipient_account
+        string recipient_bank
+        string swift_code
+        text recipient_address
+        text reference
+        timestamp created_at
+    }
+
+    CARDS {
+        int id PK
+        int user_id FK
+        string card_type
+        string card_number UK
+        string last_four
+        int expiry_month
+        int expiry_year
+        string cvv
+        string cardholder_name
+        string status
+        numeric prepaid_balance
+        string linked_account_id
+        numeric daily_limit
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CARD_DELIVERIES {
+        int id PK
+        int card_id FK
+        int user_id FK
+        text delivery_address
+        string city
+        string postal_code
+        string contact_phone
+        string status
+        text notes
+        timestamp estimated_delivery
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    BENEFICIARIES {
+        int id PK
+        int user_id FK
+        string type
+        string name
+        string account_number
+        string bank_name
+        string swift_code
+        text address
+        timestamp created_at
+    }
+
+    LOANS {
+        int id PK
+        int user_id FK
+        numeric amount
+        int tenure_months
+        numeric interest_rate
+        numeric monthly_payment
+        numeric total_repayment
+        numeric total_interest
+        numeric admin_fee
+        text purpose
+        string status
+        text rejection_reason
+        timestamp approved_at
+        timestamp disbursed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    KYC_APPLICATIONS {
+        int id PK
+        int user_id FK "UNIQUE"
+        string status
+        string national_id_front
+        string national_id_back
+        string face_selfie
+        string proof_of_address
+        string digital_signature
+        decimal face_match_score
+        boolean face_match_passed
+        text rejection_reason
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    KYC_ADDITIONAL_REQUESTS {
+        int id PK
+        int user_id FK
+        text message
+        string status
+        string document_file
+        timestamp created_at
+    }
+
+    CHANGE_REQUESTS {
+        int id PK
+        string request_id UK
+        int user_id FK
+        string change_type
+        text current_value
+        text new_value
+        string status
+        jsonb documents
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CHANGE_REQUEST_MESSAGES {
+        int id PK
+        int request_id FK
+        string sender
+        text message
+        jsonb documents
+        timestamp created_at
+    }

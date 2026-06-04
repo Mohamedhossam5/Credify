@@ -1,0 +1,175 @@
+erDiagram
+    USERS ||--o{ ACCOUNTS : "possesses (1:N)"
+    USERS ||--o{ TRANSACTIONS : "initiates (1:N)"
+    USERS ||--o{ CARDS : "holds (1:N)"
+    USERS ||--o{ CARD_DELIVERIES : "requests_delivery (1:N)"
+    USERS ||--o{ BENEFICIARIES : "manages (1:N)"
+    USERS ||--o{ LOANS : "applies_for (1:N)"
+    USERS ||--|| KYC_APPLICATIONS : "completes (1:1)"
+    USERS ||--o{ KYC_ADDITIONAL_REQUESTS : "must_resolve (1:N)"
+    USERS ||--o{ CHANGE_REQUESTS : "raises (1:N)"
+    
+    CARDS ||--o{ CARD_DELIVERIES : "requires (1:N)"
+    CHANGE_REQUESTS ||--o{ CHANGE_REQUEST_MESSAGES : "includes (1:N)"
+
+    USERS {
+        int id PK
+        varchar(100) first_name
+        varchar(100) middle_name
+        varchar(100) last_name
+        varchar(255) email UK
+        varchar(255) password_hash
+        varchar(20) phone_number
+        boolean phone_verified
+        boolean email_verified
+        varchar(10) gender "DEFAULT 'MALE'"
+        varchar(50) id_number UK
+        date birthdate
+        text address
+        varchar(30) kyc_status "DEFAULT 'PENDING'"
+        varchar(20) role "DEFAULT 'USER'"
+        text profile_picture
+        int failed_login_attempts
+        boolean is_locked
+        boolean is_frozen
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ACCOUNTS {
+        int id PK
+        int user_id FK
+        varchar(50) account_id UK
+        numeric(10_2) balance "DEFAULT 0.00"
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    TRANSACTIONS {
+        int id PK
+        int sender_id FK
+        varchar(50) sender_account_id
+        varchar(20) type
+        numeric(15_2) amount
+        numeric(12_2) fee "DEFAULT 0"
+        varchar(10) currency "DEFAULT 'USD'"
+        varchar(20) status "DEFAULT 'COMPLETED'"
+        varchar(100) recipient_name
+        varchar(100) recipient_account
+        varchar(100) recipient_bank
+        varchar(50) swift_code
+        text recipient_address
+        text reference
+        timestamp created_at
+    }
+
+    CARDS {
+        int id PK
+        int user_id FK
+        varchar(10) card_type "DEBIT or PREPAID"
+        varchar(16) card_number UK
+        varchar(4) last_four
+        int expiry_month
+        int expiry_year
+        varchar(4) cvv
+        varchar(200) cardholder_name
+        varchar(20) status "ACTIVE/FROZEN/CANCELLED"
+        numeric(15_2) prepaid_balance "DEFAULT 0.00"
+        varchar(50) linked_account_id
+        numeric(15_2) daily_limit
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CARD_DELIVERIES {
+        int id PK
+        int card_id FK
+        int user_id FK
+        text delivery_address
+        varchar(100) city
+        varchar(20) postal_code
+        varchar(30) contact_phone
+        varchar(20) status "PENDING/PROCESSING/SHIPPED"
+        text notes
+        timestamp estimated_delivery
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    BENEFICIARIES {
+        int id PK
+        int user_id FK
+        varchar(20) type
+        varchar(100) name
+        varchar(100) account_number
+        varchar(100) bank_name
+        varchar(50) swift_code
+        text address
+        timestamp created_at
+    }
+
+    LOANS {
+        int id PK
+        int user_id FK
+        numeric(15_2) amount
+        int tenure_months
+        numeric(5_2) interest_rate
+        numeric(15_2) monthly_payment
+        numeric(15_2) total_repayment
+        numeric(15_2) total_interest
+        numeric(15_2) admin_fee
+        text purpose
+        varchar(20) status "PENDING/APPROVED/REJECTED"
+        text rejection_reason
+        timestamp approved_at
+        timestamp disbursed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    KYC_APPLICATIONS {
+        int id PK
+        int user_id FK "UNIQUE (1:1)"
+        enum status
+        varchar(500) national_id_front
+        varchar(500) national_id_back
+        varchar(500) face_selfie
+        varchar(500) proof_of_address
+        varchar(500) digital_signature
+        decimal(5_4) face_match_score
+        boolean face_match_passed
+        text rejection_reason
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    KYC_ADDITIONAL_REQUESTS {
+        int id PK
+        int user_id FK
+        text message
+        varchar(20) status "DEFAULT 'PENDING'"
+        varchar(500) document_file
+        timestamp created_at
+    }
+
+    CHANGE_REQUESTS {
+        int id PK
+        varchar(20) request_id UK
+        int user_id FK
+        varchar(50) change_type
+        text current_value
+        text new_value
+        varchar(30) status "DEFAULT 'SUBMITTED'"
+        jsonb documents
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CHANGE_REQUEST_MESSAGES {
+        int id PK
+        int request_id FK
+        varchar(20) sender
+        text message
+        jsonb documents
+        timestamp created_at
+    }

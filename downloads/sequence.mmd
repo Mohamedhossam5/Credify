@@ -1,0 +1,19 @@
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant APIGateway
+    participant KYCService
+    actor Admin
+
+    Admin->>Frontend: Request Additional KYC Docs
+    Frontend->>APIGateway: POST /api/admin/kyc-additional-requests
+    APIGateway->>KYCService: Forward Request
+    KYCService-->>Frontend: Success Response
+    
+    Frontend->>User: Display Notification (Popup)
+    User->>Frontend: Upload Document Image
+    Frontend->>APIGateway: POST /api/kyc/requests/:id/upload
+    APIGateway->>KYCService: Handle Upload
+    KYCService-->>Frontend: Upload Success
+    
+    Frontend->>Admin: Send Notification (Document Uploaded)

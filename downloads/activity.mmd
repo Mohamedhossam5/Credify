@@ -1,0 +1,16 @@
+stateDiagram-v2
+    [*] --> Login
+    Login --> Dashboard : Success
+    Dashboard --> InitiateTransfer
+    InitiateTransfer --> CheckBalance
+    
+    state CheckBalance {
+        [*] --> HasSufficientFunds
+        HasSufficientFunds --> DeductBalance : Yes
+        HasSufficientFunds --> RejectTransfer : No
+    }
+    
+    DeductBalance --> ProcessTransaction
+    ProcessTransaction --> NotifyRecipient
+    NotifyRecipient --> [*]
+    RejectTransfer --> [*]

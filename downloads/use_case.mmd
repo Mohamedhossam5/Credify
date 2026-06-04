@@ -1,0 +1,25 @@
+flowchart LR
+    %% Actors
+    User((User))
+    Admin((Admin))
+
+    %% System Boundary
+    subgraph Credify System
+        UC1([Login / Register])
+        UC2([Perform Transactions])
+        UC3([Manage Cards])
+        UC4([Submit KYC])
+        UC5([Review KYC Applications])
+        UC6([Request Additional KYC Docs])
+        UC7([Manage Users & Accounts])
+    end
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+
+    Admin --> UC5
+    Admin --> UC6
+    Admin --> UC7
+    Admin --> UC1

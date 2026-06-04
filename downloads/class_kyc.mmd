@@ -1,0 +1,25 @@
+classDiagram
+    class KycApplication {
+        +findOrCreate(userId) KycRecord
+        +findByUserId(userId) KycRecord
+        +findAll() Array
+        +uploadNationalId(userId, frontPath, backPath) KycRecord
+        +uploadFaceSelfie(userId, selfiePath) KycRecord
+        +uploadProofOfAddress(userId, proofPath) KycRecord
+        +uploadDigitalSignature(userId, signaturePath) KycRecord
+        +updateStatus(userId, status, rejectionReason) KycRecord
+        +updateFaceVerification(userId, score, passed) KycRecord
+        +areDocumentsComplete(userId) boolean
+        +deleteByUserId(userId) void
+    }
+
+    class KycRequest {
+        +create(userId, message) KycAdditionalRequest
+        +findPendingByUserId(userId) Array
+        +findAllByUserId(userId) Array
+        +findAllUploaded() Array
+        +uploadDocument(requestId, documentPath) KycAdditionalRequest
+        +deleteByUserId(userId) void
+    }
+
+    KycApplication "1" -- "*" KycRequest : related

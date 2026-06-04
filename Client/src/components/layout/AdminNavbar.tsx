@@ -95,15 +95,19 @@ const AdminNavbar: React.FC<AdminNavbarProps> = ({ onToggleSidebar, onToggleThem
       color: '#f59e0b',
       link: '/admin/change-requests'
     })),
-    ...uploadedAddlKyc.map((r: any) => ({
-      id: `addl-kyc-${r.id}`,
-      type: 'Additional KYC',
-      title: 'User Uploaded Requested Doc',
-      desc: `User ${r.user_id} uploaded requested document`,
-      time: new Date(r.created_at).toLocaleDateString(),
-      color: '#ef4444',
-      link: '/admin/kyc'
-    }))
+    ...uploadedAddlKyc.map((r: any) => {
+      const user = dashboardData?.find((u: any) => u.id === r.user_id);
+      const userName = user ? `${user.first_name} ${user.last_name}` : `User ${r.user_id}`;
+      return {
+        id: `addl-kyc-${r.id}`,
+        type: 'Additional KYC',
+        title: 'User Uploaded Requested Doc',
+        desc: `${userName} uploaded requested document`,
+        time: new Date(r.created_at).toLocaleDateString(),
+        color: '#ef4444',
+        link: '/admin/kyc'
+      };
+    })
   ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
   const totalNotifs = notifications.length;

@@ -1,0 +1,95 @@
+flowchart TD
+
+    Users[Users]
+    Accounts[Accounts]
+    Transactions[Transactions]
+    Cards[Cards]
+    CardDeliveries[CardDeliveries]
+    Beneficiaries[Beneficiaries]
+    Loans[Loans]
+
+    REL_0{has}
+    Users --- REL_0
+    REL_0 --- Accounts
+    REL_1{sends}
+    Users --- REL_1
+    REL_1 --- Transactions
+    REL_2{owns}
+    Users --- REL_2
+    REL_2 --- Cards
+    REL_3{triggers}
+    Cards --- REL_3
+    REL_3 --- CardDeliveries
+    REL_4{manages}
+    Users --- REL_4
+    REL_4 --- Beneficiaries
+    REL_5{applies_for}
+    Users --- REL_5
+    REL_5 --- Loans
+
+    Users_ATTR_0([id_PK])
+    Users --- Users_ATTR_0
+    Accounts_ATTR_0([id_PK])
+    Accounts --- Accounts_ATTR_0
+    Accounts_ATTR_1([account_id_UK])
+    Accounts --- Accounts_ATTR_1
+    Accounts_ATTR_2([balance])
+    Accounts --- Accounts_ATTR_2
+    Accounts_ATTR_3([created_at])
+    Accounts --- Accounts_ATTR_3
+    Transactions_ATTR_0([id_PK])
+    Transactions --- Transactions_ATTR_0
+    Transactions_ATTR_1([type])
+    Transactions --- Transactions_ATTR_1
+    Transactions_ATTR_2([amount])
+    Transactions --- Transactions_ATTR_2
+    Transactions_ATTR_3([fee])
+    Transactions --- Transactions_ATTR_3
+    Transactions_ATTR_4([status])
+    Transactions --- Transactions_ATTR_4
+    Transactions_ATTR_5([recipient])
+    Transactions --- Transactions_ATTR_5
+    Transactions_ATTR_6([created_at])
+    Transactions --- Transactions_ATTR_6
+    Cards_ATTR_0([id_PK])
+    Cards --- Cards_ATTR_0
+    Cards_ATTR_1([card_type])
+    Cards --- Cards_ATTR_1
+    Cards_ATTR_2([card_number])
+    Cards --- Cards_ATTR_2
+    Cards_ATTR_3([status])
+    Cards --- Cards_ATTR_3
+    Cards_ATTR_4([prepaid_balance])
+    Cards --- Cards_ATTR_4
+    CardDeliveries_ATTR_0([id_PK])
+    CardDeliveries --- CardDeliveries_ATTR_0
+    CardDeliveries_ATTR_1([address])
+    CardDeliveries --- CardDeliveries_ATTR_1
+    CardDeliveries_ATTR_2([city])
+    CardDeliveries --- CardDeliveries_ATTR_2
+    CardDeliveries_ATTR_3([status])
+    CardDeliveries --- CardDeliveries_ATTR_3
+    CardDeliveries_ATTR_4([estimated_delivery])
+    CardDeliveries --- CardDeliveries_ATTR_4
+    Beneficiaries_ATTR_0([id_PK])
+    Beneficiaries --- Beneficiaries_ATTR_0
+    Beneficiaries_ATTR_1([type])
+    Beneficiaries --- Beneficiaries_ATTR_1
+    Beneficiaries_ATTR_2([name])
+    Beneficiaries --- Beneficiaries_ATTR_2
+    Beneficiaries_ATTR_3([account_number])
+    Beneficiaries --- Beneficiaries_ATTR_3
+    Beneficiaries_ATTR_4([bank_name])
+    Beneficiaries --- Beneficiaries_ATTR_4
+    Loans_ATTR_0([id_PK])
+    Loans --- Loans_ATTR_0
+    Loans_ATTR_1([amount])
+    Loans --- Loans_ATTR_1
+    Loans_ATTR_2([tenure])
+    Loans --- Loans_ATTR_2
+    Loans_ATTR_3([interest])
+    Loans --- Loans_ATTR_3
+    Loans_ATTR_4([status])
+    Loans --- Loans_ATTR_4
+    Loans_ATTR_5([approved_at])
+    Loans --- Loans_ATTR_5

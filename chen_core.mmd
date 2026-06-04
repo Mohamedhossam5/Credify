@@ -1,0 +1,55 @@
+flowchart TD
+
+    Users[Users]
+    ChangeRequests[ChangeRequests]
+    ChangeRequestMessages[ChangeRequestMessages]
+
+    REL_0{creates}
+    Users --- REL_0
+    REL_0 --- ChangeRequests
+    REL_1{contains}
+    ChangeRequests --- REL_1
+    REL_1 --- ChangeRequestMessages
+
+    Users_ATTR_0([id_PK])
+    Users --- Users_ATTR_0
+    Users_ATTR_1([first_name])
+    Users --- Users_ATTR_1
+    Users_ATTR_2([last_name])
+    Users --- Users_ATTR_2
+    Users_ATTR_3([email_UK])
+    Users --- Users_ATTR_3
+    Users_ATTR_4([password])
+    Users --- Users_ATTR_4
+    Users_ATTR_5([phone])
+    Users --- Users_ATTR_5
+    Users_ATTR_6([id_number])
+    Users --- Users_ATTR_6
+    Users_ATTR_7([address])
+    Users --- Users_ATTR_7
+    Users_ATTR_8([role])
+    Users --- Users_ATTR_8
+    Users_ATTR_9([created_at])
+    Users --- Users_ATTR_9
+    ChangeRequests_ATTR_0([id_PK])
+    ChangeRequests --- ChangeRequests_ATTR_0
+    ChangeRequests_ATTR_1([request_id])
+    ChangeRequests --- ChangeRequests_ATTR_1
+    ChangeRequests_ATTR_2([change_type])
+    ChangeRequests --- ChangeRequests_ATTR_2
+    ChangeRequests_ATTR_3([current_value])
+    ChangeRequests --- ChangeRequests_ATTR_3
+    ChangeRequests_ATTR_4([new_value])
+    ChangeRequests --- ChangeRequests_ATTR_4
+    ChangeRequests_ATTR_5([status])
+    ChangeRequests --- ChangeRequests_ATTR_5
+    ChangeRequests_ATTR_6([created_at])
+    ChangeRequests --- ChangeRequests_ATTR_6
+    ChangeRequestMessages_ATTR_0([id_PK])
+    ChangeRequestMessages --- ChangeRequestMessages_ATTR_0
+    ChangeRequestMessages_ATTR_1([sender])
+    ChangeRequestMessages --- ChangeRequestMessages_ATTR_1
+    ChangeRequestMessages_ATTR_2([message])
+    ChangeRequestMessages --- ChangeRequestMessages_ATTR_2
+    ChangeRequestMessages_ATTR_3([created_at])
+    ChangeRequestMessages --- ChangeRequestMessages_ATTR_3

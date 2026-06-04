@@ -1,0 +1,36 @@
+classDiagram
+    class User {
+        +create(input) UserRecord
+        +findByEmail(email) UserRecord
+        +findById(id) UserRecord
+        +findAll() Array
+        +updateKycStatus(userId, status) UserRecord
+        +updatePhoneVerified(userId) UserRecord
+        +updateEmailVerified(userId) UserRecord
+        +findByPhoneNumber(phone) UserRecord
+        +updatePassword(userId, passwordHash) void
+        +incrementFailedLogins(userId) void
+        +resetFailedLogins(userId) void
+        +lockAccount(userId) void
+        +unlockAccount(userId) void
+        +freezeAccount(userId) void
+        +unfreezeAccount(userId) void
+        +updateProfilePicture(userId, base64Image) UserRecord
+        +delete(userId) void
+    }
+
+    class ChangeRequest {
+        +createTables() void
+        +create(input) ChangeRequestRecord
+        +findByUserId(userId) Array
+        +findActiveByUserAndType(userId, changeType) ChangeRequestRecord
+        +findById(id) ChangeRequestRecord
+        +findAll() Array
+        +updateStatus(id, status) ChangeRequestRecord
+        +addDocuments(id, newDocs) ChangeRequestRecord
+        +addMessage(requestId, sender, message, documents) ChangeRequestMessageRecord
+        +getMessages(requestId) Array
+        +applyChange(request) void
+    }
+
+    User "1" *-- "*" ChangeRequest : creates

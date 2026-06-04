@@ -1,0 +1,43 @@
+flowchart TD
+
+    Users[Users]
+    KycApplications[KycApplications]
+    KycRequests[KycRequests]
+
+    REL_0{submits}
+    Users --- REL_0
+    REL_0 --- KycApplications
+    REL_1{receives}
+    Users --- REL_1
+    REL_1 --- KycRequests
+
+    Users_ATTR_0([id_PK])
+    Users --- Users_ATTR_0
+    KycApplications_ATTR_0([id_PK])
+    KycApplications --- KycApplications_ATTR_0
+    KycApplications_ATTR_1([status])
+    KycApplications --- KycApplications_ATTR_1
+    KycApplications_ATTR_2([id_front])
+    KycApplications --- KycApplications_ATTR_2
+    KycApplications_ATTR_3([id_back])
+    KycApplications --- KycApplications_ATTR_3
+    KycApplications_ATTR_4([selfie])
+    KycApplications --- KycApplications_ATTR_4
+    KycApplications_ATTR_5([proof_of_address])
+    KycApplications --- KycApplications_ATTR_5
+    KycApplications_ATTR_6([match_score])
+    KycApplications --- KycApplications_ATTR_6
+    KycApplications_ATTR_7([match_passed])
+    KycApplications --- KycApplications_ATTR_7
+    KycApplications_ATTR_8([rejection_reason])
+    KycApplications --- KycApplications_ATTR_8
+    KycRequests_ATTR_0([id_PK])
+    KycRequests --- KycRequests_ATTR_0
+    KycRequests_ATTR_1([message])
+    KycRequests --- KycRequests_ATTR_1
+    KycRequests_ATTR_2([status])
+    KycRequests --- KycRequests_ATTR_2
+    KycRequests_ATTR_3([document_file])
+    KycRequests --- KycRequests_ATTR_3
+    KycRequests_ATTR_4([created_at])
+    KycRequests --- KycRequests_ATTR_4

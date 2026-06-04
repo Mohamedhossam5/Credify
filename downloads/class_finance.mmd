@@ -1,0 +1,48 @@
+classDiagram
+    class Account {
+        +create(userId) AccountRecord
+        +findByUserId(userId) AccountRecord
+        +transferFunds(senderUserId, amount, receiverAccountId, fee) boolean
+    }
+
+    class Beneficiary {
+        +create(input) BeneficiaryRecord
+        +findByUserId(userId) Array
+        +delete(id, userId) boolean
+    }
+
+    class Card {
+        +create(input) CardRecord
+        +findById(cardId) CardRecord
+        +findByUserId(userId) Array
+        +findActiveByUserIdAndType(userId, cardType) Array
+        +updateStatus(cardId, status) CardRecord
+        +updateDailyLimit(cardId, limit) CardRecord
+        +loadPrepaid(cardId, amount) CardRecord
+        +unloadPrepaid(cardId, amount) CardRecord
+        +transferBetweenPrepaid(fromCardId, toCardId, amount) boolean
+    }
+
+    class CardDelivery {
+        +create(input) CardDeliveryRecord
+        +findByCardId(cardId) CardDeliveryRecord
+        +findAllByUserId(userId) Array
+        +updateStatus(deliveryId, status) CardDeliveryRecord
+        +hasActiveDelivery(cardId) boolean
+    }
+
+    class Loan {
+        +create(input) LoanRecord
+        +findById(id) LoanRecord
+        +findByUserId(userId) Array
+        +findAll(statusFilter) Array
+        +updateStatus(id, status, adminFee, rejectionReason) LoanRecord
+    }
+
+    class Transaction {
+        +create(input) TransactionRecord
+        +findByUserIdAndAccount(userId, accountId, limit) Array
+        +findAll(limit) Array
+    }
+
+    Card "1" *-- "1" CardDelivery : triggers
